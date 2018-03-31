@@ -2,7 +2,8 @@
 # -------------
 
 cfiles = [
-    "./src/repl.c",
+    "./test/test_obj.c",
+    #"./src/repl.c",
 ]
 
 includes = [
@@ -13,6 +14,7 @@ includes = [
 
 flags = [
     "-Wall",
+    "-Werror",
     "-g",
 ]
 

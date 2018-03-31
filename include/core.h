@@ -6,25 +6,28 @@
 /**
  * `nil` in Little Lisp is equivalent to C `NULL`.
  */
-#define ll_nil NULL
+#define nil NULL
 
 /**
  * A formatted print function that prints to standard error and then exits the
  * program.
  */
-#define ll_panic(...) do { \
+#define panic(...) do { \
     fprintf(stderr, "panic! "); \
     fprintf(stderr, __VA_ARGS__); \
     fprintf(stderr, "\n"); \
+    fflush(stderr); \
     exit(1); \
 } while(0);
 
 /**
- * If the condition is false panics and prints debug information.
+ * If the condition is false panics and prints debug information. Built in
+ * assert is not used because it does not crash well on windows and sometimes
+ * the output is not visible (even in the debugger).
  */
-#define ll_assert(cond) do { \
+#define assert(cond) do { \
     if (!(cond)) { \
-        ll_panic("Assert failed: %s\n  at <%s> %s:%d", \
+        panic("Assert failed: %s\n  at <%s> %s:%d", \
             (#cond), \
             __FILE__, \
             __FUNCTION__, \
@@ -32,9 +35,6 @@
         ); \
     } \
 } while(0);
-
-// CORE FUNCTIONS
-// --------------
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,17 +45,10 @@
  * @param   size_t bytes the number of bytes to allocate
  * @returns void *       a pointer to the allocated bytes
  */
-void * ll_malloc(size_t bytes) {
+void * must_malloc(size_t bytes) {
     void * ptr = malloc(bytes);
-    if (ptr == ll_nil) {
-        ll_panic("Failed to allocate %u bytes", bytes);
+    if (ptr == nil) {
+        panic("Failed to allocate %u bytes", bytes);
     }
     return ptr;
-}
-
-/**
- * `free`, just to match `ll_malloc`
- */
-void ll_free(void * ptr) {
-    free(ptr);
 }

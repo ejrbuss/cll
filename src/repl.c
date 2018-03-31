@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "ll_core.h"
+#include "core.h"
 
 int main(int argc, char ** argv) {
-    ll_assert(3 == 4);
+    assert(3 == 4);
     return EXIT_SUCCESS;
 }
