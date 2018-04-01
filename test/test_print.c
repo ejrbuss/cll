@@ -69,6 +69,7 @@ void test_map() {
 void test_function() {
     prepare_stack();
     assert(equal(print(fn(nil, nil, nil)), string("<function>")) != nil);
+    assert(equal(print(native(nil)), string("<native function>")) != nil);
     return_from_stack(nil);
 }
 

@@ -15,6 +15,7 @@ tests = [
 includes = [
     "./src",
     "./include",
+    "./include/core",
     "./test",
 ]
 
@@ -47,29 +48,28 @@ includes = ' '.join(['-I ' + file for file in includes])
 flags    = ' '.join(flags)
 build    = f'{cc} {cfiles} {includes} {flags} -o {target}/out.exe'
 
-if run(build):
-    print('build passed.')
-else:
-    panic('build failed.')
+try:
+    if run(build):
+        print('build passed.')
+    else:
+        panic('build failed.')
 
-# Action
-# ------
+    # Action
+    # ------
 
-if len(sys.argv) > 0:
-    option = sys.argv[1]
-    if option == 'run':
-        run(f'{target}/out.exe')
-    if option == 'debug':
-        run(f'gdb {target}/out.exe')
-    if option == 'test':
-        for test in tests:
-            build = f'{cc} {test} {includes} {flags} -o {target}/{os.path.basename(test)}.exe'
-            if run(build):
-                run(f'{target}/{os.path.basename(test)}.exe')
-            else:
-                panic('test failed to build.')
+    if len(sys.argv) > 0:
+        option = sys.argv[1]
+        if option == 'run':
+            run(f'{target}/out.exe')
+        if option == 'debug':
+            run(f'gdb {target}/out.exe')
+        if option == 'test':
+            for test in tests:
+                build = f'{cc} {test} {includes} {flags} -o {target}/{os.path.basename(test)}.exe'
+                if run(build):
+                    run(f'{target}/{os.path.basename(test)}.exe')
+                else:
+                    panic('test failed to build.')
 
-
-
-
-
+except KeyboardInterrupt:
+    pass

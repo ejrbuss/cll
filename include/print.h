@@ -52,6 +52,8 @@ obj * print(obj * o) {
             return return_from_stack(list_to_string(o, string("{"), string("}")));
         case type_function:
             return return_from_stack(string("<function>"));
+        case type_native_function:
+            return return_from_stack(string("<native function>"));
     }
     panic("Unreachable code execution!");
     return nil;

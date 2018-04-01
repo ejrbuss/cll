@@ -27,6 +27,7 @@ enum type {
     type_list,
     type_map,
     type_function,
+    type_native_function, // Used to call into c
 };
 
 /**
@@ -47,6 +48,7 @@ struct obj {
             obj * car;
             obj * cdr;
         };
+        obj * (*native)(obj *);
     };
 };
 
@@ -376,4 +378,11 @@ obj * fn(obj * env, obj * args, obj * body) {
     obj * o = cons(env, cons(args, cons(body, nil)));
     o->type = type_function;
     return return_from_stack(o);
+}
+
+obj * native(obj * (*fn)(obj *)) {
+    obj * o = init_obj();
+    o->type   = type_native_function;
+    o->native = fn;
+    return o;
 }
