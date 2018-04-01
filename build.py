@@ -2,8 +2,7 @@
 # -------------
 
 cfiles = [
-    "./test/test_read.c",
-    #'src/repl.c',
+    'src/repl.c',
 ]
 
 tests = [

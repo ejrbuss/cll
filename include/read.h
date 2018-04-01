@@ -168,6 +168,7 @@ obj * parse_symbol(char ** stream) {
         next(stream, 0) != '\0' &&
         next(stream, 0) != ';'
     ) {
+        int should_break = 0;
         switch (next(stream, 0)) {
             case '"':
             case ':':
@@ -177,9 +178,12 @@ obj * parse_symbol(char ** stream) {
             case ')':
             case '}':
             case ']':
-                syntax_error(stream, string("Unexpected character in symbol!"));
+                should_break = 1;
             default:
                 break;
+        }
+        if (should_break) {
+            break;
         }
         chomp(stream, 0);
     }
@@ -238,6 +242,21 @@ obj * parse(char ** stream) {
             return parse_list_macro(stream);
         case '+':
         case '-':
+            switch(*(*stream + 1)) {
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    return parse_number(stream);
+                default:
+                    return parse_symbol(stream);
+            }
         case '0':
         case '1':
         case '2':

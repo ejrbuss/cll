@@ -96,12 +96,16 @@ void test_list() {
         string("(list)")
     ) != nil);
     assert(equal(
-        print(read(string("[1 2 3 4]"))),
-        string("(list 1 2 3 4)")
+        print(read(string("[1 2 3 xyz]"))),
+        string("(list 1 2 3 xyz)")
     ) != nil);
     assert(equal(
         print(read(string("(x y (:key ()))"))),
         string("(x y (:key ()))")
+    ) != nil);
+    assert(equal(
+        print(read(string("(fn [x y] (+ (square x) y))"))),
+        string("(fn (list x y) (+ (square x) y))")
     ) != nil);
     return_from_stack(nil);
 }
