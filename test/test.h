@@ -19,5 +19,5 @@ void run_tests(test * tests) {
         fflush(stdout);
         tests++;
     }
-    printf("All tests passed.");
+    printf("All tests passed.\n\n");
 }

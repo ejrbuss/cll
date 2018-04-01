@@ -1,7 +1,8 @@
 #pragma once
 
 #include <string.h>
-#include "core.h"
+
+#include "helper.h"
 
 /**
  * Indicates the current state of an object managed by the garbage collector.
@@ -363,9 +364,11 @@ obj * cons(obj * x, obj * list) {
 
 obj * assoc(obj * key, obj * val, obj * map) {
     prepare_stack();
-    obj * o = cons(key, cons(val, map));
-    o->type = type_map;
-    return return_from_stack(o);
+    obj * v = cons(val, map);
+    obj * k = cons(key, v);
+    v->type = type_map;
+    k->type = type_map;
+    return return_from_stack(k);
 }
 
 obj * fn(obj * env, obj * args, obj * body) {
