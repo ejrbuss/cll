@@ -5,6 +5,7 @@
 #include "core.h"
 #include "test.h"
 #include "print.h"
+#include "eval.h"
 
 void test_get() {
     prepare_stack();

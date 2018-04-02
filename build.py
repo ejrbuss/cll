@@ -1,8 +1,22 @@
 # Configuration
 # -------------
 
+main = './src/repl.c'
+
 cfiles = [
-    'src/repl.c',
+    './src/core/core.c',
+    './src/core/function.c',
+    './src/core/list.c',
+    './src/core/logic.c',
+    './src/core/map.c',
+    './src/core/math.c',
+    './src/core/str.c',
+    './src/core/types.c',
+    './src/eval.c',
+    './src/ll.c',
+    './src/obj.c',
+    './src/print.c',
+    './src/read.c',
 ]
 
 tests = [
@@ -26,7 +40,7 @@ flags = [
 ]
 
 cc = 'gcc'
-target = './target'
+target = './bin'
 
 # Build
 # -----
@@ -46,7 +60,7 @@ def panic(message):
 cfiles   = ' '.join(cfiles)
 includes = ' '.join(['-I ' + file for file in includes])
 flags    = ' '.join(flags)
-build    = f'{cc} {cfiles} {includes} {flags} -o {target}/out.exe'
+build    = f'{cc} {cfiles} {main} {includes} {flags} -o {target}/out.exe'
 
 try:
     if run(build):
@@ -65,7 +79,7 @@ try:
             run(f'gdb {target}/out.exe')
         if option == 'test':
             for test in tests:
-                build = f'{cc} {test} {includes} {flags} -o {target}/{os.path.basename(test)}.exe'
+                build = f'{cc} {cfiles} {test} {includes} {flags} -o {target}/{os.path.basename(test)}.exe'
                 if run(build):
                     run(f'{target}/{os.path.basename(test)}.exe')
                 else:

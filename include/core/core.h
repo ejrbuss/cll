@@ -1,16 +1,12 @@
 #pragma once
 
+#include "obj.h"
+#include "function.h"
 #include "list.h"
-#include "map.h"
 #include "logic.h"
+#include "map.h"
 #include "math.h"
 #include "str.h"
+#include "types.h"
 
-obj * load_core(obj * env) {
-    env = load_list(env);
-    env = load_map(env);
-    env = load_logic(env);
-    env = load_math(env);
-    env = load_string(env);
-    return env;
-}
+extern obj * load_core(obj * env);

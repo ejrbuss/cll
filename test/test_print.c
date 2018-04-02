@@ -4,6 +4,7 @@
 
 #include "print.h"
 #include "test.h"
+#include "eval.h"
 
 void test_nil() {
     prepare_stack();

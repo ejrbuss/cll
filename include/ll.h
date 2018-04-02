@@ -1,6 +1,15 @@
 #pragma once
 
-// MACROS
+// C Standard Library
+// ------------------
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <stddef.h>
+
+// Macros
 // ------
 
 /**
@@ -36,19 +45,10 @@
     } \
 } while(0)
 
-#include <stdio.h>
-#include <stdlib.h>
-
 /**
- * `malloc`, but garunteed to succeed or panic
- *
- * @param   size_t bytes the number of bytes to allocate
- * @returns void *       a pointer to the allocated bytes
- */
-void * must_malloc(size_t bytes) {
-    void * ptr = malloc(bytes);
-    if (ptr == nil) {
-        panic("Failed to allocate %u bytes", bytes);
-    }
-    return ptr;
-}
+ * Behaves like `malloc`, but garunteed to succeed or else panic.
+ * - `bytes` the number of bytes to allocate
+ * returns a pointer to the allocated bytes
+*/
+extern void * must_malloc(size_t bytes);
+
