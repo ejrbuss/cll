@@ -27,10 +27,10 @@ obj * native_not(obj * args) {
  * @returns obj *        the anded object
  */
 obj * and(obj * first, obj * second) {
-    if(first != nil && second != nil) {
-        return second;
+    if(first == nil) {
+        return first;
     }
-    return nil;
+    return second;
 }
 
 // Native binding
@@ -44,8 +44,25 @@ obj * native_and(obj * args) {
     return return_from_stack(cond);
 }
 
+obj * or(obj * first, obj * second) {
+    if (first != nil) {
+        return first;
+    }
+    return second;
+}
+// Nativeee binding
+obj * native_or(obj * args) {
+    prepare_stack();
+    obj * cond = nil;
+    while(args != nil && not(cond)) {
+        cond = or(cond, car(args));
+        args = cdr(args);
+    }
+    return return_from_stack(cond);
+}
+
 /**
- * Retursn the keyword :true if first and second objects are equivalent.
+ * Returns the keyword :true if first and second objects are equivalent.
  *
  * @param   obj * first   the first object
  * @param   obj * second  the second object
@@ -126,6 +143,7 @@ obj * native_equal(obj * args) {
 obj * load_logic(obj * env) {
     env = naive_assoc(symbol("not"), native(&native_not), env);
     env = naive_assoc(symbol("and"), native(&native_and), env);
+    env = naive_assoc(symbol("or"), native(&native_or), env);
     env = naive_assoc(symbol("="), native(&native_equal), env);
     return env;
 }

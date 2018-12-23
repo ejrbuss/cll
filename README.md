@@ -8,9 +8,6 @@ C Little Lisp
 ```
 
 ## TODO
-- interned symbols
-- Let
-- References
 - Errors
 - Macros
 - Documentation

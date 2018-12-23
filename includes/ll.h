@@ -48,10 +48,5 @@
     } \
 } while(0)
 
-/**
- * Behaves like `malloc`, but garunteed to succeed or else panic.
- * - `bytes` the number of bytes to allocate
- * returns a pointer to the allocated bytes
-*/
 extern void * must_malloc(size_t bytes);
-
+extern void breakpoint_catch();

@@ -1,7 +1,5 @@
 #pragma once
 
-#define step(n) do { printf("\nstep %d\n", (n)); fflush(stdout); } while(0)
-
 #include <stdio.h>
 
 typedef struct test test;

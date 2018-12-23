@@ -2,4 +2,4 @@
 
 #include "obj.h"
 
-obj * print(obj * o);
+extern obj * print(obj * o);

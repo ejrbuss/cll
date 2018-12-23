@@ -2,5 +2,5 @@
 
 #include "core.h"
 
-obj * call(obj * fn, obj * args);
-obj * load_function(obj * env);
+extern obj * call(obj * fn, obj * args);
+extern obj * load_function(obj * env);

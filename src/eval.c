@@ -79,6 +79,11 @@ static obj * eval_list(obj * list, obj * env) {
     return return_from_stack(call(op, evaled_args));
 }
 
+/**
+ * Initializes the gobal environment, `g_env`. Loads all native functions into
+ * the stack and then buffers the stack with a nil to protect the global
+ * environment.
+ */
 void init_env() {
     assert(g_env == nil);
     prepare_stack();
@@ -89,6 +94,15 @@ void init_env() {
     prepare_stack();
 }
 
+/**
+ * Evaluates the given expresssion in the given environment. Value types (other
+ * than lists) evaluate to themselves. Symbols are lookedup up in the provided
+ * environment, and lists are evaluated using `eval_list`.
+ *
+ * @param   obj * expr the expression to evaluate
+ * @param   obj * env  the environment to use for evaluation
+ * @returns obj *      the evaluated value
+ */
 obj * eval(obj * expr, obj * env) {
     if (expr == nil) {
         return nil;
