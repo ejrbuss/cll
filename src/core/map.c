@@ -1,4 +1,5 @@
 #include "map.h"
+#include "print.h"
 
 obj * reverse_map(obj * map) {
     prepare_stack();
@@ -23,7 +24,7 @@ obj * native_reverse_map(obj * args) {
  * @param   obj * map the map to perform the lookup on
  * @returns obj *     the associated object
  */
-obj * get(obj * key, obj * map) {
+obj * naive_get(obj * key, obj * map) {
     while (map != nil) {
         if (equal(car(map), key)) {
             return car(cdr(map));
@@ -33,12 +34,25 @@ obj * get(obj * key, obj * map) {
             map = cdr(map);
         }
     }
-    return nil;
+    panic("%s not in map!", print(key)->string);
+}
+
+obj * get(obj * key, obj * map, obj * def) {
+    while (map != nil) {
+        if (equal(car(map), key)) {
+            return car(cdr(map));
+        }
+        map = cdr(map);
+        if (map != nil) {
+            map = cdr(map);
+        }
+    }
+    return def;
 }
 
 // Native binding
 obj * native_get(obj * args) {
-    return get(car(args), car(cdr(args)));
+    return get(car(args), car(cdr(args)), car(cdr(cdr(args))));
 }
 
 /**
@@ -63,6 +77,28 @@ obj * keys(obj * map) {
 // Native binding
 obj * native_keys(obj * args) {
     return keys(car(args));
+}
+
+obj * dissoc(obj * key, obj * map) {
+    if (not(in(key, keys(map)))) {
+        return map;
+    }
+    prepare_stack();
+    obj * m = nil;
+    while(map != nil) {
+        obj * k = car(map);
+        obj * v = car(cdr(map));
+        if (k != key) {
+            m = naive_assoc(k, v, m);
+        }
+        map = cdr(cdr(map));
+    }
+    return return_from_stack(m);
+}
+
+obj * assoc(obj * key, obj * val, obj * map) {
+    dissoc(key, map);
+    return naive_assoc(key, val, map);
 }
 
 obj * load_map(obj * env) {

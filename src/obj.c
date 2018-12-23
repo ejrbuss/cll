@@ -28,11 +28,15 @@ static void gc_mark_recursive(obj * o) {
     }
     o->gc_tag = gc_marked;
     switch (o->type) {
+        case type_reference:
+            gc_mark_recursive(o->ref);
+            break;
         case type_list:
         case type_map:
         case type_function:
             gc_mark_recursive(o->car);
             gc_mark_recursive(o->cdr);
+            break;
         default:
             break;
     }
@@ -45,6 +49,9 @@ static void gc_mark() {
     assert(g_vm != nil);
     gc_node * node = g_vm->stack;
     while (node != nil) {
+        if (node->car != nil) {
+            node->car->gc_tag = gc_unmarked;
+        }
         gc_mark_recursive(node->car);
         node = node->cdr;
     }
@@ -151,7 +158,7 @@ static void stack_push(obj * o) {
  * Pops the top object off the stack and moves it to the heap. Otherwise just
  * returns nil.
  */
-static obj * stack_pop() {
+obj * stack_pop() {
     assert(g_vm != nil);
     if (g_vm->stack != nil) {
         gc_node * node = g_vm->stack;
@@ -228,6 +235,13 @@ void free_vm() {
 // Object Initializers
 // -------------------
 
+obj * reference(obj * r) {
+    obj * o = init_obj();
+    o->type = type_reference;
+    o->ref = r;
+    return o;
+}
+
 static obj * resource(char * rsc, type type) {
     obj * o = init_obj();
     o->resource = (char *) must_malloc(sizeof(char) * (strlen(rsc) + 1));
@@ -263,7 +277,7 @@ obj * cons(obj * x, obj * list) {
     return obj;
 }
 
-obj * assoc(obj * key, obj * val, obj * map) {
+obj * naive_assoc(obj * key, obj * val, obj * map) {
     prepare_stack();
     obj * v = cons(val, map);
     obj * k = cons(key, v);

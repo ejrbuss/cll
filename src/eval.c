@@ -1,6 +1,7 @@
 #include "eval.h"
 #include "core.h"
 
+obj * g_env_ref = nil;
 obj * g_env = nil;
 
 static obj * eval_list(obj * list, obj * env) {
@@ -35,6 +36,7 @@ static obj * eval_list(obj * list, obj * env) {
             panic("def expects a symbol");
         }
         g_env = assoc(car(args), eval(car(cdr(args)), env), g_env);
+        set(g_env_ref, g_env);
         return return_from_stack(nil);
     }
 
@@ -71,8 +73,10 @@ static obj * eval_list(obj * list, obj * env) {
 void init_env() {
     assert(g_env == nil);
     prepare_stack();
+    g_env_ref = reference(nil);
     g_env = load_core(g_env);
-    return_from_stack(g_env);
+    set(g_env_ref, g_env);
+    return_from_stack(g_env_ref);
     prepare_stack();
 }
 
@@ -81,7 +85,7 @@ obj * eval(obj * expr, obj * env) {
         return nil;
     }
     switch (expr->type) {
-        case type_symbol: return get(expr, env);
+        case type_symbol: return get(expr, env, get(expr, g_env, symbol("lookup-error")));
         case type_list:   return eval_list(expr, env);
         default:          return expr;
     }

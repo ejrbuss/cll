@@ -6,27 +6,24 @@
 #include "print.h"
 
 #define VERSION "0.0.1"
+#define MEMORY 16000
 
 int main(int argc, char ** argv) {
 
     printf("clc v%s repl\n\n", VERSION);
 
-    char * line_buffer;
-    size_t n    = 1024;
-    line_buffer = must_malloc(n + 1);
-
-    init_vm(10000);
+    init_vm(MEMORY);
     init_env();
     for (;;) {
-        prepare_stack();
-        {
-            printf("cll> ");
-            getline(&line_buffer, &n, stdin);
-            puts(print(eval(read(string(line_buffer)), g_env))->string);
+        char * line_buffer = readline("cll>");
+        if (strlen(line_buffer) > 0) {
+            add_history(line_buffer);
         }
+        prepare_stack();
+        puts(print(eval(read(string(line_buffer)), g_env))->string);
         return_from_stack(nil);
+        free(line_buffer);
     }
     free_vm();
-    free(line_buffer);
     return EXIT_SUCCESS;
 }

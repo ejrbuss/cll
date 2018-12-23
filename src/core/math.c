@@ -10,7 +10,8 @@ obj * native_add(obj * args) {
 }
 
 obj * native_sub(obj * args) {
-    double diff = 0;
+    double diff = car(args)->number;
+    args = cdr(args);
     while(args != nil) {
         diff -= car(args)->number;
         args = cdr(args);

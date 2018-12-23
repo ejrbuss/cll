@@ -11,8 +11,8 @@
  */
 static obj * list_to_string(obj * list, obj * left, obj * right) {
     prepare_stack();
-    obj * x = print(car(list));
     obj * xs = print(cdr(list));
+    obj * x = print(car(list));
     if (equal(xs, print(nil))) {
         return return_from_stack(cat(left, cat(x, right)));
     } else {
@@ -32,6 +32,8 @@ obj * print(obj * o) {
         return return_from_stack(string("()"));
     }
     switch (o->type) {
+        case type_reference:
+            return return_from_stack(string("<ref>"));
         case type_symbol:
             return return_from_stack(string(o->symbol));
         case type_keyword:

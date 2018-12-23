@@ -4,6 +4,10 @@
 // Stream Operators
 // ---------------
 
+static int is_whitespace(char c) {
+    return isspace(c) || c == ',';
+}
+
 /**
  * Panics with an appropriate message at the current point in the stream.
  *
@@ -13,7 +17,7 @@
 static void syntax_error(char ** stream, obj * message) {
     message = cat(string("Syntax Error: "), cat(message, string("\n  at \"")));
     obj * source  = substr(number(0), number(10), string(*stream));
-    panic(cat(message, cat(source, string("...\n      ^\n")))->string);
+    panic("%s", cat(message, cat(source, string("...\n      ^\n")))->string);
 }
 
 /**
@@ -22,7 +26,7 @@ static void syntax_error(char ** stream, obj * message) {
  */
 static char next(char ** stream, int skip) {
     if (skip) {
-        while (isspace(**stream)) {
+        while (is_whitespace(**stream)) {
             (*stream)++;
         }
     }
@@ -35,7 +39,7 @@ static char next(char ** stream, int skip) {
  */
 static void chomp(char ** stream, int skip) {
     if (skip) {
-        while (isspace(**stream)) {
+        while (is_whitespace(**stream)) {
             (*stream)++;
         }
     }
@@ -111,10 +115,10 @@ static obj * parse_map(char ** stream) {
     while(next(stream, 1) != '}') {
         obj * key = parse(stream);
         obj * val = parse(stream);
-        map = assoc(key, val, map);
+        map = cons(val, cons(key, map));
     }
     chomp(stream, 1);
-    return return_from_stack(reverse_map(map));
+    return return_from_stack(cons(symbol("map"), reverse(map)));
 }
 
 static obj * parse_list_macro(char ** stream) {
@@ -146,7 +150,7 @@ static obj * parse_number(char ** stream) {
             case ']':
                 return number(n);
             default:
-                if (isspace(next(stream, 0)) || next(stream, 0) == '\0') {
+                if (is_whitespace(next(stream, 0)) || next(stream, 0) == '\0') {
                     return number(n);
                 }
                 chomp(stream, 0);
@@ -159,7 +163,7 @@ static obj * parse_number(char ** stream) {
 static obj * parse_symbol(char ** stream) {
     char * start = *stream;
     while (
-        !isspace(next(stream, 0)) &&
+        !is_whitespace(next(stream, 0)) &&
         next(stream, 0) != '\0' &&
         next(stream, 0) != ';'
     ) {

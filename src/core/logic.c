@@ -62,6 +62,8 @@ obj * equal(obj * first, obj * second) {
         return nil;
     }
     switch (first->type) {
+        case type_reference:
+            return equal(first->ref, second->ref);
         case type_symbol:
         case type_keyword:
         case type_string:
@@ -83,8 +85,8 @@ obj * equal(obj * first, obj * second) {
             obj * fst_keys = keys(first);
             while(fst_keys != nil) {
                 if (not(equal(
-                    get(car(fst_keys), first),
-                    get(car(fst_keys), second)
+                    get(car(fst_keys), first, nil),
+                    get(car(fst_keys), second, nil)
                 ))) {
                     return return_from_stack(nil);
                 }
@@ -93,8 +95,8 @@ obj * equal(obj * first, obj * second) {
             obj * snd_keys = keys(second);
             while(snd_keys != nil) {
                 if (not(equal(
-                    get(car(snd_keys), first),
-                    get(car(snd_keys), second)
+                    get(car(snd_keys), first, nil),
+                    get(car(snd_keys), second, nil)
                 ))) {
                     return return_from_stack(nil);
                 }

@@ -5,12 +5,13 @@ obj * type_of(obj * o) {
         return keyword("nil");
     }
     switch (o->type) {
-        case type_symbol:  return keyword("symbol");
-        case type_keyword: return keyword("keyword");
-        case type_string:  return keyword("string");
-        case type_number:  return keyword("number");
-        case type_list:    return keyword("list");
-        case type_map:     return keyword("map");
+        case type_reference: return keyword("reference");
+        case type_symbol:    return keyword("symbol");
+        case type_keyword:   return keyword("keyword");
+        case type_string:    return keyword("string");
+        case type_number:    return keyword("number");
+        case type_list:      return keyword("list");
+        case type_map:       return keyword("map");
         case type_function:
         case type_native_function:
             return keyword("function");
