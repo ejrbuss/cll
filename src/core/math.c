@@ -55,9 +55,9 @@ obj * nmin(obj * n, obj * m) {
 }
 
 obj * load_math(obj * env) {
-    env = assoc(symbol("+"), native(&native_add), env);
-    env = assoc(symbol("-"), native(&native_sub), env);
-    env = assoc(symbol("*"), native(&native_mul), env);
-    env = assoc(symbol("/"), native(&native_div), env);
+    env = naive_assoc(symbol("+"), native(&native_add), env);
+    env = naive_assoc(symbol("-"), native(&native_sub), env);
+    env = naive_assoc(symbol("*"), native(&native_mul), env);
+    env = naive_assoc(symbol("/"), native(&native_div), env);
     return env;
 }

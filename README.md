@@ -8,7 +8,7 @@ C Little Lisp
 ```
 
 ## TODO
-- gc-stat, gc-force
+- interned symbols
 - Let
 - References
 - Errors

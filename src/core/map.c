@@ -102,8 +102,8 @@ obj * assoc(obj * key, obj * val, obj * map) {
 }
 
 obj * load_map(obj * env) {
-    env = assoc(symbol("reverse_map"), native(&native_reverse_map), env);
-    env = assoc(symbol("get"), native(&native_get), env);
-    env = assoc(symbol("keys"), native(&native_keys), env);
+    env = naive_assoc(symbol("reverse_map"), native(&native_reverse_map), env);
+    env = naive_assoc(symbol("get"), native(&native_get), env);
+    env = naive_assoc(symbol("keys"), native(&native_keys), env);
     return env;
 }

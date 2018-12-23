@@ -49,11 +49,20 @@ static obj * eval_list(obj * list, obj * env) {
 
     // Special form: let
     if (equal(op, symbol("let"))) {
-        /* TODO let
-
-            (let [x 10
-                  y 5] (+ x y))
-        */
+        obj * map = car(args);
+        obj * expr = car(cdr(args));
+        if (map == nil || map->type != type_list || not(equal(car(map), symbol("map")))) {
+            panic("let expects a map");
+        }
+        map = cdr(map);
+        obj * expr_env = env;
+        while(map != nil) {
+            obj * k = car(map);
+            obj * v = car(cdr(map));
+            expr_env = naive_assoc(k, v, expr_env);
+            map = cdr(cdr(map));
+        }
+        return return_from_stack(eval(expr, expr_env));
     }
     // Eval operator
     op = eval(op, env);

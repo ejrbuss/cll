@@ -24,6 +24,6 @@ obj * native_type_of(obj * args) {
 }
 
 obj * load_types(obj * env) {
-    env = assoc(symbol("type"), native(&native_type_of), env);
+    env = naive_assoc(symbol("type"), native(&native_type_of), env);
     return env;
 }

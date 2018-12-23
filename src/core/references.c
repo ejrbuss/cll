@@ -35,8 +35,8 @@ obj * native_deref(obj * args) {
 }
 
 obj * load_references(obj * env) {
-    env = assoc(symbol("ref"), native(&native_ref), env);
-    env = assoc(symbol("set"), native(&native_set), env);
-    env = assoc(symbol("deref"), native(&native_deref), env);
+    env = naive_assoc(symbol("ref"), native(&native_ref), env);
+    env = naive_assoc(symbol("set"), native(&native_set), env);
+    env = naive_assoc(symbol("deref"), native(&native_deref), env);
     return env;
 }

@@ -68,6 +68,8 @@ struct vm {
 
 vm * g_vm; // The gobal vm reference
 
+void vm_debug();
+
 /**
  * Initialzes a new global little lisp virtual machine.
  *

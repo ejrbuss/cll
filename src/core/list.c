@@ -100,12 +100,12 @@ obj * native_count(obj * args) {
  * Loads all core list operations into the global environemnt.
  */
 obj * load_list(obj * env) {
-    env = assoc(symbol("list"), native(&native_list), env);
-    env = assoc(symbol("car"), native(&native_car), env);
-    env = assoc(symbol("cdr"), native(&native_cdr), env);
-    env = assoc(symbol("cons"), native(&native_cons), env);
-    env = assoc(symbol("reverse"), native(&native_reverse), env);
-    env = assoc(symbol("in"), native(&native_in), env);
-    env = assoc(symbol("count"), native(&native_count), env);
+    env = naive_assoc(symbol("list"), native(&native_list), env);
+    env = naive_assoc(symbol("car"), native(&native_car), env);
+    env = naive_assoc(symbol("cdr"), native(&native_cdr), env);
+    env = naive_assoc(symbol("cons"), native(&native_cons), env);
+    env = naive_assoc(symbol("reverse"), native(&native_reverse), env);
+    env = naive_assoc(symbol("in"), native(&native_in), env);
+    env = naive_assoc(symbol("count"), native(&native_count), env);
     return env;
 }

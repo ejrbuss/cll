@@ -10,9 +10,9 @@ obj * call(obj * fn, obj * args) {
         case type_keyword:
             return get(fn, car(args), nil);
         case type_map:
-            return return_from_stack(get(car(args), fn, car(cdr(args))));
+            return get(car(args), fn, car(cdr(args)));
         case type_native_function:
-            return return_from_stack(fn->native(args));
+            return fn->native(args);
         case type_function:
             break;
         default:
@@ -35,6 +35,6 @@ static obj * native_call(obj * args) {
 }
 
 obj * load_function(obj * env) {
-    env = assoc(symbol("call"), native(&native_call), env);
+    env = naive_assoc(symbol("call"), native(&native_call), env);
     return env;
 }

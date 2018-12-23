@@ -9,5 +9,6 @@
 #include "references.h"
 #include "str.h"
 #include "types.h"
+#include "vmstat.h"
 
 extern obj * load_core(obj * env);

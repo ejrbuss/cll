@@ -124,8 +124,8 @@ obj * native_equal(obj * args) {
 }
 
 obj * load_logic(obj * env) {
-    env = assoc(symbol("not"), native(&native_not), env);
-    env = assoc(symbol("and"), native(&native_and), env);
-    env = assoc(symbol("="), native(&native_equal), env);
+    env = naive_assoc(symbol("not"), native(&native_not), env);
+    env = naive_assoc(symbol("and"), native(&native_and), env);
+    env = naive_assoc(symbol("="), native(&native_equal), env);
     return env;
 }

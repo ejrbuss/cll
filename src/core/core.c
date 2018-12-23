@@ -9,5 +9,6 @@ obj * load_core(obj * env) {
     env = load_references(env);
     env = load_string(env);
     env = load_function(env);
+    env = load_vmstat(env);
     return env;
 }

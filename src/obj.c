@@ -1,5 +1,72 @@
 #include "obj.h"
 
+int has_resource(obj * o) {
+    return o != nil && (
+        o->type == type_string ||
+        o->type == type_symbol ||
+        o->type == type_keyword
+    );
+}
+
+static void gc_mark();
+void vm_debug() {
+    char * gc_tag_lookup[] = {
+        "marked  ",
+        "unmarked",
+        "freed   ",
+    };
+    char * type_lookup[] = {
+        "type_reference",
+        "type_symbol",
+        "type_keyword",
+        "type_string",
+        "type_number",
+        "type_list",
+        "type_map",
+        "type_function",
+        "type_native_function",
+    };
+    gc_mark();
+    gc_node * node;
+
+    printf("--- HEAP ---\n");
+    node = g_vm->heap;
+    while (node != nil) {
+        obj * o = node->car;
+        if (o == nil) {
+            printf("!!! nil !!!\n");
+        } else {
+            printf("%s | %s | %s\n", 
+                gc_tag_lookup[o->gc_tag], 
+                type_lookup[o->type],
+                has_resource(o) ? o->resource : ""
+            );
+        }
+        node = node->cdr;
+    }
+
+    printf("--- STACK ---\n");
+    node = g_vm->stack;
+    while (node != nil) {
+        obj * o = node->car;
+        if (o == nil) {
+            printf("!!! nil !!!\n");
+        } else {
+            printf("%s | %s | %s\n", 
+                gc_tag_lookup[o->gc_tag], 
+                type_lookup[o->type],
+                has_resource(o) ? o->resource : ""
+            );
+        }
+        node = node->cdr;
+    }
+    printf("allocated: %u\nmax:       %u", 
+        (unsigned int) g_vm->allocated, 
+        (unsigned int) g_vm->max_allocated
+    );
+
+}
+
 void init_vm(size_t max_allocated) {
     // Do not overwrite a VM!
     assert(g_vm == nil);
