@@ -6,6 +6,7 @@ obj * type_of(obj * o) {
     }
     switch (o->type) {
         case type_reference: return keyword("reference");
+        case type_error:     return keyword("error");
         case type_symbol:    return keyword("symbol");
         case type_keyword:   return keyword("keyword");
         case type_string:    return keyword("string");
@@ -24,6 +25,6 @@ obj * native_type_of(obj * args) {
 }
 
 obj * load_types(obj * env) {
-    env = naive_assoc(symbol("type"), native(&native_type_of), env);
+    env = naive_assoc(symbol("type-of"), native(&native_type_of), env);
     return env;
 }

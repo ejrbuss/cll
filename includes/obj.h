@@ -19,6 +19,7 @@ enum gc_tag {
 typedef enum type type;
 enum type {
     type_reference,
+    type_error,
     type_symbol,
     type_keyword,
     type_string,
@@ -76,6 +77,7 @@ extern void prepare_stack();
 extern obj * return_from_stack(obj * o);
 extern obj * stack_pop();
 extern obj * reference(obj * o);
+extern obj * error(char * s);
 extern obj * symbol(char * s);
 extern obj * keyword(char * k);
 extern obj * string(char * s);

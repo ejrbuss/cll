@@ -81,6 +81,7 @@ obj * equal(obj * first, obj * second) {
     switch (first->type) {
         case type_reference:
             return equal(first->ref, second->ref);
+        case type_error:
         case type_symbol:
         case type_keyword:
         case type_string:

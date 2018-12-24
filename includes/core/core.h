@@ -1,6 +1,8 @@
 #pragma once
 
 #include "obj.h"
+#include "print.h"
+#include "read.h"
 #include "function.h"
 #include "list.h"
 #include "logic.h"

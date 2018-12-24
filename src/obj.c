@@ -17,6 +17,7 @@ void vm_debug() {
     };
     char * type_lookup[] = {
         "type_reference",
+        "type_error",
         "type_symbol",
         "type_keyword",
         "type_string",
@@ -350,6 +351,10 @@ static obj * resource(char * rsc, type type) {
     o->type = type;
     strcpy(o->resource, rsc);
     return o;
+}
+
+obj * error(char * e) {
+    return resource(e, type_error);
 }
 
 obj * symbol(char * s) {

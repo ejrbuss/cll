@@ -2,23 +2,38 @@
 #include "print.h"
 #include "eval.h"
 
+/**
+ * Call fn with the provided arg. Key words will look themselvese up on their
+ * first argument. Maps will look up their first arguments. Native functions 
+ * will be called. Functions are evaluated. All other types produce an error.
+ * 
+ * @param   obj * fn the function to call
+ * @param   obj * args args to provide the function
+ * @returns obj * the result of the function call
+ */
 obj * call(obj * fn, obj * args) {
+    prepare_stack();
     if (fn == nil) {
-        panic("nil cannot be called!");
+        return return_from_stack(error_format(
+            "nil cannot be called!", 
+            nil
+        ));
     }
-    switch (fn->type) {
+    switch (fn->type) {            
         case type_keyword:
-            return get(fn, car(args), nil);
+            return return_from_stack(get(fn, car(args), nil));
         case type_map:
-            return get(car(args), fn, car(cdr(args)));
+            return return_from_stack(get(car(args), fn, car(cdr(args))));
         case type_native_function:
-            return fn->native(args);
+            return return_from_stack(fn->native(args));
         case type_function:
             break;
         default:
-            panic("%s cannot be called!", print(fn)->string);
+            return return_from_stack(error_format(
+                "{} cannot be called!", 
+                cons(fn, nil)
+            ));
     }
-    prepare_stack();
     obj * fn_env  = car(fn);
     obj * fn_args = car(cdr(fn));
     obj * fn_body = car(cdr(cdr(fn)));
@@ -35,6 +50,7 @@ static obj * native_call(obj * args) {
 }
 
 obj * load_function(obj * env) {
+    prepare_stack();
     env = naive_assoc(symbol("call"), native(&native_call), env);
-    return env;
+    return return_from_stack(env);
 }

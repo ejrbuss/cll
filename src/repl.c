@@ -1,17 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-
+#include "ll.h"
 #include "read.h"
 #include "eval.h"
 #include "print.h"
 
-#define VERSION "0.0.1"
-#define MEMORY 16000
-
 int main(int argc, char ** argv) {
-
     printf("clc v%s repl\n\n", VERSION);
-
     init_vm(MEMORY);
     init_env();
     for (;;) {

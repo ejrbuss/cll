@@ -4,11 +4,26 @@ C Little Lisp
 ## Broken
 
 ```
-(def fact (fn [n] (if (= n 1) 1 (* n (fact (- n 1))))))
+cll>(def fact (fn [x] (if (= x 1) 1 (* x (fact (- x 1))))))
+()
+cll>(fact 1)
+1
+cll>(fact 2)
+```
+
+```
+(def x 4) (def y 5)
+```
+
+```
+cll>
+panic! Syntax Error: Unexpected end of input!
+  at "...
 ```
 
 ## TODO
 - Errors
+- Handle multi-line input
 - Macros
 - Documentation
 - Testing

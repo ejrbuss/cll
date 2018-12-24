@@ -2,8 +2,13 @@
 #include "core.h"
 
 // Stream Operators
-// ---------------
+// ----------------
 
+/**
+ * Returns true if character is whitespace
+ * @param   char c the character to check 
+ * @returns int    if the chracter is whitepsace
+ */
 static int is_whitespace(char c) {
     return isspace(c) || c == ',';
 }
@@ -64,6 +69,11 @@ obj * read(obj * source) {
         syntax_error(&stream, string("Expected end of input!"));
     }
     return o;
+}
+
+obj * cread(char * source) {
+    prepare_stack();
+    return return_from_stack(read(string(source)));
 }
 
 static obj * parse_string(char ** stream) {

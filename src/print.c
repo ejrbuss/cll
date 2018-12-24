@@ -34,6 +34,8 @@ obj * print(obj * o) {
     switch (o->type) {
         case type_reference:
             return return_from_stack(string("<ref>"));
+        case type_error:
+            return return_from_stack(cat(string("Error: "), string(o->resource)));
         case type_symbol:
             return return_from_stack(string(o->symbol));
         case type_keyword:

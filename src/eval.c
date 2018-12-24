@@ -67,6 +67,11 @@ static obj * eval_list(obj * list, obj * env) {
     // Eval operator
     op = eval(op, env);
 
+    // Propogate error
+    if (op != nil && op->type == type_error) {
+        return op;
+    }
+
     // Eval arguments
     obj * evaled_args = nil;
     while (args != nil) {
@@ -108,8 +113,19 @@ obj * eval(obj * expr, obj * env) {
         return nil;
     }
     switch (expr->type) {
-        case type_symbol: return get(expr, env, get(expr, g_env, symbol("lookup-error")));
+        case type_symbol: 
+            prepare_stack();
+            obj * lookup_error = error_format("`{}` is not defined!", cons(expr, nil));
+            return return_from_stack(
+                get(expr, env, 
+                get(expr, g_env, lookup_error)
+            ));
         case type_list:   return eval_list(expr, env);
         default:          return expr;
     }
+}
+
+obj * ceval(char * source) {
+    prepare_stack();
+    return return_from_stack(eval(cread(source), g_env));
 }

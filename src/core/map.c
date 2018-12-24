@@ -1,19 +1,15 @@
 #include "map.h"
-#include "print.h"
 
-obj * reverse_map(obj * map) {
+obj * native_map(obj * args) {
     prepare_stack();
-    obj * reversed = nil;
-    while (map != nil) {
-        reversed = assoc(car(map), car(cdr(map)), reversed);
-        map = cdr(cdr(map));
+    obj * map = nil;
+    while(args != nil) {
+        obj * k = car(args);
+        obj * v = car(cdr(args));
+        map = assoc(k, v, map);
+        args = cdr(cdr(args));
     }
-    return return_from_stack(reversed);
-}
-
-// Native binding
-obj * native_reverse_map(obj * args) {
-    return reverse_map(car(args));
+    return return_from_stack(map);
 }
 
 /**
@@ -25,29 +21,38 @@ obj * native_reverse_map(obj * args) {
  * @returns obj *     the associated object
  */
 obj * naive_get(obj * key, obj * map) {
+    prepare_stack();
+    if (map != nil && map->type != type_map) {
+        return return_from_stack(error_format("cannot apply naive_get to `{}`!", cons(map, nil)));
+    }
     while (map != nil) {
+
         if (equal(car(map), key)) {
-            return car(cdr(map));
+            return return_from_stack(car(cdr(map)));
         }
         map = cdr(map);
         if (map != nil) {
             map = cdr(map);
         }
     }
-    panic("%s not in map!", print(key)->string);
+    return return_from_stack(error_format("`{}` not in map!", cons(key, nil)));
 }
 
 obj * get(obj * key, obj * map, obj * def) {
+    prepare_stack();
+    if (map != nil && map->type != type_map) {
+        return return_from_stack(error_format("cannot apply get to `{}`!", cons(map, nil)));
+    }
     while (map != nil) {
         if (equal(car(map), key)) {
-            return car(cdr(map));
+            return return_from_stack(car(cdr(map)));
         }
         map = cdr(map);
         if (map != nil) {
             map = cdr(map);
         }
     }
-    return def;
+    return return_from_stack(def);
 }
 
 // Native binding
@@ -63,6 +68,9 @@ obj * native_get(obj * args) {
  */
 obj * keys(obj * map) {
     prepare_stack();
+    if (map != nil && map->type != type_map) {
+        return return_from_stack(error_format("cannot apply keys to `{}`!", cons(map, nil)));
+    }
     obj * keys = nil;
     while(map != nil) {
         keys = cons(car(map), keys);
@@ -88,7 +96,7 @@ obj * dissoc(obj * key, obj * map) {
     while(map != nil) {
         obj * k = car(map);
         obj * v = car(cdr(map));
-        if (k != key) {
+        if (not(equal(k, key))) {
             m = naive_assoc(k, v, m);
         }
         map = cdr(cdr(map));
@@ -97,12 +105,12 @@ obj * dissoc(obj * key, obj * map) {
 }
 
 obj * assoc(obj * key, obj * val, obj * map) {
-    dissoc(key, map);
+    map = dissoc(key, map);
     return naive_assoc(key, val, map);
 }
 
 obj * load_map(obj * env) {
-    env = naive_assoc(symbol("reverse_map"), native(&native_reverse_map), env);
+    env = naive_assoc(symbol("map"), native(&native_map), env);
     env = naive_assoc(symbol("get"), native(&native_get), env);
     env = naive_assoc(symbol("keys"), native(&native_keys), env);
     return env;

@@ -1,6 +1,5 @@
 #include "list.h"
 
-// Native binding
 obj * native_list(obj * args) {
     return args;
 }
@@ -16,10 +15,20 @@ obj * car(obj * list) {
     if (list == nil) {
         return nil;
     }
-    return list->car;
+    switch(list->type) {
+        case type_list:
+        case type_map:
+        case type_function:
+            return list->car;
+        case type_string:
+            prepare_stack();
+            return return_from_stack(substr(number(0), number(1), list));
+        default:
+            prepare_stack();
+            return return_from_stack(error_format("cannot apply car to `%s`!", cons(list, nil)));
+    }
 }
 
-// Native binding
 obj * native_car(obj * args) {
     return car(car(args));
 }
@@ -35,15 +44,24 @@ obj * cdr(obj * list) {
     if (list == nil) {
         return nil;
     }
-    return list->cdr;
+    switch(list->type) {
+        case type_list:
+        case type_map:
+        case type_function:
+            return list->cdr;
+        case type_string:
+            prepare_stack();
+            return return_from_stack(substr(number(1), number(strlen(list->string)), list));
+        default:
+            prepare_stack();
+            return return_from_stack(error_format("cannot apply cdr to `%s`!", cons(list, nil)));
+    }
 }
 
-// Native binding
 obj * native_cdr(obj * args) {
     return cdr(car(args));
 }
 
-// Native binding
 obj * native_cons(obj * args) {
     return cons(car(args), car(cdr(args)));
 }
@@ -55,6 +73,17 @@ obj * native_cons(obj * args) {
  * @returns obj *      the reversed list
  */
 obj * reverse(obj * list) {
+    if (list == nil) {
+        return nil;
+    }
+    switch(list->type) {
+        case type_list:
+        case type_map:
+            break;
+        default:
+            prepare_stack();
+            return return_from_stack(error_format("cannot apply reverse to `%s`!", cons(list, nil)));
+    }
     prepare_stack();
     obj * reversed = nil;
     while (list != nil) {
@@ -64,19 +93,44 @@ obj * reverse(obj * list) {
     return return_from_stack(reversed);
 }
 
-// Native binding
 obj * native_reverse(obj * args) {
     return reverse(car(args));
 }
 
+/**
+ * Returns true if itme is in list. Checks only one level deep. Also supports
+ * checking if a string contains a substring.
+ * 
+ * @param   obj * item the item to search for
+ * @param   obj * list the list to search
+ * @returns obj *      true if the item is found
+ */
 obj * in(obj * item, obj * list) {
-    while (list != nil) {
-        if (equal(item, car(list))) {
-            return keyword("true");
-        }
-        list = cdr(list);
+    if (list == nil) {
+        return nil;
     }
-    return nil;
+    switch(list->type) {
+        case type_list:
+        case type_map:
+            while (list != nil) {
+                if (equal(item, car(list))) {
+                    return keyword("true");
+                }
+                list = cdr(list);
+            }
+            return nil;
+        case type_string:
+            prepare_stack();
+            if (item == nil || item->type != type_string) {
+                return return_from_stack(error_format("cannot apply in to string and `%s`!", cons(item, nil)));
+            }
+            obj * rep = replace(item, cat(item, string("$")), list);
+            return return_from_stack(not(equal(list, rep)));
+        default:
+            prepare_stack();
+            return return_from_stack(error_format("cannot apply in to `%s`!", cons(list, nil)));
+    }
+    
 }
 
 obj * native_in(obj * args) {
@@ -85,6 +139,16 @@ obj * native_in(obj * args) {
 
 obj * count(obj * list) {
     int count = 0;
+    switch(list->type) {
+        case type_list:
+        case type_map:
+            break;
+        case type_string:
+            return number(strlen(list->string));
+        default:
+            prepare_stack();
+            return return_from_stack(error_format("cannot count to `%s`!", cons(list, nil)));
+    }
     while (list != nil) {
         count++;
         list = cdr(list);
@@ -104,8 +168,8 @@ obj * load_list(obj * env) {
     env = naive_assoc(symbol("car"), native(&native_car), env);
     env = naive_assoc(symbol("cdr"), native(&native_cdr), env);
     env = naive_assoc(symbol("cons"), native(&native_cons), env);
-    env = naive_assoc(symbol("reverse"), native(&native_reverse), env);
     env = naive_assoc(symbol("in"), native(&native_in), env);
     env = naive_assoc(symbol("count"), native(&native_count), env);
+    env = naive_assoc(symbol("list-reverse"), native(&native_reverse), env);
     return env;
 }
