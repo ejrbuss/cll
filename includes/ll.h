@@ -8,6 +8,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stddef.h>
+#include <math.h>
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -28,9 +29,16 @@
  * program.
  */
 #define panic(...) do { \
-    fprintf(stderr, "panic! "); \
+    fflush(stdout); \
+    fflush(stderr); \
+    fprintf(stderr, "\npanic! "); \
     fprintf(stderr, __VA_ARGS__); \
     fprintf(stderr, "\n"); \
+    fprintf(stderr, "  at <%s> %s:%d", \
+        __FILE__, \
+        __FUNCTION__, \
+        __LINE__\
+    ); \
     fflush(stderr); \
     exit(1); \
 } while(0)
@@ -42,12 +50,7 @@
  */
 #define assert(cond) do { \
     if (!(cond)) { \
-        panic("Assert failed: %s\n  at <%s> %s:%d", \
-            (#cond), \
-            __FILE__, \
-            __FUNCTION__, \
-            __LINE__\
-        ); \
+        panic("Assert failed: %s", (#cond)); \
     } \
 } while(0)
 

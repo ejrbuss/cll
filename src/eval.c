@@ -1,6 +1,11 @@
 #include "eval.h"
 #include "core.h"
 
+#define symbol_cmp(o, s) (o != nil \
+    && o->type == type_symbol \
+    && strcmp(o->resource, s) == 0 \
+)
+
 obj * g_env_ref = nil;
 obj * g_env = nil;
 
@@ -12,7 +17,7 @@ static obj * eval_list(obj * list, obj * env) {
 
     // Special form: quote
     // Should return its first arg unevaluated
-    if (equal(op, symbol("quote"))) {
+    if (symbol_cmp(op, "quote")) {
         return return_from_stack(car(args));
     }
 
@@ -20,7 +25,7 @@ static obj * eval_list(obj * list, obj * env) {
     // If the first argument is truthy, if should evaluate and return its
     // second argument, otherwise it should evaluate and return its third
     // argument.
-    if (equal(op, symbol("if"))) {
+    if (symbol_cmp(op, "if")) {
         if (eval(car(args), env)) {
             return return_from_stack(eval(car(cdr(args)), env));
         } else {
@@ -31,29 +36,32 @@ static obj * eval_list(obj * list, obj * env) {
     // Specifal form: def
     // Using the first argument as a key in the global environment, adds an
     // entry for the evaluated second argument.
-    if (equal(op, symbol("def"))) {
-        if (car(args) == nil || car(args)->type != type_symbol) {
-            panic("def expects a symbol");
-        }
-        g_env = assoc(car(args), eval(car(cdr(args)), env), g_env);
-        set(g_env_ref, g_env);
+    if (symbol_cmp(op, "def")) {
+        check_type(string("def"), type_symbol, car(args));
+        // We use naive_assoc here because we don't care about cleaning up old
+        // definitions. Re-defs shouldn't be used for large amounts of data,
+        // refs should be used for that. In return we don't ever have to copy
+        // over all of g_env just because of a redef, decreasing our memory 
+        // footprint
+        g_env = naive_assoc(car(args), eval(car(cdr(args)), env), g_env);
+        g_env_ref->ref = g_env;
         return return_from_stack(nil);
     }
 
     // Special form: fn
     // Creates a new function, using the first argument as the arguments and
     // the second argument as the function body.
-    if (equal(op, symbol("fn"))) {
+    if (symbol_cmp(op, "fn")) {
         return return_from_stack(fn(env, cdr(car(args)), car(cdr(args))));
     }
 
     // Special form: let
-    if (equal(op, symbol("let"))) {
+    // Evals an expr with the first argument (a dictionary) attached to the 
+    // front of the environment.  
+    if (symbol_cmp(op, "let")) {
         obj * map = car(args);
         obj * expr = car(cdr(args));
-        if (map == nil || map->type != type_list || not(equal(car(map), symbol("map")))) {
-            panic("let expects a map");
-        }
+        check_type_or_nil(string("let"), type_map, map);
         map = cdr(map);
         obj * expr_env = env;
         while(map != nil) {
@@ -69,18 +77,24 @@ static obj * eval_list(obj * list, obj * env) {
 
     // Propogate error
     if (op != nil && op->type == type_error) {
-        return op;
+        return return_from_stack(op);
     }
 
     // Eval arguments
     obj * evaled_args = nil;
     while (args != nil) {
-        evaled_args = cons(eval(car(args), env), evaled_args);
+        obj * next = eval(car(args), env);
+        // If an argument is an error we need to propogate it
+        if (next != nil && next->type == type_error) {
+            return return_from_stack(next);
+        }
+        // Otherwise put it onto the evaluated argument list
+        evaled_args = cons(next, evaled_args);
         args = cdr(args);
     }
+    // We reversed the order when building the list, so now we need to undo that
     evaled_args = reverse(evaled_args);
     // Call operator on evaled arguments
-
     return return_from_stack(call(op, evaled_args));
 }
 
@@ -115,13 +129,27 @@ obj * eval(obj * expr, obj * env) {
     switch (expr->type) {
         case type_symbol: 
             prepare_stack();
-            obj * lookup_error = error_format("`{}` is not defined!", cons(expr, nil));
+            obj * lookup_error = error_format(
+                keyword("Lookup-Error"),
+                string("`{}` is not defined!"),
+                cons(expr, nil)
+            );
+            lookup_error = cons(expr, lookup_error);
+            lookup_error->type = type_error;
             return return_from_stack(
                 get(expr, env, 
                 get(expr, g_env, lookup_error)
             ));
-        case type_list:   return eval_list(expr, env);
-        default:          return expr;
+        case type_list:
+            prepare_stack();
+            obj * result = eval_list(expr, env);
+            if (result != nil && result->type == type_error) {
+                result = cons(expr, result);
+                result->type = type_error;
+            }
+            return return_from_stack(result);
+        default:         
+             return expr;
     }
 }
 

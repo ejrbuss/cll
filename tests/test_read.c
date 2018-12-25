@@ -1,8 +1,6 @@
 #include "ll.h"
 #include "test.h"
-#include "read.h"
 #include "core.h"
-#include "print.h"
 
 void test_nil() {
     prepare_stack();
@@ -118,7 +116,7 @@ void test_map() {
 }
 
 int main() {
-    init_vm(10000);
+    init_vm(MEMORY);
     test tests[] = {
         { "test_nil", test_nil },
         { "test_symbol", test_symbol },

@@ -20,11 +20,12 @@ obj * type_of(obj * o) {
     panic("Unreachable code execution!");
 }
 
-obj * native_type_of(obj * args) {
+static obj * native_type_of(obj * args) {
     return type_of(car(args));
 }
 
 obj * load_types(obj * env) {
+    prepare_stack();
     env = naive_assoc(symbol("type-of"), native(&native_type_of), env);
-    return env;
+    return return_from_stack(env);
 }

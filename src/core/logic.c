@@ -13,8 +13,7 @@ obj * not(obj * o) {
     return nil;
 }
 
-// Native binding
-obj * native_not(obj * args) {
+static obj * native_not(obj * args) {
     return not(car(args));
 }
 
@@ -33,11 +32,10 @@ obj * and(obj * first, obj * second) {
     return second;
 }
 
-// Native binding
-obj * native_and(obj * args) {
+static obj * native_and(obj * args) {
     prepare_stack();
     obj * cond = keyword("true");
-    while (args != nil) {
+    while (args != nil && cond) {
         cond = and(cond, car(args));
         args = cdr(args);
     }
@@ -50,8 +48,7 @@ obj * or(obj * first, obj * second) {
     }
     return second;
 }
-// Nativeee binding
-obj * native_or(obj * args) {
+static obj * native_or(obj * args) {
     prepare_stack();
     obj * cond = nil;
     while(args != nil && not(cond)) {
@@ -128,8 +125,7 @@ obj * equal(obj * first, obj * second) {
     return nil;
 }
 
-// Native binding
-obj * native_equal(obj * args) {
+static obj * native_equal(obj * args) {
     prepare_stack();
     obj * first = car(args);
     obj * cond = keyword("true");
@@ -142,9 +138,10 @@ obj * native_equal(obj * args) {
 }
 
 obj * load_logic(obj * env) {
+    prepare_stack();
     env = naive_assoc(symbol("not"), native(&native_not), env);
     env = naive_assoc(symbol("and"), native(&native_and), env);
     env = naive_assoc(symbol("or"), native(&native_or), env);
     env = naive_assoc(symbol("="), native(&native_equal), env);
-    return env;
+    return return_from_stack(env);
 }

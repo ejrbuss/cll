@@ -77,7 +77,7 @@ extern void prepare_stack();
 extern obj * return_from_stack(obj * o);
 extern obj * stack_pop();
 extern obj * reference(obj * o);
-extern obj * error(char * s);
+extern obj * error(obj * type, obj * mes);
 extern obj * symbol(char * s);
 extern obj * keyword(char * k);
 extern obj * string(char * s);

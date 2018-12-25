@@ -1,42 +1,47 @@
-#include "function.h"
-#include "print.h"
+#include "references.h"
 
-obj * native_ref(obj * args) {
+static obj * native_ref(obj * args) {
     return reference(car(args));
 }
 
-void set(obj * ref, obj * val) {
-    if (ref == nil) {
-        panic("nil cannot be set!");
-    }
-    if (ref->type != type_reference) {
-        panic("%s cannot be set!", print(ref)->string);
-    }
+/**
+ * Sets a reference to a particular value.
+ * 
+ * @param   obj * ref the reference
+ * @param   obj * val the value
+ * @returns nil       if success
+ */
+obj * set(obj * ref, obj * val) {
+    prepare_stack();
+    check_type(string("set!"), type_reference, ref);
     ref->ref = val;
+    return return_from_stack(nil);
 }
 
-obj * native_set(obj * args) {
-    set(car(args), car(cdr(args)));
-    return nil;
+static obj * native_set(obj * args) {
+    return set(car(args), car(cdr(args)));
 }
 
+/**
+ * Safely dereferences a reference.
+ * 
+ * @param   obj * ref the reference
+ * @returns obj *     the value
+ */
 obj * deref(obj * ref) {
-    if (ref == nil) {
-        panic("nil cannot be dereferenced!");
-    }
-    if (ref->type != type_reference) {
-        panic("%s cannot be dereferenced!", print(ref)->string);
-    }
-    return ref->ref;
+    prepare_stack();
+    check_type(string("deref"), type_reference, ref);
+    return return_from_stack(ref->ref);
 }
 
-obj * native_deref(obj * args) {
+static obj * native_deref(obj * args) {
     return deref(car(args));
 }
 
 obj * load_references(obj * env) {
+    prepare_stack();
     env = naive_assoc(symbol("ref"), native(&native_ref), env);
-    env = naive_assoc(symbol("set"), native(&native_set), env);
+    env = naive_assoc(symbol("set!"), native(&native_set), env);
     env = naive_assoc(symbol("deref"), native(&native_deref), env);
-    return env;
+    return return_from_stack(env);
 }

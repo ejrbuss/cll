@@ -10,5 +10,4 @@ extern obj * no_whitespace(obj * s);
 extern obj * split(obj * delim, obj * s);
 extern obj * substr(obj * start, obj * length, obj * s);
 extern obj * format(obj * fmt, obj * args);
-extern obj * error_format(char * fmt, obj * args);
 extern obj * load_string(obj * env);

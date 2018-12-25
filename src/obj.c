@@ -61,11 +61,11 @@ void vm_debug() {
         }
         node = node->cdr;
     }
-    printf("allocated: %u\nmax:       %u", 
+    printf("allocated: %u\nmax:       %u\n", 
         (unsigned int) g_vm->allocated, 
         (unsigned int) g_vm->max_allocated
     );
-
+    fflush(stdout);
 }
 
 /**
@@ -110,6 +110,7 @@ static void gc_mark_recursive(obj * o) {
         case type_reference:
             gc_mark_recursive(o->ref);
             break;
+        case type_error:
         case type_list:
         case type_map:
         case type_function:
@@ -211,6 +212,7 @@ static void * try_malloc(size_t bytes) {
         //printf("\nAfter: %u\n", g_vm->allocated);
     }
     if (g_vm->allocated + bytes > g_vm->max_allocated) {
+        breakpoint_catch();
         panic("Ran out of memory!");
     }
     g_vm->allocated += bytes;
@@ -345,16 +347,19 @@ obj * reference(obj * r) {
     return o;
 }
 
+obj * error(obj * type, obj * mes) {
+    prepare_stack();
+    obj * o = cons(mes, cons(type, nil));
+    o->type = type_error;
+    return return_from_stack(o);
+}
+
 static obj * resource(char * rsc, type type) {
     obj * o = init_obj();
     o->resource = (char *) must_malloc(sizeof(char) * (strlen(rsc) + 1));
     o->type = type;
     strcpy(o->resource, rsc);
     return o;
-}
-
-obj * error(char * e) {
-    return resource(e, type_error);
 }
 
 obj * symbol(char * s) {

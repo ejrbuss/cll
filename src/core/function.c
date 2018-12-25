@@ -1,5 +1,4 @@
 #include "function.h"
-#include "print.h"
 #include "eval.h"
 
 /**
@@ -12,28 +11,23 @@
  * @returns obj * the result of the function call
  */
 obj * call(obj * fn, obj * args) {
-    prepare_stack();
     if (fn == nil) {
-        return return_from_stack(error_format(
-            "nil cannot be called!", 
-            nil
-        ));
+        return apply_error(string("call"), fn);
     }
     switch (fn->type) {            
         case type_keyword:
-            return return_from_stack(get(fn, car(args), nil));
+            return get(fn, car(args), car(cdr(args)));
         case type_map:
-            return return_from_stack(get(car(args), fn, car(cdr(args))));
+            return get(car(args), fn, car(cdr(args)));
         case type_native_function:
-            return return_from_stack(fn->native(args));
+            return fn->native(args);
         case type_function:
             break;
         default:
-            return return_from_stack(error_format(
-                "{} cannot be called!", 
-                cons(fn, nil)
-            ));
+            prepare_stack();
+            return return_from_stack(apply_error(string("call"), fn));
     }
+    prepare_stack();
     obj * fn_env  = car(fn);
     obj * fn_args = car(cdr(fn));
     obj * fn_body = car(cdr(cdr(fn)));

@@ -6,7 +6,7 @@ name = 'cll'
 # the .c file containing `main`
 main = 'repl.c'
 # any libraries to load
-libs = ['readline']
+libs = ['m', 'readline']
 # the c compiler configuration to use (gcc/clang)
 cc = 'gcc/clang'
 # the c compiler command to use on the command line

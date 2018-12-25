@@ -1,14 +1,7 @@
 #include "core.h"
 
 static obj * native_error(obj * args) {
-        prepare_stack();
-    obj * s;
-    if (car(args) != nil && car(args)->type == type_string) {
-        s = car(args);
-    } else {
-        s = print(args);
-    }
-    return return_from_stack(error((s)->string));
+    return error(car(args), car(cdr(args)));
 }
 
 static obj * native_symbol(obj * args) {
