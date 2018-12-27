@@ -1,0 +1,2 @@
+(def str-eval (fn [s]
+    (eval (read s))))

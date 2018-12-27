@@ -40,11 +40,6 @@ static obj * eval_list(obj * list, obj * env) {
         }
     }
 
-    // Special form: cond
-    if (symbol_cmp(op, "cond")) {
-        return return_from_stack(string("TODO cond"));
-    }
-
     // Special form: def
     // Using the first argument as a key in the global environment, adds an
     // entry for the evaluated second argument.

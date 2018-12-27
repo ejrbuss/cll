@@ -14,6 +14,12 @@
     } \
 } while(0)
 
+#define return_on_error(e) do { \
+    if (e != nil && e->type == type_error) { \
+        return return_from_stack(e); \
+    } \
+} while(0)
+
 extern obj * error_format(obj * type, obj * fmt, obj * args);
 extern obj * apply_error(obj * func, obj * o);
 extern obj * error_to_map(obj * error);

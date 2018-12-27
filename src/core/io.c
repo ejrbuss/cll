@@ -121,6 +121,14 @@ obj * native_io_write(obj * args) {
     return io_write(car(args), car(cdr(args)), car(cdr(cdr(args))));
 }
 
+obj * native_exit(obj * args) {
+    if (car(args) != nil && car(args)->type == type_number) {
+        exit((int) car(args)->number);
+    } else {
+        exit(EXIT_SUCCESS);
+    }
+}
+
 obj * load_io(obj * env) {
     prepare_stack();
     env = naive_assoc(symbol("input"), native(&native_io_input), env);
@@ -128,5 +136,6 @@ obj * load_io(obj * env) {
     env = naive_assoc(symbol("println"), native(&native_io_println), env);
     env = naive_assoc(symbol("io-read"), native(&native_io_read), env);
     env = naive_assoc(symbol("io-write"), native(&native_io_write), env);
+    env = naive_assoc(symbol("exit"), native(&native_exit), env);
     return return_from_stack(env);
 }

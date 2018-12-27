@@ -16,13 +16,15 @@ panic! Ran out of memory!
 
 ## TODO
 - Load in prelude
-- Add remaining special forms (catch, cond, quasi-quote, macro)
+- Add remaining special forms (catch, quasi-quote, macro)
 - Macros
   - quasiquote
   - unquote
   - splice-unquote
+- Once macros exist add `reduce` and implement `do`, `cond`, `defn`, `defmacro`
 - Testing
   - Eval test (define how errors should behave)
+- Syntax highlighting extension
 - Documentation
   - Prettyify (vm-debug)
   - Meta system

@@ -1,4 +1,5 @@
 #include "core.h"
+#include "eval.h"
 
 static obj * native_error(obj * args) {
     return error(car(args), car(cdr(args)));
@@ -26,11 +27,40 @@ static obj * native_keyword(obj * args) {
     return return_from_stack(keyword(no_whitespace(s)->string));
 }
 
+extern obj * native_eval(obj * args) {
+    return eval(car(args), g_env);
+}
+
+extern obj * native_read(obj * args) {
+    prepare_stack();
+    check_type(string("read"), type_string, car(args));
+    return return_from_stack(read(car(args)));
+}
+
+extern obj * native_load(obj * args) {
+    prepare_stack();
+    check_type(string("load"), type_string, car(args));
+    obj * source = io_read(car(args));
+    return_on_error(source);
+    obj * forms = read_all(source);
+    return_on_error(forms);
+    obj * o = nil;
+    while(forms != nil) {
+        o = eval(car(forms), g_env);
+        return_on_error(o);
+        forms = cdr(forms);
+    }
+    return return_from_stack(o);
+}
+
 obj * load_core(obj * env) {
     prepare_stack();
     env = naive_assoc(symbol("throw"), native(&native_error), env);
     env = naive_assoc(symbol("symbol"), native(&native_symbol), env);
     env = naive_assoc(symbol("keyword"), native(&native_keyword), env);
+    env = naive_assoc(symbol("eval"), native(&native_eval), env);
+    env = naive_assoc(symbol("read"), native(&native_read), env);
+    env = naive_assoc(symbol("load"), native(&native_load), env);
     env = naive_assoc(symbol("nil"), nil, env);
     // Load other libs
     env = load_io(env);

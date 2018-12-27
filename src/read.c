@@ -132,13 +132,13 @@ static obj * parse_string(char ** stream) {
     free(buffer);
     chomp(stream, 0);
     // Perform escapes
-    o = replace(string("\\a"), string("\a"), o);
-    o = replace(string("\\b"), string("\b"), o);
-    o = replace(string("\\n"), string("\n"), o);
-    o = replace(string("\\r"), string("\r"), o);
-    o = replace(string("\\t"), string("\t"), o);
-    o = replace(string("\\\""), string("\""), o);
-    o = replace(string("\\\\"), string("\\"), o);
+    o = replace_all(string("\\a"), string("\a"), o);
+    o = replace_all(string("\\b"), string("\b"), o);
+    o = replace_all(string("\\n"), string("\n"), o);
+    o = replace_all(string("\\r"), string("\r"), o);
+    o = replace_all(string("\\t"), string("\t"), o);
+    o = replace_all(string("\\\""), string("\""), o);
+    o = replace_all(string("\\\\"), string("\\"), o);
     return return_from_stack(o);
 }
 
