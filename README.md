@@ -3,16 +3,6 @@ C Little Lisp
 
 ## Broken
 
-```
-(def x 4) (def y 5)
-```
-
-```
-cll>(1 2 3
-
-panic! Ran out of memory!
-  at <./src/obj.c> try_malloc:215
-```
 
 ## TODO
 - Load in prelude
