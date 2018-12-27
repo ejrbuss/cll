@@ -14,13 +14,10 @@ cmd = 'clang'
 # the debugger to use
 dbg = 'lldb'
 # additional compiler flags
-flags = ['-Wall', '-I./includes/core']
+flags = ['-Wall']
 # Provide a list to override the c compiler configuration default
-override_debug_flags = None
-# Provide a list to override the c compiler configuration default
-override_release_flags = None
 
 if options.release:
-    pass # this code will only run for release builds
+    flags = flags + ['-O']
 else:
-    pass # this code will only run for debug builds
+    flags = flags + ['-g']

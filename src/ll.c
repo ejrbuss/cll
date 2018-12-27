@@ -13,6 +13,4 @@ void * must_malloc(size_t bytes) {
     return ptr;
 }
 
-void breakpoint_catch() {
-    puts("In breakpoint catch!");
-}
+void breakpoint_catch() {}

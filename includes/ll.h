@@ -29,12 +29,13 @@
  * program.
  */
 #define panic(...) do { \
+    breakpoint_catch(); \
     fflush(stdout); \
     fflush(stderr); \
     fprintf(stderr, "\npanic! "); \
     fprintf(stderr, __VA_ARGS__); \
     fprintf(stderr, "\n"); \
-    fprintf(stderr, "  at <%s> %s:%d", \
+    fprintf(stderr, "  at <%s> %s:%d\n", \
         __FILE__, \
         __FUNCTION__, \
         __LINE__\

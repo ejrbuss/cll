@@ -19,10 +19,14 @@ static int is_whitespace(char c) {
  * @param char ** stream  the character stream
  * @param obj *   message the syntax error message
  */
-static void syntax_error(char ** stream, obj * message) {
-    message = cat(string("Syntax Error: "), cat(message, string("\n  at \"")));
-    obj * source  = substr(number(0), number(10), string(*stream));
-    panic("%s", cat(message, cat(source, string("...\n      ^\n")))->string);
+static obj * syntax_error(char * stream, obj * message) {
+    prepare_stack();
+    obj * err = error(keyword("Syntax-Error"), message);
+    obj * src = substr(number(0), number(10), string(stream));
+    obj * fmt_src = format(string("{}..."), cons(src, nil));
+    err = cons(fmt_src, err);
+    err->type = type_error;
+    return return_from_stack(err);
 }
 
 /**
@@ -65,10 +69,39 @@ static obj * parse(char ** stream);
 obj * read(obj * source) {
     char * stream = source->string;
     obj * o = parse(&stream);
+    if (o != nil && o->type == type_error) {
+        return o;
+    }
     if (next(&stream, 1) != '\0') {
-        syntax_error(&stream, string("Expected end of input!"));
+        return syntax_error(stream, string("Expected end of input!"));
     }
     return o;
+}
+
+obj * read_all(obj * source) {
+    char * stream = source->string;
+    prepare_stack();
+    obj * forms = nil;
+    while(next(&stream, 1) != '\0') {
+        obj * o = parse(&stream);
+        // Immediately return errors
+        if (o != nil && o->type == type_error) {
+            return return_from_stack(o);
+        }
+        forms = cons(o, forms);
+    }
+    return return_from_stack(forms);
+}
+
+obj * need_more_input(obj * source) {
+    prepare_stack();
+    obj * o = read(source);
+    if (o != nil && o->type == type_error) {
+        if (error_of_type(o, keyword("Syntax-Error"), string("Unexpected end of input!"))) {
+            return return_from_stack(keyword("true"));
+        }
+    }
+    return return_from_stack(nil);
 }
 
 obj * cread(char * source) {
@@ -82,7 +115,7 @@ static obj * parse_string(char ** stream) {
     int escaped = 0;
     while (escaped || next(stream, 0) != '"') {
         if (next(stream, 0) == '\0') {
-            syntax_error(stream, string("Unexpected end of input!"));
+            return return_from_stack(syntax_error(start - 1, string("Unexpected end of input!")));
         }
         if (next(stream, 0) == '\\') {
             escaped = !escaped;
@@ -112,7 +145,11 @@ static obj * parse_string(char ** stream) {
 static obj * parse_list(char ** stream) {
     prepare_stack();
     obj * list = nil;
+    char * start = *stream - 1;
     while(next(stream, 1) != ')') {
+        if (**stream == '\0') {
+            return return_from_stack(syntax_error(start, string("Unexpected end of input!")));
+        }
         list = cons(parse(stream), list);
     }
     chomp(stream, 1);
@@ -122,7 +159,11 @@ static obj * parse_list(char ** stream) {
 static obj * parse_map(char ** stream) {
     prepare_stack();
     obj * map = nil;
+    char * start = *stream - 1;
     while(next(stream, 1) != '}') {
+        if (**stream == '\0') {
+            return return_from_stack(syntax_error(start, string("Unexpected end of input!")));
+        }
         obj * key = parse(stream);
         obj * val = parse(stream);
         map = cons(val, cons(key, map));
@@ -134,7 +175,11 @@ static obj * parse_map(char ** stream) {
 static obj * parse_list_macro(char ** stream) {
     prepare_stack();
     obj * list = nil;
+    char * start = *stream - 1;
     while(next(stream, 1) != ']') {
+        if (**stream == '\0') {
+            return return_from_stack(syntax_error(start, string("Unexpected end of input!")));
+        }
         list = cons(parse(stream), list);
     }
     chomp(stream, 1);
@@ -145,7 +190,7 @@ static obj * parse_number(char ** stream) {
     double n;
     int count = sscanf(*stream, "%lg", &n);
     if (count == 0) {
-        syntax_error(stream, string("Expected a number!"));
+        return syntax_error(*stream, string("Expected a number!"));
     }
     // Move passed number
     for (;;) {
@@ -167,7 +212,6 @@ static obj * parse_number(char ** stream) {
         }
     }
     panic("Unreachable code execution!");
-    return number(n);
 }
 
 static obj * parse_symbol(char ** stream) {
@@ -220,6 +264,31 @@ static void parse_comment(char ** stream) {
     }
 }
 
+static obj * parse_quote(char ** stream) {
+    prepare_stack();
+    return return_from_stack(cons(symbol("quote"), cons(parse(stream), nil)));
+}
+
+static obj * parse_quasi_quote(char ** stream) {
+    prepare_stack();
+    return return_from_stack(cons(symbol("quasi-quote"), cons(parse(stream), nil)));
+}
+
+static obj * parse_unquote(char ** stream) {
+    prepare_stack();
+    return return_from_stack(cons(symbol("unquote"), cons(parse(stream), nil)));
+}
+
+static obj * parse_unquote_splice(char ** stream) {
+    prepare_stack();
+    return return_from_stack(cons(symbol("unquote-splice"), cons(parse(stream), nil)));
+}
+
+static obj * parse_deref(char ** stream) {
+    prepare_stack();
+    return return_from_stack(cons(symbol("deref"), cons(parse(stream), nil)));
+}
+
 /**
  * Distpatches the correct parser function based off one chracter lookahead.
  *
@@ -229,11 +298,11 @@ static void parse_comment(char ** stream) {
 obj * parse(char ** stream) {
     switch (next(stream, 1)) {
         case '\0':
-            syntax_error(stream, string("Unexpected end of input!"));
+            return syntax_error(*stream, string("Unexpected end of input!"));
         case ')':
         case '}':
         case ']':
-            syntax_error(stream, string("Unexpected character!"));
+            return syntax_error(*stream, string("Unexpected character!"));
         case '"':
             chomp(stream, 1);
             return parse_string(stream);
@@ -249,6 +318,26 @@ obj * parse(char ** stream) {
         case '[':
             chomp(stream, 1);
             return parse_list_macro(stream);
+        case '\'':
+            chomp(stream, 1);
+            return parse_quote(stream);
+        case '~':
+            switch(*(*stream + 1)) {
+                case '\'':
+                    chomp(stream, 1);
+                    chomp(stream, 1);
+                    return parse_quasi_quote(stream);
+                case '~':
+                    chomp(stream, 1);
+                    chomp(stream, 1);
+                    return parse_unquote_splice(stream);
+                default:
+                    chomp(stream, 1);
+                    return parse_unquote(stream);
+            }
+        case '@':
+            chomp(stream, 1);
+            return parse_deref(stream);
         case '+':
         case '-':
             switch(*(*stream + 1)) {
@@ -282,8 +371,6 @@ obj * parse(char ** stream) {
             return parse(stream);
         default:
             return parse_symbol(stream);
-
     }
     panic("Unreachable code execution!");
-    return nil;
 }

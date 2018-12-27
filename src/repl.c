@@ -1,21 +1,32 @@
 #include "ll.h"
-#include "read.h"
+#include "core.h"
 #include "eval.h"
-#include "print.h"
+
+char * wrap_readline(char * prompt) {
+    char * line = readline(prompt);
+    if (strlen(line) > 0) {
+        add_history(line);
+    }
+    return line;
+}
 
 int main(int argc, char ** argv) {
     printf("clc v%s repl\n\n", VERSION);
     init_vm(MEMORY);
     init_env();
     for (;;) {
-        char * line_buffer = readline("cll>");
-        if (strlen(line_buffer) > 0) {
-            add_history(line_buffer);
-        }
+        char * line = wrap_readline("cll>");
         prepare_stack();
-        puts(print(eval(read(string(line_buffer)), g_env))->string);
+        obj * source = string(line);
+        // Allow for multi-line input from the user
+        while (need_more_input(source)) {
+            free(line);
+            line = wrap_readline("..  ");
+            source = cat(source, cat(string("\n"), string(line)));
+        }
+        free(line);
+        puts(print(eval(read(source), g_env))->string);
         return_from_stack(nil);
-        free(line_buffer);
     }
     free_vm();
     return EXIT_SUCCESS;

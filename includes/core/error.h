@@ -17,3 +17,4 @@
 extern obj * error_format(obj * type, obj * fmt, obj * args);
 extern obj * apply_error(obj * func, obj * o);
 extern obj * error_to_map(obj * error);
+extern obj * error_of_type(obj * error, obj * type, obj * message);

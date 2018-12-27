@@ -33,6 +33,7 @@ obj * load_core(obj * env) {
     env = naive_assoc(symbol("keyword"), native(&native_keyword), env);
     env = naive_assoc(symbol("nil"), nil, env);
     // Load other libs
+    env = load_io(env);
     env = load_types(env);
     env = load_list(env);
     env = load_map(env);

@@ -31,3 +31,16 @@ obj * error_to_map(obj * error) {
     m = naive_assoc(keyword("stack"), stack, m);
     return return_from_stack(m);
 }
+
+extern obj * error_of_type(obj * error, obj * type, obj * message) {
+    prepare_stack();
+    obj * error_dict = error_to_map(error);
+    obj * t = get(keyword("type"), error_dict, nil);
+    obj * m = get(keyword("message"), error_dict, nil);
+    if (type == nil || equal(type, t)) {
+        if (message == nil || equal(message, m)) {
+            return return_from_stack(keyword("true"));
+        }
+    }
+    return return_from_stack(nil);
+}

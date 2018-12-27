@@ -1,11 +1,6 @@
 #include "eval.h"
 #include "core.h"
 
-#define symbol_cmp(o, s) (o != nil \
-    && o->type == type_symbol \
-    && strcmp(o->resource, s) == 0 \
-)
-
 obj * g_env_ref = nil;
 obj * g_env = nil;
 
@@ -21,6 +16,18 @@ static obj * eval_list(obj * list, obj * env) {
         return return_from_stack(car(args));
     }
 
+    // Special form: quasi-quote
+    // Iterates over quated form and replaces calls with (unquote) and 
+    // (unqoute-splice) with their appropriate values.
+    if (symbol_cmp(op, "quasi-quote")) {
+        return return_from_stack(string("TODO quasi-quote"));
+    }
+
+    // Special form: macro
+    if (symbol_cmp(op, "macro")) {
+        return return_from_stack(string("TODO macro"));
+    }
+
     // Special form: if
     // If the first argument is truthy, if should evaluate and return its
     // second argument, otherwise it should evaluate and return its third
@@ -33,7 +40,12 @@ static obj * eval_list(obj * list, obj * env) {
         }
     }
 
-    // Specifal form: def
+    // Special form: cond
+    if (symbol_cmp(op, "cond")) {
+        return return_from_stack(string("TODO cond"));
+    }
+
+    // Special form: def
     // Using the first argument as a key in the global environment, adds an
     // entry for the evaluated second argument.
     if (symbol_cmp(op, "def")) {
@@ -72,6 +84,14 @@ static obj * eval_list(obj * list, obj * env) {
         }
         return return_from_stack(eval(expr, expr_env));
     }
+
+    // Special form: catch
+    if (symbol_cmp(op, "catch")) {
+        return return_from_stack(string("TODO catch"));
+    }
+
+    // Not a special form, evaluate as a function
+
     // Eval operator
     op = eval(op, env);
 

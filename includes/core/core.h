@@ -5,6 +5,7 @@
 #include "error.h"
 #include "read.h"
 #include "function.h"
+#include "io.h"
 #include "list.h"
 #include "logic.h"
 #include "map.h"

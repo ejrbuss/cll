@@ -212,7 +212,6 @@ static void * try_malloc(size_t bytes) {
         //printf("\nAfter: %u\n", g_vm->allocated);
     }
     if (g_vm->allocated + bytes > g_vm->max_allocated) {
-        breakpoint_catch();
         panic("Ran out of memory!");
     }
     g_vm->allocated += bytes;
