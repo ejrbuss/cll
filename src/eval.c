@@ -237,9 +237,7 @@ void init_env() {
     // Load prelude
     prepare_stack();
     obj * o = ceval("(load \"prelude.cll\")");
-    if (o != nil && o->type == type_error) {
-        panic("Error during prelude!\n%s", print(o)->string);
-    }
+    exit_on_error("Error during prelude!\n%s", o);
     return_from_stack(nil);
 }
 

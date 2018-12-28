@@ -1,5 +1,12 @@
 #include "ll.h"
 
+size_t MEMORY = 128000;
+int DEBUG_CONFIG   = 0;
+int DEBUG_PARSE    = 0;
+int DEBUG_MACROEXP = 0;
+int DEBUG_GC       = 0;
+int DEBUG_STAT     = 0;
+
 /**
  * Behaves like `malloc`, but garunteed to succeed or else panic.
  * - `bytes` the number of bytes to allocate

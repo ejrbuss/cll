@@ -18,7 +18,13 @@
 // ------
 
 #define VERSION "0.0.1"
-#define MEMORY 128000
+
+extern size_t MEMORY;
+extern int DEBUG_CONFIG;
+extern int DEBUG_PARSE;
+extern int DEBUG_MACROEXP;
+extern int DEBUG_GC;
+extern int DEBUG_STAT;
 
 /**
  * `nil` in Little Lisp is equivalent to C `NULL`.

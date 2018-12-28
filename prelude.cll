@@ -21,6 +21,12 @@
     (cons (do 
       ~~body) __for_0)) nil ~iter)))
 
+(defmacro time-it [& body]
+  ~'(let { start (time) }
+    ~~body
+    (let { end (time) }
+      (- end start))))
+
 ;; Functions
 ;; ---------
 

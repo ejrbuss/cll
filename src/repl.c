@@ -2,6 +2,97 @@
 #include "core.h"
 #include "eval.h"
 
+#define check_option(o, f, v) (strcmp(o, f) == 0 || strcmp(o, v) == 0)
+
+void parse_args(int argc, char ** argv) {
+    int i = 1;
+    int interactive = 0;
+    for(; argv[i][0] == '-' && i < argc; i++) {
+        char * option = argv[i];
+        if (check_option(option, "-h", "--help")) {
+            // todo_help();
+            continue;
+        }
+        if (check_option(option, "-v", "--version")) {
+            printf("cll v%s\n", VERSION);
+            exit(EXIT_SUCCESS);
+        }
+        if (check_option(option, "-i", "--interactive")) {
+            interactive = 1;
+            continue;
+        }
+        if (check_option(option, "-d", "--Debug-All")) {
+            DEBUG_CONFIG   = 1;
+            DEBUG_PARSE    = 1;
+            DEBUG_MACROEXP = 1;
+            DEBUG_GC       = 1;
+            DEBUG_STAT     = 1;
+            continue;
+        }
+        if (check_option(option, "-dConfig", "--Debug-Donfig")) {
+            DEBUG_CONFIG   = 1;
+            continue;
+        }
+        if (check_option(option, "-dParse", "--Debug-Parse")) {
+            DEBUG_PARSE    = 1;
+            continue;
+        }
+        if (check_option(option, "-dMacroexp", "--Debug-Macroexp")) {
+            DEBUG_MACROEXP = 1;
+            continue;
+        }
+        if (check_option(option, "-dGC", "--Debug-GC")) {
+            DEBUG_GC       = 1;
+            continue;
+        }
+        if (check_option(option, "-dStat", "--Debug-Stat")) {
+            DEBUG_STAT     = 1;
+            continue;
+        }
+        if (check_option(option, "-m", "--memory")) {
+            // todo_memory();
+            continue;
+        }
+        panic("Unknown command line option `%s`!", option);
+    }
+
+    // Now that the options have been parsed start the VM
+    init_vm(MEMORY);
+    init_env();
+
+    char * program = nil;
+    if (i < argc) {
+        program = argv[i];
+    }
+
+    // Load command line arguments
+    prepare_stack();
+    obj * args = nil;
+    while(i < argc) {
+        args = cons(string(argv[i]), args);
+        i++;
+    }
+    args = reverse(args);
+    args = cons(symbol("list"), args);
+    obj * args_def = format(string("(def io-args {})"), cons(args, nil));
+    obj * o = eval(read(args_def), g_env);
+    exit_on_error("Error during command line argument parsing!\n%s", o);
+    return_from_stack(nil);
+
+    // Further arguments mean we run a file
+    if (program) {
+        prepare_stack();
+        obj * load_program = print_format(string("(load {})"), cons(string(program), nil));
+        o = eval(read(load_program), g_env);
+        if (!interactive) {
+            exit_on_error("%s", o);
+            exit(EXIT_SUCCESS);
+        }
+        puts(print(o)->string);
+        return_from_stack(nil);\
+    }
+}
+
 char * wrap_readline(char * prompt) {
     char * line = readline(prompt);
     if (strlen(line) > 0) {
@@ -11,9 +102,8 @@ char * wrap_readline(char * prompt) {
 }
 
 int main(int argc, char ** argv) {
-    printf("clc v%s repl\n\n", VERSION);
-    init_vm(MEMORY);
-    init_env();
+    parse_args(argc, argv);
+    printf("cll v%s repl\n\n", VERSION);
     for (;;) {
         char * line = wrap_readline("cll>");
         prepare_stack();
