@@ -4,13 +4,12 @@ obj * io_input(obj * prompt) {
     prepare_stack();
     char * line;
     if (prompt != nil) {
-        check_type(string("input"), type_string, prompt);
+        check_type(lstring("input"), type_string, prompt);
         line = readline(prompt->string);
     } else {
         line = readline("");
     }
-    obj * o = string(line);
-    free(line);
+    obj * o = pstring(line);
     return return_from_stack(o);
 }
 
@@ -43,7 +42,7 @@ obj * native_io_println(obj * args) {
 
 obj * io_read(obj * path) {
     prepare_stack();
-    check_type(string("io-read"), type_string, path);
+    check_type(lstring("io-read"), type_string, path);
     char * buffer;
     long length;
     FILE * file = fopen(path->string, "r");
@@ -57,18 +56,18 @@ obj * io_read(obj * path) {
         buffer[length] = 0;
     } else {
         return return_from_stack(error_format(
-            keyword("IO-Error"),
-            string("Could not open `{}`!"),
+            lkeyword("IO-Error"),
+            lstring("Could not open `{}`!"),
             cons(path, nil)
         ));
     }
     if (buffer) {
-        obj * o = string(buffer);
+        obj * o = pstring(buffer);
         return return_from_stack(o);
     } else {
         return return_from_stack(error_format(
-            keyword("IO-Error"),
-            string("Could not reead `{}`!"),
+            lkeyword("IO-Error"),
+            lstring("Could not reead `{}`!"),
             cons(path, nil)
         ));
     }
@@ -80,16 +79,16 @@ obj * native_io_read(obj * args) {
 
 obj * io_write(obj * method, obj * path, obj * data) {
     prepare_stack();
-    check_type(string("io-write"), type_string, path);
+    check_type(lstring("io-write"), type_string, path);
     FILE * file;
-    if (equal(method, keyword("write"))) {
+    if (equal(method, lkeyword("write"))) {
         file = fopen(path->string, "w");
-    } else if (equal(method, keyword("append"))) {
+    } else if (equal(method, lkeyword("append"))) {
         file = fopen(path->string, "a");
     } else {
         return return_from_stack(error_format(
-            keyword("Argument-Error"),
-            string("Unexpected write method `{}`!"),
+            lkeyword("Argument-Error"),
+            lstring("Unexpected write method `{}`!"),
             cons(method, nil)
         ));
     }
@@ -102,15 +101,15 @@ obj * io_write(obj * method, obj * path, obj * data) {
         }
         if (e == EOF) {
             return return_from_stack(error_format(
-                keyword("Argument-Error"),
-                string("Could not write to `{}`!"),
+                lkeyword("Argument-Error"),
+                lstring("Could not write to `{}`!"),
                 cons(path, nil)
             ));
         } 
     } else {
         return return_from_stack(error_format(
-            keyword("IO-Error"),
-            string("Could not open `{}`!"),
+            lkeyword("IO-Error"),
+            lstring("Could not open `{}`!"),
             cons(path, nil)
         ));
     }
@@ -135,12 +134,12 @@ obj * native_exit(obj * args) {
 
 obj * load_io(obj * env) {
     prepare_stack();
-    env = naive_assoc(symbol("input"), native(&native_io_input), env);
-    env = naive_assoc(symbol("print"), native(&native_io_print), env);
-    env = naive_assoc(symbol("println"), native(&native_io_println), env);
-    env = naive_assoc(symbol("io-read"), native(&native_io_read), env);
-    env = naive_assoc(symbol("io-write"), native(&native_io_write), env);
-    env = naive_assoc(symbol("time"), native(&native_time), env);
-    env = naive_assoc(symbol("exit"), native(&native_exit), env);
+    env = naive_assoc(lsymbol("input"), native(&native_io_input), env);
+    env = naive_assoc(lsymbol("print"), native(&native_io_print), env);
+    env = naive_assoc(lsymbol("println"), native(&native_io_println), env);
+    env = naive_assoc(lsymbol("io-read"), native(&native_io_read), env);
+    env = naive_assoc(lsymbol("io-write"), native(&native_io_write), env);
+    env = naive_assoc(lsymbol("time"), native(&native_time), env);
+    env = naive_assoc(lsymbol("exit"), native(&native_exit), env);
     return return_from_stack(env);
 }

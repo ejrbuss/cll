@@ -13,7 +13,7 @@ static obj * native_ref(obj * args) {
  */
 obj * set(obj * ref, obj * val) {
     prepare_stack();
-    check_type(string("set!"), type_reference, ref);
+    check_type(lstring("set!"), type_reference, ref);
     ref->ref = val;
     return return_from_stack(nil);
 }
@@ -30,7 +30,7 @@ static obj * native_set(obj * args) {
  */
 obj * deref(obj * ref) {
     prepare_stack();
-    check_type(string("deref"), type_reference, ref);
+    check_type(lstring("deref"), type_reference, ref);
     return return_from_stack(ref->ref);
 }
 
@@ -40,8 +40,8 @@ static obj * native_deref(obj * args) {
 
 obj * load_references(obj * env) {
     prepare_stack();
-    env = naive_assoc(symbol("ref"), native(&native_ref), env);
-    env = naive_assoc(symbol("set!"), native(&native_set), env);
-    env = naive_assoc(symbol("deref"), native(&native_deref), env);
+    env = naive_assoc(lsymbol("ref"), native(&native_ref), env);
+    env = naive_assoc(lsymbol("set!"), native(&native_set), env);
+    env = naive_assoc(lsymbol("deref"), native(&native_deref), env);
     return return_from_stack(env);
 }

@@ -152,7 +152,9 @@ static void free_gc_node(gc_node * node) {
         case type_symbol:
         case type_keyword:
         case type_string:
-            free(o->resource);
+            if (o->owned) {
+                free(o->resource);
+            }
         default:
             break;
     }
@@ -358,26 +360,32 @@ obj * error(obj * type, obj * mes) {
     return return_from_stack(o);
 }
 
-static obj * resource(char * rsc, type type) {
+static obj * resource(char * rsc, int copy, int owned, type type) {
     obj * o = init_obj();
     int l = strlen(rsc);
-    o->resource = (char *) must_malloc(sizeof(char) * (l + 1));
+    if (copy) {
+        o->resource = (char *) must_malloc(sizeof(char) * (l + 1));
+        strcpy(o->resource, rsc);
+        o->owned = 1;
+    } else {
+        o->resource = rsc;
+        o->owned = owned;
+    }
     o->length = l;
     o->type = type;
-    strcpy(o->resource, rsc);
     return o;
 }
 
-obj * symbol(char * s) {
-    return resource(s, type_symbol);
+obj * symbol(char * s, int copy, int owned) {
+    return resource(s, copy, owned, type_symbol);
 }
 
-obj * keyword(char * k) {
-    return resource(k, type_keyword);
+obj * keyword(char * k, int copy, int owned) {
+    return resource(k, copy, owned, type_keyword);
 }
 
-obj * string(char * s) {
-    return resource(s, type_string);
+obj * string(char * s, int copy, int owned) {
+    return resource(s, copy, owned, type_string);
 }
 
 obj * number(double n) {
@@ -420,7 +428,7 @@ obj * fn(obj * env, obj * args, obj * body) {
 
 obj * native(obj * (*fn)(obj *)) {
     obj * o = init_obj();
-    o->type   = type_native_function;
+    o->type = type_native_function;
     o->native = fn;
     return o;
 }

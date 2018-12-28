@@ -8,7 +8,7 @@
  */
 obj * not(obj * o) {
     if (o == nil) {
-        return keyword("true");
+        return lkeyword("true");
     }
     return nil;
 }
@@ -34,7 +34,7 @@ obj * and(obj * first, obj * second) {
 
 static obj * native_and(obj * args) {
     prepare_stack();
-    obj * cond = keyword("true");
+    obj * cond = lkeyword("true");
     while (args != nil && cond) {
         cond = and(cond, car(args));
         args = cdr(args);
@@ -67,7 +67,7 @@ static obj * native_or(obj * args) {
  */
 obj * equal(obj * first, obj * second) {
     if (first == second) {
-        return keyword("true");
+        return lkeyword("true");
     }
     if (first == nil || second == nil) {
         return nil;
@@ -83,11 +83,11 @@ obj * equal(obj * first, obj * second) {
         case type_keyword:
         case type_string:
             return strcmp(first->resource, second->resource) == 0
-                ? keyword("true")
+                ? lkeyword("true")
                 : nil;
         case type_number:
             return first->number == second->number
-                ? keyword("true")
+                ? lkeyword("true")
                 : nil;
         case type_list:
             return and(
@@ -117,7 +117,7 @@ obj * equal(obj * first, obj * second) {
                 }
                 snd_keys = cdr(snd_keys);
             }
-            return return_from_stack(keyword("true"));
+            return return_from_stack(lkeyword("true"));
         case type_macro:
         case type_function:
         case type_native_function:
@@ -129,7 +129,7 @@ obj * equal(obj * first, obj * second) {
 static obj * native_equal(obj * args) {
     prepare_stack();
     obj * first = car(args);
-    obj * cond = keyword("true");
+    obj * cond = lkeyword("true");
     args = cdr(args);
     while (args != nil) {
         cond = equal(first, car(args));
@@ -140,9 +140,9 @@ static obj * native_equal(obj * args) {
 
 obj * load_logic(obj * env) {
     prepare_stack();
-    env = naive_assoc(symbol("not"), native(&native_not), env);
-    env = naive_assoc(symbol("and"), native(&native_and), env);
-    env = naive_assoc(symbol("or"), native(&native_or), env);
-    env = naive_assoc(symbol("="), native(&native_equal), env);
+    env = naive_assoc(lsymbol("not"), native(&native_not), env);
+    env = naive_assoc(lsymbol("and"), native(&native_and), env);
+    env = naive_assoc(lsymbol("or"), native(&native_or), env);
+    env = naive_assoc(lsymbol("="), native(&native_equal), env);
     return return_from_stack(env);
 }

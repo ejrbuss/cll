@@ -13,7 +13,7 @@ static obj * native_symbol(obj * args) {
     } else {
         s = print(args);
     }
-    return return_from_stack(symbol(no_whitespace(s)->string));
+    return return_from_stack(csymbol(no_whitespace(s)->string));
 }
 
 static obj * native_keyword(obj * args) {
@@ -24,7 +24,7 @@ static obj * native_keyword(obj * args) {
     } else {
         s = print(args);
     }
-    return return_from_stack(keyword(no_whitespace(s)->string));
+    return return_from_stack(ckeyword(no_whitespace(s)->string));
 }
 
 extern obj * native_eval(obj * args) {
@@ -33,13 +33,13 @@ extern obj * native_eval(obj * args) {
 
 extern obj * native_read(obj * args) {
     prepare_stack();
-    check_type(string("read"), type_string, car(args));
+    check_type(lstring("read"), type_string, car(args));
     return return_from_stack(read(car(args)));
 }
 
 extern obj * native_load(obj * args) {
     prepare_stack();
-    check_type(string("load"), type_string, car(args));
+    check_type(lstring("load"), type_string, car(args));
     obj * source = io_read(car(args));
     return_on_error(source);
     obj * forms = read_all(source);
@@ -55,13 +55,13 @@ extern obj * native_load(obj * args) {
 
 obj * load_core(obj * env) {
     prepare_stack();
-    env = naive_assoc(symbol("throw"), native(&native_error), env);
-    env = naive_assoc(symbol("symbol"), native(&native_symbol), env);
-    env = naive_assoc(symbol("keyword"), native(&native_keyword), env);
-    env = naive_assoc(symbol("eval"), native(&native_eval), env);
-    env = naive_assoc(symbol("read"), native(&native_read), env);
-    env = naive_assoc(symbol("load"), native(&native_load), env);
-    env = naive_assoc(symbol("nil"), nil, env);
+    env = naive_assoc(lsymbol("throw"), native(&native_error), env);
+    env = naive_assoc(lsymbol("symbol"), native(&native_symbol), env);
+    env = naive_assoc(lsymbol("keyword"), native(&native_keyword), env);
+    env = naive_assoc(lsymbol("eval"), native(&native_eval), env);
+    env = naive_assoc(lsymbol("read"), native(&native_read), env);
+    env = naive_assoc(lsymbol("load"), native(&native_load), env);
+    env = naive_assoc(lsymbol("nil"), nil, env);
     // Load other libs
     env = load_io(env);
     env = load_types(env);

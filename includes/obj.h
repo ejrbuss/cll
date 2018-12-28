@@ -48,7 +48,7 @@ struct obj {
                 char * string;
             };
             int length;
-            int owned; // TODO
+            int owned;
         };
         struct {
             obj * car;
@@ -76,6 +76,21 @@ struct vm {
 
 vm * g_vm; // The gobal vm reference
 
+// String literal macros
+#define lsymbol(s) symbol(s, 0, 0)
+#define lkeyword(s) keyword(s, 0, 0)
+#define lstring(s) string(s, 0, 0)
+
+// Copy macros
+#define csymbol(s) symbol(s, 1, 1)
+#define ckeyword(s) keyword(s, 1, 1)
+#define cstring(s) string(s, 1, 1)
+
+// Pre-allocated macros
+#define psymbol(s) symbol(s, 0, 1)
+#define pkeyword(s) keyword(s, 0, 1)
+#define pstring(s) string(s, 0, 1)
+
 extern void vm_debug();
 extern void init_vm(size_t max_allocated);
 extern void free_vm();
@@ -85,9 +100,9 @@ extern obj * return_from_stack(obj * o);
 extern obj * stack_pop();
 extern obj * reference(obj * o);
 extern obj * error(obj * type, obj * mes);
-extern obj * symbol(char * s);
-extern obj * keyword(char * k);
-extern obj * string(char * s);
+extern obj * symbol(char * s, int copy, int own);
+extern obj * keyword(char * k, int copy, int own);
+extern obj * string(char * s, int copy, int own);
 extern obj * number(double n);
 extern obj * cons(obj * x, obj * list);
 extern obj * naive_assoc(obj * key, obj * val, obj * map);

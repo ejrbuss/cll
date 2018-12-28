@@ -12,7 +12,7 @@
  */
 obj * call(obj * fn, obj * args) {
     if (fn == nil) {
-        return apply_error(string("call"), fn);
+        return apply_error(lstring("call"), fn);
     }
     switch (fn->type) {            
         case type_keyword:
@@ -26,7 +26,7 @@ obj * call(obj * fn, obj * args) {
             break;
         default:
             prepare_stack();
-            return return_from_stack(apply_error(string("call"), fn));
+            return return_from_stack(apply_error(lstring("call"), fn));
     }
     prepare_stack();
     obj * fn_env  = car(fn);
@@ -51,6 +51,6 @@ static obj * native_call(obj * args) {
 
 obj * load_function(obj * env) {
     prepare_stack();
-    env = naive_assoc(symbol("call"), native(&native_call), env);
+    env = naive_assoc(lsymbol("call"), native(&native_call), env);
     return return_from_stack(env);
 }

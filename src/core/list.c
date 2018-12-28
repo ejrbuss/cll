@@ -26,7 +26,7 @@ obj * car(obj * list) {
             prepare_stack();
             return return_from_stack(substr(number(0), number(1), list));
         default:
-            return apply_error(string("car"), list);
+            return apply_error(lstring("car"), list);
     }
 }
 
@@ -56,7 +56,7 @@ obj * cdr(obj * list) {
             prepare_stack();
             return return_from_stack(substr(number(1), number(list->length), list));
         default:
-            return apply_error(string("cdr"), list);
+            return apply_error(lstring("cdr"), list);
 
     }
 }
@@ -84,7 +84,7 @@ obj * reverse(obj * list) {
         case type_map:
             break;
         default:
-            return apply_error(string("reverse"), list);
+            return apply_error(lstring("reverse"), list);
     }
     prepare_stack();
     obj * reversed = nil;
@@ -117,19 +117,19 @@ obj * in(obj * item, obj * list) {
         case type_map:
             while (list != nil) {
                 if (equal(item, car(list))) {
-                    return return_from_stack(keyword("true"));
+                    return return_from_stack(lkeyword("true"));
                 }
                 list = cdr(list);
             }
             return return_from_stack(nil);
         case type_string:
             if (item == nil || item->type != type_string) {
-                return return_from_stack(apply_error(string("in"), item));
+                return return_from_stack(apply_error(lstring("in"), item));
             }
-            obj * rep = replace(item, cat(item, string("$")), list);
+            obj * rep = replace(item, cat(item, lstring("$")), list);
             return return_from_stack(not(equal(list, rep)));
         default:
-            return return_from_stack(apply_error(string("in"), list));            
+            return return_from_stack(apply_error(lstring("in"), list));            
     }
     
 }
@@ -154,7 +154,7 @@ obj * count(obj * list) {
         case type_string:
             return return_from_stack(number(list->length));
         default:
-            return return_from_stack(apply_error(string("count"), list));
+            return return_from_stack(apply_error(lstring("count"), list));
     }
     while (list != nil) {
         count++;
@@ -172,12 +172,12 @@ static obj * native_count(obj * args) {
  */
 obj * load_list(obj * env) {
     prepare_stack();
-    env = naive_assoc(symbol("list"), native(&native_list), env);
-    env = naive_assoc(symbol("car"), native(&native_car), env);
-    env = naive_assoc(symbol("cdr"), native(&native_cdr), env);
-    env = naive_assoc(symbol("cons"), native(&native_cons), env);
-    env = naive_assoc(symbol("in"), native(&native_in), env);
-    env = naive_assoc(symbol("count"), native(&native_count), env);
-    env = naive_assoc(symbol("reverse"), native(&native_reverse), env);
+    env = naive_assoc(lsymbol("list"), native(&native_list), env);
+    env = naive_assoc(lsymbol("car"), native(&native_car), env);
+    env = naive_assoc(lsymbol("cdr"), native(&native_cdr), env);
+    env = naive_assoc(lsymbol("cons"), native(&native_cons), env);
+    env = naive_assoc(lsymbol("in"), native(&native_in), env);
+    env = naive_assoc(lsymbol("count"), native(&native_count), env);
+    env = naive_assoc(lsymbol("reverse"), native(&native_reverse), env);
     return return_from_stack(env);
 }

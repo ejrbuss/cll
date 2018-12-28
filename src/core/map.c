@@ -22,7 +22,7 @@ static obj * native_map(obj * args) {
  */
 obj * naive_get(obj * key, obj * map) {
     prepare_stack();
-    check_type_or_nil(string("naive_get"), type_map, map);
+    check_type_or_nil(lstring("naive_get"), type_map, map);
     while (map != nil) {
         if (equal(car(map), key)) {
             return return_from_stack(car(cdr(map)));
@@ -33,15 +33,15 @@ obj * naive_get(obj * key, obj * map) {
         }
     }
     return return_from_stack(error_format(
-        keyword("Lookup-Error"), 
-        string("`{}` not in map!"), 
+        lkeyword("Lookup-Error"), 
+        lstring("`{}` not in map!"), 
         cons(key, nil)
     ));
 }
 
 obj * get(obj * key, obj * map, obj * def) {
     prepare_stack();
-    check_type_or_nil(string("get"), type_map, map);
+    check_type_or_nil(lstring("get"), type_map, map);
     while (map != nil) {
         if (equal(car(map), key)) {
             return return_from_stack(car(cdr(map)));
@@ -67,7 +67,7 @@ obj * native_get(obj * args) {
  */
 obj * keys(obj * map) {
     prepare_stack();
-    check_type_or_nil(string("keys"), type_map, map);
+    check_type_or_nil(lstring("keys"), type_map, map);
     obj * keys = nil;
     while(map != nil) {
         keys = cons(car(map), keys);
@@ -86,7 +86,7 @@ obj * native_keys(obj * args) {
 
 obj * dissoc(obj * key, obj * map) {
     prepare_stack();
-    check_type_or_nil(string("dissoc"), type_map, map);
+    check_type_or_nil(lstring("dissoc"), type_map, map);
     if (not(in(key, keys(map)))) {
         return return_from_stack(map);
     }
@@ -107,7 +107,7 @@ static obj * native_dissoc(obj * args) {
 }
 
 obj * assoc(obj * key, obj * val, obj * map) {
-    check_type_or_nil(string("assoc"), type_map, map);
+    check_type_or_nil(lstring("assoc"), type_map, map);
     map = dissoc(key, map);
     return naive_assoc(key, val, map);
 }
@@ -118,10 +118,10 @@ static obj * native_assoc(obj * args) {
 
 obj * load_map(obj * env) {
     prepare_stack();
-    env = naive_assoc(symbol("map"), native(&native_map), env);
-    env = naive_assoc(symbol("get"), native(&native_get), env);
-    env = naive_assoc(symbol("keys"), native(&native_keys), env);
-    env = naive_assoc(symbol("dissoc"), native(&native_dissoc), env);
-    env = naive_assoc(symbol("assoc"), native(&native_assoc), env);
+    env = naive_assoc(lsymbol("map"), native(&native_map), env);
+    env = naive_assoc(lsymbol("get"), native(&native_get), env);
+    env = naive_assoc(lsymbol("keys"), native(&native_keys), env);
+    env = naive_assoc(lsymbol("dissoc"), native(&native_dissoc), env);
+    env = naive_assoc(lsymbol("assoc"), native(&native_assoc), env);
     return return_from_stack(env);
 }

@@ -5,7 +5,7 @@
 void test_nil() {
     prepare_stack();
     assert(equal(
-        read(string("()")),
+        read(lstring("()")),
         nil
     ) != nil);
     return_from_stack(nil);
@@ -14,12 +14,12 @@ void test_nil() {
 void test_symbol() {
     prepare_stack();
     assert(equal(
-        read(string("x")),
-        symbol("x")
+        read(lstring("x")),
+        lsymbol("x")
     ) != nil);
     assert(equal(
-        read(string("some-symbol?")),
-        symbol("some-symbol?")
+        read(lstring("some-symbol?")),
+        lsymbol("some-symbol?")
     ) != nil);
     return_from_stack(nil);
 }
@@ -28,12 +28,12 @@ void test_keyword() {
     prepare_stack();
         prepare_stack();
     assert(equal(
-        read(string(":x")),
-        keyword("x")
+        read(lstring(":x")),
+        lkeyword("x")
     ) != nil);
     assert(equal(
-        read(string(":some-keyword?")),
-        keyword("some-keyword?")
+        read(lstring(":some-keyword?")),
+        lkeyword("some-keyword?")
     ) != nil);
     return_from_stack(nil);
     return_from_stack(nil);
@@ -42,16 +42,16 @@ void test_keyword() {
 void test_string() {
     prepare_stack();
     assert(equal(
-        read(string("\"test\"")),
-        string("test")
+        read(lstring("\"test\"")),
+        lstring("test")
     ) != nil);
     assert(equal(
-        read(string("\"Hello, World!\"")),
-        string("Hello, World!")
+        read(lstring("\"Hello, World!\"")),
+        lstring("Hello, World!")
     ) != nil);
     assert(equal(
-        read(string("\"escaped \\\"\\n\n\"")),
-        string("escaped \"\n\n")
+        read(lstring("\"escaped \\\"\\n\n\"")),
+        lstring("escaped \"\n\n")
     ) != nil);
     return_from_stack(nil);
 }
@@ -59,19 +59,19 @@ void test_string() {
 void test_number() {
     prepare_stack();
     assert(equal(
-        read(string("7")),
+        read(lstring("7")),
         number(7)
     ) != nil);
     assert(equal(
-        read(string("1024")),
+        read(lstring("1024")),
         number(1024)
     ) != nil);
     assert(equal(
-        read(string("3.14159")),
+        read(lstring("3.14159")),
         number(3.14159)
     ) != nil);
     assert(equal(
-        read(string("042.124")),
+        read(lstring("042.124")),
         number(42.124)
     ) != nil);
     return_from_stack(nil);
@@ -80,24 +80,24 @@ void test_number() {
 void test_list() {
     prepare_stack();
     assert(equal(
-        print(read(string("(1 2 3 4)"))),
-        string("(1 2 3 4)")
+        print(read(lstring("(1 2 3 4)"))),
+        lstring("(1 2 3 4)")
     ) != nil);
     assert(equal(
-        print(read(string("[]"))),
-        string("(list)")
+        print(read(lstring("[]"))),
+        lstring("(list)")
     ) != nil);
     assert(equal(
-        print(read(string("[1 2 3 xyz]"))),
-        string("(list 1 2 3 xyz)")
+        print(read(lstring("[1 2 3 xyz]"))),
+        lstring("(list 1 2 3 xyz)")
     ) != nil);
     assert(equal(
-        print(read(string("(x y (:key ()))"))),
-        string("(x y (:key ()))")
+        print(read(lstring("(x y (:key ()))"))),
+        lstring("(x y (:key ()))")
     ) != nil);
     assert(equal(
-        print(read(string("(fn [x y] (+ (square x) y))"))),
-        string("(fn (list x y) (+ (square x) y))")
+        print(read(lstring("(fn [x y] (+ (square x) y))"))),
+        lstring("(fn (list x y) (+ (square x) y))")
     ) != nil);
     return_from_stack(nil);
 }
@@ -105,12 +105,12 @@ void test_list() {
 void test_map() {
     prepare_stack();
     assert(equal(
-        print(read(string("{:key \"value\"}"))),
-        string("(map :key \"value\")")
+        print(read(lstring("{:key \"value\"}"))),
+        lstring("(map :key \"value\")")
     ) != nil);
     assert(equal(
-        print(read(string("{1 2 :list (1 2 3 {})}"))),
-        string("(map 1 2 :list (1 2 3 (map)))")
+        print(read(lstring("{1 2 :list (1 2 3 {})}"))),
+        lstring("(map 1 2 :list (1 2 3 (map)))")
     ) != nil);
     return_from_stack(nil);
 }

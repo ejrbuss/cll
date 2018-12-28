@@ -16,24 +16,24 @@ static obj * list_to_string(obj * list, obj * left, obj * right) {
     if (equal(xs, print(nil))) {
         return return_from_stack(cat(left, cat(x, right)));
     } else {
-        return return_from_stack(cat(left, cat(x, cat(string(" "), string(xs->string + 1)))));
+        return return_from_stack(cat(left, cat(x, cat(lstring(" "), cstring(xs->string + 1)))));
     }
 }
 
 static obj * error_to_string(obj * error) {
     prepare_stack();
     obj * error_map = error_to_map(error);
-    obj * type = naive_get(keyword("type"), error_map);
-    obj * message = naive_get(keyword("message"), error_map);
-    obj * stack = naive_get(keyword("stack"), error_map);
+    obj * type = naive_get(lkeyword("type"), error_map);
+    obj * message = naive_get(lkeyword("message"), error_map);
+    obj * stack = naive_get(lkeyword("stack"), error_map);
     obj * header = format(
-        string("{} {}"), 
+        lstring("{} {}"), 
         cons(type, cons(message, nil))
     );
-    obj * stack_string = string("");
+    obj * stack_string = lstring("");
     while(stack != nil) {
         stack_string = format(
-            string("{}\n  at {}"),
+            lstring("{}\n  at {}"),
             cons(stack_string, cons(print(car(stack)), nil))
         );
         stack = cdr(stack);
@@ -51,31 +51,31 @@ static obj * error_to_string(obj * error) {
 obj * print(obj * o) {
     prepare_stack();
     if (o == nil) {
-        return return_from_stack(string("()"));
+        return return_from_stack(lstring("()"));
     }
     switch (o->type) {
         case type_reference:
-            return return_from_stack(string("<ref>"));
+            return return_from_stack(lstring("<ref>"));
         case type_error:
             return return_from_stack(error_to_string(o));
         case type_symbol:
-            return return_from_stack(string(o->symbol));
+            return return_from_stack(cstring(o->symbol));
         case type_keyword:
-            return return_from_stack(cat(string(":"), string(o->keyword)));
+            return return_from_stack(cat(lstring(":"), cstring(o->keyword)));
         case type_string:
-            return return_from_stack(cat(string("\""), cat(o, string("\""))));
+            return return_from_stack(cat(lstring("\""), cat(o, lstring("\""))));
         case type_number:
             return return_from_stack(number_to_string(o));
         case type_list:
-            return return_from_stack(list_to_string(o, string("("), string(")")));
+            return return_from_stack(list_to_string(o, lstring("("), lstring(")")));
         case type_map:
-            return return_from_stack(list_to_string(o, string("{"), string("}")));
+            return return_from_stack(list_to_string(o, lstring("{"), lstring("}")));
         case type_macro:
-            return return_from_stack(string("<macro>"));
+            return return_from_stack(lstring("<macro>"));
         case type_function:
-            return return_from_stack(string("<function>"));
+            return return_from_stack(lstring("<function>"));
         case type_native_function:
-            return return_from_stack(string("<native function>"));
+            return return_from_stack(lstring("<native function>"));
     }
     panic("Unreachable code execution!");
 }

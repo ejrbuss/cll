@@ -7,7 +7,7 @@
 void parse_args(int argc, char ** argv) {
     int i = 1;
     int interactive = 0;
-    for(; argv[i][0] == '-' && i < argc; i++) {
+    for(; i < argc && argv[i][0] == '-'; i++) {
         char * option = argv[i];
         if (check_option(option, "-h", "--help")) {
             puts(
@@ -73,12 +73,12 @@ void parse_args(int argc, char ** argv) {
     prepare_stack();
     obj * args = nil;
     while(i < argc) {
-        args = cons(string(argv[i]), args);
+        args = cons(cstring(argv[i]), args);
         i++;
     }
     args = reverse(args);
-    args = cons(symbol("list"), args);
-    obj * args_def = format(string("(def io-args {})"), cons(args, nil));
+    args = cons(lsymbol("list"), args);
+    obj * args_def = format(lstring("(def io-args {})"), cons(args, nil));
     obj * o = eval(read(args_def), g_env);
     exit_on_error("Error during command line argument parsing!\n%s", o);
     return_from_stack(nil);
@@ -86,7 +86,7 @@ void parse_args(int argc, char ** argv) {
     // Further arguments mean we run a file
     if (program) {
         prepare_stack();
-        obj * load_program = print_format(string("(load {})"), cons(string(program), nil));
+        obj * load_program = print_format(lstring("(load {})"), cons(cstring(program), nil));
         o = eval(read(load_program), g_env);
         if (!interactive) {
             exit_on_error("%s", o);
@@ -111,14 +111,12 @@ int main(int argc, char ** argv) {
     for (;;) {
         char * line = wrap_readline("cll>");
         prepare_stack();
-        obj * source = string(line);
+        obj * source = pstring(line);
         // Allow for multi-line input from the user
         while (need_more_input(source)) {
-            free(line);
             line = wrap_readline("..  ");
-            source = cat(source, cat(string("\n"), string(line)));
+            source = cat(source, cat(lstring("\n"), pstring(line)));
         }
-        free(line);
         puts(print(eval(read(source), g_env))->string);
         return_from_stack(nil);
     }

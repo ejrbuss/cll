@@ -113,7 +113,7 @@ static obj * eval_list(obj * list, obj * env) {
     // Using the first argument as a key in the global environment, adds an
     // entry for the evaluated second argument.
     if (symbol_cmp(op, "def")) {
-        check_type(string("def"), type_symbol, car(args));
+        check_type(lstring("def"), type_symbol, car(args));
         // We use naive_assoc here because we don't care about cleaning up old
         // definitions. Re-defs shouldn't be used for large amounts of data,
         // refs should be used for that. In return we don't ever have to copy
@@ -140,7 +140,7 @@ static obj * eval_list(obj * list, obj * env) {
         if (map != nil && map->type == type_list && symbol_cmp(car(map), "map")) {
             map = cdr(map);
         } else {
-            check_type_or_nil(string("let"), type_map, map);
+            check_type_or_nil(lstring("let"), type_map, map);
         }
         obj * let_env = env;
         while(map != nil) {
@@ -168,7 +168,7 @@ static obj * eval_list(obj * list, obj * env) {
             return return_from_stack(o);
         }
         obj * err_map = error_to_map(o);
-        obj * err_type = get(keyword("type"), err_map, nil);
+        obj * err_type = get(lkeyword("type"), err_map, nil);
         obj * handler = eval(car(args), env);
         return_on_error(handler);
         if (handler != nil && handler->type == type_map) {
@@ -180,7 +180,7 @@ static obj * eval_list(obj * list, obj * env) {
         )) {
             return return_from_stack(call(handler, cons(err_map, nil)));
         }
-        return return_from_stack(apply_error(string("catch"), handler));
+        return return_from_stack(apply_error(lstring("catch"), handler));
     }
 
     // Not a special form, evaluate as a function
@@ -263,8 +263,8 @@ obj * eval(obj * expr, obj * env) {
         case type_symbol: 
             prepare_stack();
             obj * lookup_error = error_format(
-                keyword("Lookup-Error"),
-                string("`{}` is not defined!"),
+                lkeyword("Lookup-Error"),
+                lstring("`{}` is not defined!"),
                 cons(expr, nil)
             );
             lookup_error = cons(expr, lookup_error);

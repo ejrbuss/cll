@@ -49,7 +49,7 @@ void test_simple_stack() {
 
 void test_symbol() {
     init_vm(vm_size(1));
-    obj * o = symbol("name");
+    obj * o = lsymbol("name");
     gc();
     assert(strcmp(o->symbol, "name") == 0);
     free_vm();
@@ -57,7 +57,7 @@ void test_symbol() {
 
 void test_keyword() {
     init_vm(vm_size(1));
-    obj * o = keyword("name");
+    obj * o = lkeyword("name");
     gc();
     assert(strcmp(o->keyword, "name") == 0);
     free_vm();
@@ -65,7 +65,7 @@ void test_keyword() {
 
 void test_string() {
     init_vm(vm_size(1));
-    obj * o = string("Hello, World!");
+    obj * o = lstring("Hello, World!");
     gc();
     assert(strcmp(o->string, "Hello, World!") == 0);
     free_vm();
@@ -92,7 +92,7 @@ void test_list() {
 void test_map() {
     init_vm(vm_size(5));
     prepare_stack();
-    obj * o = naive_assoc(string("key"), string("value"), nil);
+    obj * o = naive_assoc(lstring("key"), lstring("value"), nil);
     return_from_stack(o);
     gc();
     assert(g_vm->stack->car == o);
@@ -110,8 +110,8 @@ void test_function() {
     prepare_stack();
     obj * o = fn(
         nil,
-        cons(symbol("x"), nil),
-        cons(symbol("square"), cons(symbol("x"), nil))
+        cons(lsymbol("x"), nil),
+        cons(lsymbol("square"), cons(lsymbol("x"), nil))
     );
     return_from_stack(o);
     gc();
@@ -146,7 +146,7 @@ void test_simple_auto_gc() {
     int i;
     for (i = 0; i < 100000; i++) {
         prepare_stack();
-        string("abcdefghijklmnopqrstuvwxyz");
+        lstring("abcdefghijklmnopqrstuvwxyz");
         return_from_stack(nil);
     }
     free_vm();

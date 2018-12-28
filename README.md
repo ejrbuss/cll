@@ -19,6 +19,14 @@ Options:
 
 ## Broken
 
+```
+cll>(time-it (fib 20))
+15
+cll>(time-it (ifib 20))
+0
+cll>(vm-stat)
+{:allocated 88512 :max 128000}
+```
 
 ## TODO
 - Testing

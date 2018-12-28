@@ -9,22 +9,21 @@
  */
 obj * cat(obj * first, obj * second) {
     prepare_stack();
-    check_type(string("str"), type_string, first);
-    check_type(string("str"), type_string, second);
+    check_type(lstring("str"), type_string, first);
+    check_type(lstring("str"), type_string, second);
     char * buffer = (char *) must_malloc(
         first->length +
         second->length + 1
     );
     strcpy(buffer, first->string);
     strcat(buffer, second->string);
-    obj * catted = string(buffer);
-    free(buffer);
+    obj * catted = pstring(buffer);
     return return_from_stack(catted);
 }
 
 static obj * native_cat(obj * args) {
     prepare_stack();
-    obj * s = string("");
+    obj * s = lstring("");
     while(args != nil) {
         if (car(args) != nil && car(args)->type == type_string) {
             s = cat(s, car(args));
@@ -47,12 +46,11 @@ static obj * native_cat(obj * args) {
  */
 obj * number_to_string(obj * n) {
     prepare_stack();
-    check_type(string("number_to_string"), type_number, n);
+    check_type(lstring("number_to_string"), type_number, n);
     size_t max_len = sizeof(char) * 32;
     char * buffer = (char *) must_malloc(max_len + 1);
     snprintf(buffer, max_len, "%lg", n->number);
-    obj * s = string(buffer);
-    free(buffer);
+    obj * s = pstring(buffer);
     return return_from_stack(s);
 }
 
@@ -68,9 +66,9 @@ obj * number_to_string(obj * n) {
  */
 obj * replace(obj * ref, obj * rep, obj * s) {
     prepare_stack();
-    check_type(string("replace"), type_string, ref);
-    check_type(string("replace"), type_string, rep);
-    check_type(string("replace"), type_string, s);
+    check_type(lstring("replace"), type_string, ref);
+    check_type(lstring("replace"), type_string, rep);
+    check_type(lstring("replace"), type_string, s);
     int replaced = 0;
     char * buffer = (char *) must_malloc(s->length + rep->length);
     char * bp = buffer;
@@ -88,8 +86,7 @@ obj * replace(obj * ref, obj * rep, obj * s) {
         }
     }
     *bp = '\0';
-    obj * r = string(buffer);
-    free(buffer);
+    obj * r = pstring(buffer);
     return return_from_stack(r);
 }
 
@@ -109,9 +106,9 @@ static obj * native_replace(obj * args) {
  */
 obj * replace_all(obj * ref, obj * rep, obj * s) {
     prepare_stack();
-    check_type(string("replace"), type_string, ref);
-    check_type(string("replace"), type_string, rep);
-    check_type(string("replace"), type_string, s);
+    check_type(lstring("replace"), type_string, ref);
+    check_type(lstring("replace"), type_string, rep);
+    check_type(lstring("replace"), type_string, s);
     // count the number of occurences
     int count = 0;
     char * sp;
@@ -139,8 +136,7 @@ obj * replace_all(obj * ref, obj * rep, obj * s) {
         }
     }
     *bp = '\0';
-    obj * r = string(buffer);
-    free(buffer);
+    obj * r = pstring(buffer);
     return return_from_stack(r);
 }
 
@@ -156,11 +152,11 @@ static obj * native_replace_all(obj * args) {
  */
 obj * no_whitespace(obj * s) {
     prepare_stack();
-    check_type(string("no_whitespace"), type_string, s);
-    s = replace_all(string(" "), string(""), s);
-    s = replace_all(string("\t"), string(""), s);
-    s = replace_all(string("\n"), string(""), s);
-    s = replace_all(string(","), string(""), s);
+    check_type(lstring("no_whitespace"), type_string, s);
+    s = replace_all(lstring(" "), lstring(""), s);
+    s = replace_all(lstring("\t"), lstring(""), s);
+    s = replace_all(lstring("\n"), lstring(""), s);
+    s = replace_all(lstring(","), lstring(""), s);
     return return_from_stack(s);
 }
 
@@ -178,13 +174,13 @@ static obj * native_no_whitespace(obj * args) {
  */
 obj * split(obj * delim, obj * s) {
     prepare_stack();
-    check_type(string("split"), type_string, delim);
-    check_type(string("split"), type_string, s);    
-    obj * copy = string(s->string);
+    check_type(lstring("split"), type_string, delim);
+    check_type(lstring("split"), type_string, s);    
+    obj * copy = cstring(s->string);
     obj * list = nil;
     char * token = strtok(copy->string, delim->string);
     while (token != nil) {
-        list = cons(string(token), list);
+        list = cons(cstring(token), list);
         token = strtok(nil, delim->string);
     }
     return return_from_stack(reverse(list));
@@ -205,16 +201,15 @@ static obj * native_split(obj * args) {
  */
 obj * substr(obj * start, obj * length, obj * s) {
     prepare_stack();
-    check_type(string("substr"), type_number, start);
-    check_type(string("substr"), type_number, length);
-    check_type(string("substr"), type_string, s);
+    check_type(lstring("substr"), type_number, start);
+    check_type(lstring("substr"), type_number, length);
+    check_type(lstring("substr"), type_string, s);
     size_t max_len = s->length + 1 * sizeof(char);
     char * buffer = (char *) must_malloc(max_len);
     memset(buffer, '\0', max_len);
     length = nmin(length, number(max_len - 1));
     strncpy(buffer, s->string + ((int) start->number), ((int) length->number));
-    obj * o = string(buffer);
-    free(buffer);
+    obj * o = pstring(buffer);
     return return_from_stack(o);
 }
 
@@ -232,9 +227,9 @@ static obj * native_substr(obj * args) {
  */
 obj * format(obj * fmt, obj * args) {
     prepare_stack();
-    check_type(string("format"), type_string, fmt);
+    check_type(lstring("format"), type_string, fmt);
     while(args != nil) {
-        obj * ref = string("{}");
+        obj * ref = lstring("{}");
         if (car(args) != nil && car(args)->type == type_string) {
             fmt = replace(ref, car(args), fmt);
         } else {
@@ -247,9 +242,9 @@ obj * format(obj * fmt, obj * args) {
 
 obj * print_format(obj * fmt, obj * args) {
     prepare_stack();
-    check_type(string("format"), type_string, fmt);
+    check_type(lstring("format"), type_string, fmt);
     while(args != nil) {
-        fmt = replace(string("{}"), print(car(args)), fmt);
+        fmt = replace(lstring("{}"), print(car(args)), fmt);
         args = cdr(args);
     }
     return return_from_stack(fmt);
@@ -261,12 +256,12 @@ static obj * native_format(obj * args) {
 
 obj * load_string(obj * env) {
     prepare_stack();
-    env = naive_assoc(symbol("str"), native(&native_cat), env);
-    env = naive_assoc(symbol("str-replace"), native(&native_replace), env);
-    env = naive_assoc(symbol("str-replace-all"), native(&native_replace_all), env);
-    env = naive_assoc(symbol("str-no-whitespace"), native(&native_no_whitespace), env);
-    env = naive_assoc(symbol("str-split"), native(&native_split), env);
-    env = naive_assoc(symbol("str-sub"), native(&native_substr), env);
-    env = naive_assoc(symbol("str-fmt"), native(&native_format), env);
+    env = naive_assoc(lsymbol("str"), native(&native_cat), env);
+    env = naive_assoc(lsymbol("str-replace"), native(&native_replace), env);
+    env = naive_assoc(lsymbol("str-replace-all"), native(&native_replace_all), env);
+    env = naive_assoc(lsymbol("str-no-whitespace"), native(&native_no_whitespace), env);
+    env = naive_assoc(lsymbol("str-split"), native(&native_split), env);
+    env = naive_assoc(lsymbol("str-sub"), native(&native_substr), env);
+    env = naive_assoc(lsymbol("str-fmt"), native(&native_format), env);
     return return_from_stack(env);
 }

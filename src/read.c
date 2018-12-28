@@ -21,9 +21,9 @@ static int is_whitespace(char c) {
  */
 static obj * syntax_error(char * stream, obj * message) {
     prepare_stack();
-    obj * err = error(keyword("Syntax-Error"), message);
-    obj * src = substr(number(0), number(10), string(stream));
-    obj * fmt_src = format(string("{}..."), cons(src, nil));
+    obj * err = error(lkeyword("Syntax-Error"), message);
+    obj * src = substr(number(0), number(10), cstring(stream));
+    obj * fmt_src = format(lstring("{}..."), cons(src, nil));
     err = cons(fmt_src, err);
     err->type = type_error;
     return return_from_stack(err);
@@ -68,7 +68,7 @@ static obj * parse(char ** stream);
  */
 obj * read(obj * source) {
     prepare_stack();
-    check_type(string("read"), type_string, source);
+    check_type(lstring("read"), type_string, source);
     char * stream = source->string;
     obj * o = parse(&stream);
     if (DEBUG_PARSE) {
@@ -81,7 +81,7 @@ obj * read(obj * source) {
         return return_from_stack(o);
     }
     if (next(&stream, 1) != '\0') {
-        return return_from_stack(syntax_error(stream, string("Expected end of input!")));
+        return return_from_stack(syntax_error(stream, lstring("Expected end of input!")));
     }
     return return_from_stack(o);
 }
@@ -118,8 +118,8 @@ obj * need_more_input(obj * source) {
     obj * o = read(source);
     DEBUG_PARSE = save;
     if (o != nil && o->type == type_error) {
-        if (error_of_type(o, keyword("Syntax-Error"), string("Unexpected end of input!"))) {
-            return return_from_stack(keyword("true"));
+        if (error_of_type(o, lkeyword("Syntax-Error"), lstring("Unexpected end of input!"))) {
+            return return_from_stack(lkeyword("true"));
         }
     }
     return return_from_stack(nil);
@@ -127,7 +127,7 @@ obj * need_more_input(obj * source) {
 
 obj * cread(char * source) {
     prepare_stack();
-    return return_from_stack(read(string(source)));
+    return return_from_stack(read(cstring(source)));
 }
 
 static obj * parse_string(char ** stream) {
@@ -136,7 +136,7 @@ static obj * parse_string(char ** stream) {
     int escaped = 0;
     while (escaped || next(stream, 0) != '"') {
         if (next(stream, 0) == '\0') {
-            return return_from_stack(syntax_error(start - 1, string("Unexpected end of input!")));
+            return return_from_stack(syntax_error(start - 1, lstring("Unexpected end of input!")));
         }
         if (next(stream, 0) == '\\') {
             escaped = !escaped;
@@ -149,17 +149,16 @@ static obj * parse_string(char ** stream) {
     char * buffer = (char *) must_malloc(length + 1);
     memset(buffer, '\0', length + 1);
     strncpy(buffer, start, length);
-    obj * o = string(buffer);
-    free(buffer);
+    obj * o = pstring(buffer);
     chomp(stream, 0);
     // Perform escapes
-    o = replace_all(string("\\a"), string("\a"), o);
-    o = replace_all(string("\\b"), string("\b"), o);
-    o = replace_all(string("\\n"), string("\n"), o);
-    o = replace_all(string("\\r"), string("\r"), o);
-    o = replace_all(string("\\t"), string("\t"), o);
-    o = replace_all(string("\\\""), string("\""), o);
-    o = replace_all(string("\\\\"), string("\\"), o);
+    o = replace_all(lstring("\\a"), lstring("\a"), o);
+    o = replace_all(lstring("\\b"), lstring("\b"), o);
+    o = replace_all(lstring("\\n"), lstring("\n"), o);
+    o = replace_all(lstring("\\r"), lstring("\r"), o);
+    o = replace_all(lstring("\\t"), lstring("\t"), o);
+    o = replace_all(lstring("\\\""), lstring("\""), o);
+    o = replace_all(lstring("\\\\"), lstring("\\"), o);
     return return_from_stack(o);
 }
 
@@ -169,7 +168,7 @@ static obj * parse_list(char ** stream) {
     char * start = *stream - 1;
     while(next(stream, 1) != ')') {
         if (**stream == '\0') {
-            return return_from_stack(syntax_error(start, string("Unexpected end of input!")));
+            return return_from_stack(syntax_error(start, lstring("Unexpected end of input!")));
         }
         list = cons(parse(stream), list);
     }
@@ -183,14 +182,14 @@ static obj * parse_map(char ** stream) {
     char * start = *stream - 1;
     while(next(stream, 1) != '}') {
         if (**stream == '\0') {
-            return return_from_stack(syntax_error(start, string("Unexpected end of input!")));
+            return return_from_stack(syntax_error(start, lstring("Unexpected end of input!")));
         }
         obj * key = parse(stream);
         obj * val = parse(stream);
         map = cons(val, cons(key, map));
     }
     chomp(stream, 1);
-    return return_from_stack(cons(symbol("map"), reverse(map)));
+    return return_from_stack(cons(lsymbol("map"), reverse(map)));
 }
 
 static obj * parse_list_macro(char ** stream) {
@@ -199,19 +198,19 @@ static obj * parse_list_macro(char ** stream) {
     char * start = *stream - 1;
     while(next(stream, 1) != ']') {
         if (**stream == '\0') {
-            return return_from_stack(syntax_error(start, string("Unexpected end of input!")));
+            return return_from_stack(syntax_error(start, lstring("Unexpected end of input!")));
         }
         list = cons(parse(stream), list);
     }
     chomp(stream, 1);
-    return return_from_stack(cons(symbol("list"), reverse(list)));
+    return return_from_stack(cons(lsymbol("list"), reverse(list)));
 }
 
 static obj * parse_number(char ** stream) {
     double n;
     int count = sscanf(*stream, "%lg", &n);
     if (count == 0) {
-        return syntax_error(*stream, string("Expected a number!"));
+        return syntax_error(*stream, lstring("Expected a number!"));
     }
     // Move passed number
     for (;;) {
@@ -265,7 +264,7 @@ static obj * parse_symbol(char ** stream) {
     char * buffer = (char *) must_malloc(length + 1);
     memset(buffer, '\0', length + 1);
     strncpy(buffer, start, length);
-    obj * o = symbol(buffer);
+    obj * o = csymbol(buffer);
     free(buffer);
     return o;
 }
@@ -287,27 +286,27 @@ static void parse_comment(char ** stream) {
 
 static obj * parse_quote(char ** stream) {
     prepare_stack();
-    return return_from_stack(cons(symbol("quote"), cons(parse(stream), nil)));
+    return return_from_stack(cons(lsymbol("quote"), cons(parse(stream), nil)));
 }
 
 static obj * parse_quasi_quote(char ** stream) {
     prepare_stack();
-    return return_from_stack(cons(symbol("quasi-quote"), cons(parse(stream), nil)));
+    return return_from_stack(cons(lsymbol("quasi-quote"), cons(parse(stream), nil)));
 }
 
 static obj * parse_unquote(char ** stream) {
     prepare_stack();
-    return return_from_stack(cons(symbol("unquote"), cons(parse(stream), nil)));
+    return return_from_stack(cons(lsymbol("unquote"), cons(parse(stream), nil)));
 }
 
 static obj * parse_unquote_splice(char ** stream) {
     prepare_stack();
-    return return_from_stack(cons(symbol("unquote-splice"), cons(parse(stream), nil)));
+    return return_from_stack(cons(lsymbol("unquote-splice"), cons(parse(stream), nil)));
 }
 
 static obj * parse_deref(char ** stream) {
     prepare_stack();
-    return return_from_stack(cons(symbol("deref"), cons(parse(stream), nil)));
+    return return_from_stack(cons(lsymbol("deref"), cons(parse(stream), nil)));
 }
 
 /**
@@ -319,11 +318,11 @@ static obj * parse_deref(char ** stream) {
 obj * parse(char ** stream) {
     switch (next(stream, 1)) {
         case '\0':
-            return syntax_error(*stream, string("Unexpected end of input!"));
+            return syntax_error(*stream, lstring("Unexpected end of input!"));
         case ')':
         case '}':
         case ']':
-            return syntax_error(*stream, string("Unexpected character!"));
+            return syntax_error(*stream, lstring("Unexpected character!"));
         case '"':
             chomp(stream, 1);
             return parse_string(stream);
