@@ -67,15 +67,23 @@ static obj * parse(char ** stream);
  * @returns obj *        the read in object
  */
 obj * read(obj * source) {
+    prepare_stack();
+    check_type(string("read"), type_string, source);
     char * stream = source->string;
     obj * o = parse(&stream);
+    if (DEBUG_PARSE) {
+        printf("DEBUG PARSE\n  %s\n->\n  %s\n",
+            source->string,
+            print(o)->string
+        );
+    }
     if (o != nil && o->type == type_error) {
-        return o;
+        return return_from_stack(o);
     }
     if (next(&stream, 1) != '\0') {
-        return syntax_error(stream, string("Expected end of input!"));
+        return return_from_stack(syntax_error(stream, string("Expected end of input!")));
     }
-    return o;
+    return return_from_stack(o);
 }
 
 obj * read_all(obj * source) {
@@ -83,7 +91,19 @@ obj * read_all(obj * source) {
     prepare_stack();
     obj * forms = nil;
     while(next(&stream, 1) != '\0') {
+        char * start = stream;
         obj * o = parse(&stream);
+        if (DEBUG_PARSE) {
+            int length = stream - start;
+            char * form_buffer = must_malloc(sizeof(char) * (length + 1));
+            strncpy(form_buffer, start, length);
+            form_buffer[length] = 0;
+            printf("DEBUG PARSE\n  %s\n->\n  %s\n",
+                form_buffer,
+                print(o)->string
+            );
+            free(form_buffer);
+        }
         // Immediately return errors
         return_on_error(o);
         forms = cons(o, forms);
@@ -93,7 +113,10 @@ obj * read_all(obj * source) {
 
 obj * need_more_input(obj * source) {
     prepare_stack();
+    int save = DEBUG_PARSE;
+    DEBUG_PARSE = 0;
     obj * o = read(source);
+    DEBUG_PARSE = save;
     if (o != nil && o->type == type_error) {
         if (error_of_type(o, keyword("Syntax-Error"), string("Unexpected end of input!"))) {
             return return_from_stack(keyword("true"));

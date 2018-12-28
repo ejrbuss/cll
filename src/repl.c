@@ -10,7 +10,20 @@ void parse_args(int argc, char ** argv) {
     for(; argv[i][0] == '-' && i < argc; i++) {
         char * option = argv[i];
         if (check_option(option, "-h", "--help")) {
-            // todo_help();
+            puts(
+                "\n"
+                "Usage:\n"
+                "    cll [options] <program> <args...>\n"
+                "\n"
+                "Options:\n"
+                "    -h,         --help           Display this message\n"
+                "    -v,         --version        Print version info and exit\n"
+                "    -i,         --interactive    Run the repl after program\n"
+                "    -d,         --Debug-All      Enable all debug features\n"
+                "    -dParse,    --Debug-Parse    Enable parsing debugging\n"
+                "    -dMacroexp, --Debug-Macroexp Enable macro debugging\n"
+                "    -dGC,       --Debug-GC       Enable GC debugging\n"
+            );
             continue;
         }
         if (check_option(option, "-v", "--version")) {
@@ -22,15 +35,9 @@ void parse_args(int argc, char ** argv) {
             continue;
         }
         if (check_option(option, "-d", "--Debug-All")) {
-            DEBUG_CONFIG   = 1;
             DEBUG_PARSE    = 1;
             DEBUG_MACROEXP = 1;
             DEBUG_GC       = 1;
-            DEBUG_STAT     = 1;
-            continue;
-        }
-        if (check_option(option, "-dConfig", "--Debug-Donfig")) {
-            DEBUG_CONFIG   = 1;
             continue;
         }
         if (check_option(option, "-dParse", "--Debug-Parse")) {
@@ -45,12 +52,9 @@ void parse_args(int argc, char ** argv) {
             DEBUG_GC       = 1;
             continue;
         }
-        if (check_option(option, "-dStat", "--Debug-Stat")) {
-            DEBUG_STAT     = 1;
-            continue;
-        }
         if (check_option(option, "-m", "--memory")) {
-            // todo_memory();
+            i++;
+            MEMORY = atoi(argv[i]);
             continue;
         }
         panic("Unknown command line option `%s`!", option);

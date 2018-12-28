@@ -196,7 +196,12 @@ static obj * eval_list(obj * list, obj * env) {
     // Expand macros
     if (op != nil && op->type == type_macro) {
         obj * expanded = macro_expand(op, args);
-        // printf("expanding: %s -> %s\n", print(list)->string, print(expanded)->string);
+        if (DEBUG_MACROEXP) {
+            printf("DEBUG MACROEXP\n  %s\n->\n  %s\n", 
+                print(list)->string, 
+                print(expanded)->string
+            );
+        }
         return return_from_stack(eval(expanded, env));
     }
 

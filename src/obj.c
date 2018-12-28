@@ -198,6 +198,9 @@ void gc_sweep() {
  * Mark & sweep since 1960.
  */
 void gc() {
+    if (DEBUG_GC) {
+        puts("DEBUG GC");
+    }
     gc_mark();
     gc_sweep();
 }

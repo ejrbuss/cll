@@ -22,10 +22,10 @@
       ~~body) __for_0)) nil ~iter)))
 
 (defmacro time-it [& body]
-  ~'(let { start (time) }
+  ~'(let { __time_it_0 (time) }
     ~~body
-    (let { end (time) }
-      (- end start))))
+    (let { __time_it_1 (time) }
+      (- __time_it_1 __time_it_0))))
 
 ;; Functions
 ;; ---------

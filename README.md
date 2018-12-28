@@ -4,34 +4,17 @@ C Little Lisp
 # Command line args
 
 ```
--v
---version
+Usage:
+    cll [options] <program> <args...>
 
--h
---help
-
--i
---interactiv
-
--d
---Debug-All
--dConfig
---Debug-Config
--dParse
---Debug-Parse
--dMacroexp
---Debug-Macroexp
--dGC
---Debug-GC
--dStat
---Debug-Stat
-
--m <memory>
---memory <memory>
-
-<file>
-
-<programargs>...
+Options:
+    -h,         --help           Display this message
+    -v,         --version        Print version info and exit
+    -i,         --interactive    Run the repl after program
+    -d,         --Debug-All      Enable all debug features
+    -dParse,    --Debug-Parse    Enable parsing debugging
+    -dMacroexp, --Debug-Macroexp Enable macro debugging
+    -dGC,       --Debug-GC       Enable GC debugging
 ```
 
 ## Broken
@@ -40,17 +23,12 @@ C Little Lisp
 ## TODO
 - Testing
   - Eval test (define how errors should behave)
-- Command line arguments
-- DEBUG: print when gc happens
-- DEBUG: object count
-- DEBUG: macro expansion
 - Prettyify (vm-debug)
 - Meta system
 - Documentation
 - Syntax highlighting extension
 - Docs site
 - Performance (benchmarking)
-  - `time-it`
 - Long term
   - Self hosting?
 
