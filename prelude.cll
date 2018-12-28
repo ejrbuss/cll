@@ -1,7 +1,112 @@
-(def str-eval (fn [s]
-  (eval (read s))))
+;; Macros
+;; ------
 
-(def quit (fn []
-  (do
-		(println "Goddbye! ^_^")
-		(exit))))
+(def defmacro (macro [name args & body]
+  ~'(def ~name (macro ~args (do ~~body)))))
+
+(defmacro defn [name args & body]
+  ~'(def ~name (fn ~args (do ~~body))))
+
+(defmacro comment [] nil)
+
+(defmacro cond [& conds] 
+  (if conds
+    ~'(if ~(car conds) 
+      ~(car (cdr conds)) 
+      (cond ~~(cdr (cdr conds))))
+    nil))
+
+;; Functions
+;; ---------
+
+;; Lists
+
+(defn nth [i iter]
+  (let { ref-iter (ref iter)
+         r         (ref 0) }
+    (while (!= @r i)
+      (set! r (+ @r 1))
+      (set! ref-iter (cdr @ref-iter)))
+    (car @ref-iter)))
+
+(defn != [x y] 
+  (not (= x y)))
+
+(defn each [f iter]
+  (let { ref-iter (ref iter) }
+    (while @ref-iter
+      (f (car @ref-iter))
+      (set! ref-iter (cdr @ref-iter)))))
+
+(defn reduce [f first iter]
+  (let { r (ref first) }
+    (each (fn [x] 
+      (set! r (f @r x))) iter)
+    @r))
+
+(defn map [f iter]
+  (let { r (ref nil) }
+    (each (fn [x]
+      (set! r (cons (f x) @r))) iter)
+    (reverse @r)))
+
+(defn filter [f iter]
+  (let { r (ref nil) }
+    (each (fn [x]
+      (if (f x) 
+        (set! r (cons x @r)))) iter)
+    (reverse @r)))
+
+(defn range [start end]
+  (if (> start end)
+    (throw :Parameter-Error "start must be less than end!")
+    nil)
+  (let { s (ref start)
+         e (ref end) 
+         l (ref nil) }
+    (while (< @s @e)
+      (set! l (cons @s @l))
+      (set! s (+ @s 1)))
+    (reverse @l)))
+
+;; string
+
+(defn str-eval [s]
+  (eval (read s)))
+
+;; Types
+
+(defn reference? [o]
+  (= (type-of o) :reference))
+
+(defn symbol? [o]
+  (= (type-of o) :symbol))
+
+(defn keyword? [o]
+  (= (type-of o) :keyword))
+
+(defn string? [o]
+  (= (type-of o) :string))
+
+(defn number? [o]
+  (= (type-of o) :number))
+
+(defn list? [o]
+  (= (type-of o) :list))
+
+(defn map? [o]
+  (= (type-of o) :map))
+
+(defn macro? [o]
+  (= (type-of o) :macro))
+
+(defn function? [o]
+  (= (type-of o) :function))
+
+;; Math
+
+(defn even? [n] 
+  (= (mod n 2) 0))
+
+(defn odd? [n]
+  (not (even? n)))

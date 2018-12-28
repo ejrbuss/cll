@@ -5,13 +5,11 @@ C Little Lisp
 
 
 ## TODO
-- Load in prelude
-- Add remaining special forms (catch, quasi-quote, macro)
-- Macros
-  - quasiquote
-  - unquote
-  - splice-unquote
-- Once macros exist add `reduce` and implement `do`, `cond`, `defn`, `defmacro`
+- Stop error_format from unquoting strings
+- DEBUG: print when gc happens
+- DEBUG: object count
+- DEBUG: macro expansion
+- Load in prelude in a better way
 - Testing
   - Eval test (define how errors should behave)
 - Command line arguments
@@ -76,3 +74,10 @@ struct obj {
   (set! n (dec n)))
 
 ```
+
+Consider a new memory model
+Stack at top
+Heap at bottom
+Everything pre allocated
+Iter through memory until gc_tag_free
+No need for gc_node

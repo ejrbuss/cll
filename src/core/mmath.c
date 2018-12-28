@@ -48,6 +48,15 @@ static obj * native_div(obj * args) {
     return return_from_stack(number(dividend));
 }
 
+static obj * native_mod(obj * args) {
+    prepare_stack();
+    check_type(string("mod"), type_number, car(args));
+    check_type(string("mod"), type_number, car(cdr(args)));
+    int a = (int) car(args)->number;
+    int b = (int) car(cdr(args))->number;
+    return return_from_stack(number(a % b));
+}
+
 obj * nmax(obj * n, obj * m) {
     prepare_stack();
     check_type(string("max"), type_number, n);
@@ -294,6 +303,7 @@ obj * load_math(obj * env) {
     env = naive_assoc(symbol("-"), native(&native_sub), env);
     env = naive_assoc(symbol("*"), native(&native_mul), env);
     env = naive_assoc(symbol("/"), native(&native_div), env);
+    env = naive_assoc(symbol("mod"), native(&native_mod), env);
     env = naive_assoc(symbol("max"), native(&native_max), env);
     env = naive_assoc(symbol("min"), native(&native_min), env);
     env = naive_assoc(symbol("<"), native(&native_lt), env);

@@ -118,6 +118,7 @@ obj * equal(obj * first, obj * second) {
                 snd_keys = cdr(snd_keys);
             }
             return return_from_stack(keyword("true"));
+        case type_macro:
         case type_function:
         case type_native_function:
             return nil;

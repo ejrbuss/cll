@@ -26,6 +26,7 @@ enum type {
     type_number,
     type_list,
     type_map,
+    type_macro,
     type_function,
     type_native_function, // Used to call into c
 };
@@ -90,5 +91,6 @@ extern obj * string(char * s);
 extern obj * number(double n);
 extern obj * cons(obj * x, obj * list);
 extern obj * naive_assoc(obj * key, obj * val, obj * map);
+extern obj * macro(obj * eenv, obj * args, obj * body);
 extern obj * fn(obj * env, obj * args, obj * body);
 extern obj * native(obj * (*fn)(obj *));

@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <stddef.h>
 #include <math.h>
+#include <time.h>
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -17,7 +18,7 @@
 // ------
 
 #define VERSION "0.0.1"
-#define MEMORY 32000
+#define MEMORY 64000
 
 /**
  * `nil` in Little Lisp is equivalent to C `NULL`.

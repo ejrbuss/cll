@@ -14,6 +14,12 @@ int main(int argc, char ** argv) {
     printf("clc v%s repl\n\n", VERSION);
     init_vm(MEMORY);
     init_env();
+
+    // Temporary
+    prepare_stack();
+    puts(print(ceval("(load \"prelude.cll\")"))->string);
+    return_from_stack(nil);
+
     for (;;) {
         char * line = wrap_readline("cll>");
         prepare_stack();

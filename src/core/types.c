@@ -13,6 +13,7 @@ obj * type_of(obj * o) {
         case type_number:    return keyword("number");
         case type_list:      return keyword("list");
         case type_map:       return keyword("map");
+        case type_macro:     return keyword("macro");
         case type_function:
         case type_native_function:
             return keyword("function");

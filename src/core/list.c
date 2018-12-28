@@ -19,6 +19,7 @@ obj * car(obj * list) {
         case type_error:
         case type_list:
         case type_map:
+        case type_macro:
         case type_function:
             return list->car;
         case type_string:
@@ -48,6 +49,7 @@ obj * cdr(obj * list) {
         case type_error:
         case type_list:
         case type_map:
+        case type_macro:
         case type_function:
             return list->cdr;
         case type_string:
@@ -176,6 +178,6 @@ obj * load_list(obj * env) {
     env = naive_assoc(symbol("cons"), native(&native_cons), env);
     env = naive_assoc(symbol("in"), native(&native_in), env);
     env = naive_assoc(symbol("count"), native(&native_count), env);
-    env = naive_assoc(symbol("list-reverse"), native(&native_reverse), env);
+    env = naive_assoc(symbol("reverse"), native(&native_reverse), env);
     return return_from_stack(env);
 }

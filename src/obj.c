@@ -24,6 +24,7 @@ void vm_debug() {
         "type_number",
         "type_list",
         "type_map",
+        "type_macro",
         "type_function",
         "type_native_function",
     };
@@ -113,6 +114,7 @@ static void gc_mark_recursive(obj * o) {
         case type_error:
         case type_list:
         case type_map:
+        case type_macro:
         case type_function:
             gc_mark_recursive(o->car);
             gc_mark_recursive(o->cdr);
@@ -397,6 +399,13 @@ obj * naive_assoc(obj * key, obj * val, obj * map) {
     v->type = type_map;
     k->type = type_map;
     return return_from_stack(k);
+}
+
+obj * macro(obj * env, obj * args, obj * body) {
+    prepare_stack();
+    obj * o = cons(env, cons(args, cons(body, nil)));
+    o->type = type_macro;
+    return return_from_stack(o);
 }
 
 obj * fn(obj * env, obj * args, obj * body) {

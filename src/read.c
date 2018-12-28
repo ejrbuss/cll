@@ -85,12 +85,10 @@ obj * read_all(obj * source) {
     while(next(&stream, 1) != '\0') {
         obj * o = parse(&stream);
         // Immediately return errors
-        if (o != nil && o->type == type_error) {
-            return return_from_stack(o);
-        }
+        return_on_error(o);
         forms = cons(o, forms);
     }
-    return return_from_stack(forms);
+    return return_from_stack(reverse(forms));
 }
 
 obj * need_more_input(obj * source) {
@@ -368,7 +366,7 @@ obj * parse(char ** stream) {
             return parse_number(stream);
         case ';':
             parse_comment(stream);
-            return parse(stream);
+            return nil;
         default:
             return parse_symbol(stream);
     }

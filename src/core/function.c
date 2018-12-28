@@ -22,6 +22,7 @@ obj * call(obj * fn, obj * args) {
         case type_native_function:
             return fn->native(args);
         case type_function:
+        case type_macro:
             break;
         default:
             prepare_stack();

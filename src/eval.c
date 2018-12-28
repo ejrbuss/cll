@@ -4,10 +4,23 @@
 obj * g_env_ref = nil;
 obj * g_env = nil;
 
+static obj * macro_expand(obj * op, obj * args) {
+    prepare_stack();
+    obj * o = call(op, args);
+    if (o != nil && o->type == type_list) {
+        op = car(o);
+        args = cdr(o);
+        if (op != nil && o->type == type_macro) {
+            return return_from_stack(macro_expand(op, args));
+        }
+    }
+    return return_from_stack(o);
+}
+
 static obj * quasi_quote(obj * expr, obj * env) {
     prepare_stack();
     if (expr == nil || expr->type != type_list) {
-        return expr;
+        return return_from_stack(expr);
     }
     obj * op   = car(expr);
     obj * args = cdr(expr);
@@ -55,19 +68,7 @@ static obj * eval_list(obj * list, obj * env) {
 
     // Special form: macro
     if (symbol_cmp(op, "macro")) {
-        return return_from_stack(string("TODO macro"));
-    }
-
-    // Speciial form: do
-    // Evaluates each argument in turn, and returns the final value
-    if (symbol_cmp(op, "do")) {
-        obj * o = nil;
-        while (args != nil) {
-            o = eval(car(args), env);
-            return_on_error(o);
-            args = cdr(args);
-        }
-        return return_from_stack(o);
+        return return_from_stack(macro(env, cdr(car(args)), car(cdr(args))));
     }
 
     // Special form: if
@@ -80,6 +81,32 @@ static obj * eval_list(obj * list, obj * env) {
         } else {
             return return_from_stack(eval(car(cdr(cdr(args))), env));
         }
+    }
+
+    if (symbol_cmp(op, "do")) {
+        obj * o = nil;
+        while(args) {
+            o = eval(car(args), env);
+            return_on_error(o);
+            args = cdr(args);
+        }
+        return return_from_stack(o);
+    }
+
+    if (symbol_cmp(op, "while")) {
+        obj * cond = car(args);
+        obj * c = nil;
+        obj * o = nil;
+        while((c = eval(cond, env)) != nil) {
+            return_on_error(c);
+            obj * body = cdr(args);
+            while(body) {
+                o = eval(car(body), env);
+                return_on_error(o);
+                body = cdr(body);
+            }
+        }
+        return return_from_stack(o);
     }
 
     // Special form: def
@@ -109,17 +136,27 @@ static obj * eval_list(obj * list, obj * env) {
     // front of the environment.  
     if (symbol_cmp(op, "let")) {
         obj * map = car(args);
-        obj * expr = car(cdr(args));
-        check_type_or_nil(string("let"), type_map, map);
-        map = cdr(map);
-        obj * expr_env = env;
+        args = cdr(args);
+        if (map != nil && map->type == type_list && symbol_cmp(car(map), "map")) {
+            map = cdr(map);
+        } else {
+            check_type_or_nil(string("let"), type_map, map);
+        }
+        obj * let_env = env;
         while(map != nil) {
             obj * k = car(map);
-            obj * v = car(cdr(map));
-            expr_env = naive_assoc(k, v, expr_env);
+            obj * v = eval(car(cdr(map)), env);
+            return_on_error(v);
+            let_env = naive_assoc(k, v, let_env);
             map = cdr(cdr(map));
         }
-        return return_from_stack(eval(expr, expr_env));
+        obj * o = nil;
+        while(args) {
+            o = eval(car(args), let_env);
+            return_on_error(o);
+            args = cdr(args);
+        }
+        return return_from_stack(o);
     }
 
     // Special form: catch
@@ -154,6 +191,13 @@ static obj * eval_list(obj * list, obj * env) {
     // Propogate error
     if (op != nil && op->type == type_error) {
         return return_from_stack(op);
+    }
+
+    // Expand macros
+    if (op != nil && op->type == type_macro) {
+        obj * expanded = macro_expand(op, args);
+        // printf("expanding: %s -> %s\n", print(list)->string, print(expanded)->string);
+        return return_from_stack(eval(expanded, env));
     }
 
     // Eval arguments
