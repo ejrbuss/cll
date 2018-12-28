@@ -12,8 +12,8 @@ obj * cat(obj * first, obj * second) {
     check_type(string("str"), type_string, first);
     check_type(string("str"), type_string, second);
     char * buffer = (char *) must_malloc(
-        strlen(first->string) +
-        strlen(second->string) + 1
+        first->length +
+        second->length + 1
     );
     strcpy(buffer, first->string);
     strcat(buffer, second->string);
@@ -72,15 +72,15 @@ obj * replace(obj * ref, obj * rep, obj * s) {
     check_type(string("replace"), type_string, rep);
     check_type(string("replace"), type_string, s);
     int replaced = 0;
-    char * buffer = (char *) must_malloc(strlen(s->string) + strlen(rep->string));
+    char * buffer = (char *) must_malloc(s->length + rep->length);
     char * bp = buffer;
     char * sp = s->string;
     while (*sp != '\0') {
-        if (!replaced && strncmp(ref->string, sp, strlen(ref->string)) == 0) {
+        if (!replaced && strncmp(ref->string, sp, ref->length) == 0) {
             replaced = 1;
             strcpy(bp, rep->string);
-            bp += strlen(rep->string);
-            sp += strlen(ref->string);
+            bp += rep->length;
+            sp += ref->length;
         } else {
             *bp = *sp;
             sp++;
@@ -117,21 +117,21 @@ obj * replace_all(obj * ref, obj * rep, obj * s) {
     char * sp;
     sp = s->string;
     while (*sp != '\0') {
-        if (strncmp(ref->string, sp, strlen(ref->string)) == 0) {
+        if (strncmp(ref->string, sp, ref->length) == 0) {
             count++;
         }
         sp++;
     }
     // Perform the replacement
-    char * buffer = (char *) must_malloc(strlen(s->string) + count * strlen(rep->string));
+    char * buffer = (char *) must_malloc(s->length + count * rep->length);
     char * bp;
     sp = s->string;
     bp = buffer;
     while (*sp != '\0') {
-        if (strncmp(ref->string, sp, strlen(ref->string)) == 0) {
+        if (strncmp(ref->string, sp, ref->length) == 0) {
             strcpy(bp, rep->string);
-            bp += strlen(rep->string);
-            sp += strlen(ref->string);
+            bp += rep->length;
+            sp += ref->length;
         } else {
             *bp = *sp;
             sp++;
@@ -208,7 +208,7 @@ obj * substr(obj * start, obj * length, obj * s) {
     check_type(string("substr"), type_number, start);
     check_type(string("substr"), type_number, length);
     check_type(string("substr"), type_string, s);
-    size_t max_len = strlen(s->string) + 1 * sizeof(char);
+    size_t max_len = s->length + 1 * sizeof(char);
     char * buffer = (char *) must_malloc(max_len);
     memset(buffer, '\0', max_len);
     length = nmin(length, number(max_len - 1));

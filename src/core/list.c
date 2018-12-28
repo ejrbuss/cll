@@ -52,7 +52,7 @@ obj * cdr(obj * list) {
             return list->cdr;
         case type_string:
             prepare_stack();
-            return return_from_stack(substr(number(1), number(strlen(list->string)), list));
+            return return_from_stack(substr(number(1), number(list->length), list));
         default:
             return apply_error(string("cdr"), list);
 
@@ -150,7 +150,7 @@ obj * count(obj * list) {
         case type_map:
             break;
         case type_string:
-            return return_from_stack(number(strlen(list->string)));
+            return return_from_stack(number(list->length));
         default:
             return return_from_stack(apply_error(string("count"), list));
     }

@@ -39,15 +39,21 @@ struct obj {
     gc_tag gc_tag;
     type type;
     union {
-        char * resource; // generic resource
-        char * symbol;
-        char * keyword;
-        char * string;
-        double number;
+        struct {
+            union {
+                char * resource; // generic resource
+                char * symbol;
+                char * keyword;
+                char * string;
+            };
+            int length;
+            int owned; // TODO
+        };
         struct {
             obj * car;
             obj * cdr;
         };
+        double number;
         obj * ref;
         obj * (*native)(obj *);
     };

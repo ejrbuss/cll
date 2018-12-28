@@ -355,7 +355,9 @@ obj * error(obj * type, obj * mes) {
 
 static obj * resource(char * rsc, type type) {
     obj * o = init_obj();
-    o->resource = (char *) must_malloc(sizeof(char) * (strlen(rsc) + 1));
+    int l = strlen(rsc);
+    o->resource = (char *) must_malloc(sizeof(char) * (l + 1));
+    o->length = l;
     o->type = type;
     strcpy(o->resource, rsc);
     return o;

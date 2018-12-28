@@ -1,2 +1,7 @@
 (def str-eval (fn [s]
-    (eval (read s))))
+  (eval (read s))))
+
+(def quit (fn []
+  (do
+		(println "Goddbye! ^_^")
+		(exit))))

@@ -4,6 +4,36 @@
 obj * g_env_ref = nil;
 obj * g_env = nil;
 
+static obj * quasi_quote(obj * expr, obj * env) {
+    prepare_stack();
+    if (expr == nil || expr->type != type_list) {
+        return expr;
+    }
+    obj * op   = car(expr);
+    obj * args = cdr(expr);
+    if (symbol_cmp(op, "unquote") || symbol_cmp(op, "unquote-splice")) {
+        return return_from_stack(eval(car(args), env));
+    }
+    obj * new_expr = nil;
+    while (expr != nil) {
+        obj * o = car(expr);
+        if (o != nil && o->type == type_list && symbol_cmp(car(o), "unquote-splice")) {
+            o = quasi_quote(o, env);
+            return_on_error(o);
+            while (o) {
+                new_expr = cons(car(o), new_expr);
+                o = cdr(o);
+            }
+        } else {
+            o = quasi_quote(o, env);
+            return_on_error(o);
+            new_expr = cons(o, new_expr);
+        }
+        expr = cdr(expr);
+    }
+    return return_from_stack(reverse(new_expr));
+}
+
 static obj * eval_list(obj * list, obj * env) {
     prepare_stack();
 
@@ -20,12 +50,24 @@ static obj * eval_list(obj * list, obj * env) {
     // Iterates over quated form and replaces calls with (unquote) and 
     // (unqoute-splice) with their appropriate values.
     if (symbol_cmp(op, "quasi-quote")) {
-        return return_from_stack(string("TODO quasi-quote"));
+        return return_from_stack(quasi_quote(car(args), env));
     }
 
     // Special form: macro
     if (symbol_cmp(op, "macro")) {
         return return_from_stack(string("TODO macro"));
+    }
+
+    // Speciial form: do
+    // Evaluates each argument in turn, and returns the final value
+    if (symbol_cmp(op, "do")) {
+        obj * o = nil;
+        while (args != nil) {
+            o = eval(car(args), env);
+            return_on_error(o);
+            args = cdr(args);
+        }
+        return return_from_stack(o);
     }
 
     // Special form: if
@@ -82,7 +124,26 @@ static obj * eval_list(obj * list, obj * env) {
 
     // Special form: catch
     if (symbol_cmp(op, "catch")) {
-        return return_from_stack(string("TODO catch"));
+        obj * dangerous = car(args);
+        args = cdr(args);
+        obj * o = eval(dangerous, env);
+        if (o == nil || o->type != type_error) {
+            return return_from_stack(o);
+        }
+        obj * err_map = error_to_map(o);
+        obj * err_type = get(keyword("type"), err_map, nil);
+        obj * handler = eval(car(args), env);
+        return_on_error(handler);
+        if (handler != nil && handler->type == type_map) {
+            handler = get(err_type, handler, nil);
+        }
+        if (handler != nil && (
+            handler->type == type_function || 
+            handler->type == type_native_function
+        )) {
+            return return_from_stack(call(handler, cons(err_map, nil)));
+        }
+        return return_from_stack(apply_error(string("catch"), handler));
     }
 
     // Not a special form, evaluate as a function
