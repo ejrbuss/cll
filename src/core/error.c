@@ -5,13 +5,13 @@ obj * apply_error(obj * func, obj * o) {
     return return_from_stack(error_format(
         keyword("Type-Error"),
         string("Cannot apply `{}` to `{}`!"), 
-        cons(o, cons(func, nil))
+        cons(o, cons(symbol(func->resource), nil))
     ));
 }
 
 obj * error_format(obj * type, obj * fmt, obj * args) {
     prepare_stack();
-    return return_from_stack(error(type, format(fmt, args)));
+    return return_from_stack(error(type, print_format(fmt, args)));
 }
 
 obj * error_to_map(obj * error) {

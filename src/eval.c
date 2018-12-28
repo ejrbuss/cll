@@ -225,12 +225,22 @@ static obj * eval_list(obj * list, obj * env) {
  */
 void init_env() {
     assert(g_env == nil);
+
+    // Load core
     prepare_stack();
     g_env_ref = reference(nil);
     g_env = load_core(g_env);
     set(g_env_ref, g_env);
     return_from_stack(g_env_ref);
     prepare_stack();
+
+    // Load prelude
+    prepare_stack();
+    obj * o = ceval("(load \"prelude.cll\")");
+    if (o != nil && o->type == type_error) {
+        panic("Error during prelude!\n%s", print(o)->string);
+    }
+    return_from_stack(nil);
 }
 
 /**

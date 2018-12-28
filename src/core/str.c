@@ -245,6 +245,16 @@ obj * format(obj * fmt, obj * args) {
     return return_from_stack(fmt);
 }
 
+obj * print_format(obj * fmt, obj * args) {
+    prepare_stack();
+    check_type(string("format"), type_string, fmt);
+    while(args != nil) {
+        fmt = replace(string("{}"), print(car(args)), fmt);
+        args = cdr(args);
+    }
+    return return_from_stack(fmt);
+}
+
 static obj * native_format(obj * args) {
     return format(car(args), cdr(args));
 }

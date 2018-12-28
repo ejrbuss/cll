@@ -16,6 +16,11 @@
       (cond ~~(cdr (cdr conds))))
     nil))
 
+(defmacro for [e iter & body]
+  ~'(reverse (reduce (fn [__for_0 ~e] 
+    (cons (do 
+      ~~body) __for_0)) nil ~iter)))
+
 ;; Functions
 ;; ---------
 
@@ -44,7 +49,7 @@
       (set! r (f @r x))) iter)
     @r))
 
-(defn map [f iter]
+(defn fmap [f iter]
   (let { r (ref nil) }
     (each (fn [x]
       (set! r (cons (f x) @r))) iter)
@@ -69,7 +74,26 @@
       (set! s (+ @s 1)))
     (reverse @l)))
 
-;; string
+(defn concat [& lists]
+  (if lists
+    (if (cdr lists)
+      (let { r    (ref nil)
+             xs   (reverse (car lists))
+             rest (call concat (cdr lists)) }
+        (set! r rest)
+        (each (fn [x] 
+          (set! r (cons x @r))) xs)
+        @r)
+      (car lists))
+  nil))
+
+;; Functions
+
+(defn curry [f & curried-args]
+  (fn [& args]
+    (call f (concat curried-args args))))
+
+;; Strings
 
 (defn str-eval [s]
   (eval (read s)))

@@ -5,11 +5,9 @@ C Little Lisp
 
 
 ## TODO
-- Stop error_format from unquoting strings
 - DEBUG: print when gc happens
 - DEBUG: object count
 - DEBUG: macro expansion
-- Load in prelude in a better way
 - Testing
   - Eval test (define how errors should behave)
 - Command line arguments
