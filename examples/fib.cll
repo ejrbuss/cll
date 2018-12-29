@@ -16,5 +16,8 @@
       (set! t2 @next))
     @t1))
 
+
 (println "(fib 5) = " (fib 5))
 (println "(ifib 50) = " (ifib 50))
+
+(println (time-it (fib 15)))
