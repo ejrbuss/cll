@@ -36,12 +36,12 @@ void * pool_alloc(pool * p) {
     }
     pool_node * node = p->head;
     p->head = p->head->cdr;
-    return (void *) (((char *) node) + sizeof(pool_node));
+    return pool_node_chunk(node);
 
 }
 
 void pool_free(pool * p, void * chunk) {
-    pool_node * node = (pool_node *) (((char *) chunk) - sizeof(pool_node));
+    pool_node * node = pool_chunk_node(chunk);
     node->cdr = p->head;
     p->head = node;
     return;

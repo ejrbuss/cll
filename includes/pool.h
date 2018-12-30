@@ -20,6 +20,8 @@ struct pool {
 // Fast macros
 #define pool_iter(p, c) ((void *) (p->data + (p->step * c) + sizeof(pool_node)))
 #define pool_can_alloc(p) (p->head->cdr != nil)
+#define pool_node_chunk(n) ((void *) (n + 1))
+#define pool_chunk_node(c) (((pool_node *) c) - 1)
 
 extern pool * init_pool(size_t chunk, size_t chunks, char * err);
 extern int pool_free_chunks(pool * p);

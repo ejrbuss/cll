@@ -3,6 +3,7 @@
 obj * vm_stat() {
     prepare_stack();
     obj * result = nil;
+    /*
     int available = pool_free_chunks(g_vm->obj_pool);
     int allocated = g_vm->obj_pool->chunks - available;
     int bytes = sizeof(obj) + sizeof(gc_node) + 2 * sizeof(pool_node *);
@@ -12,6 +13,7 @@ obj * vm_stat() {
     result = naive_assoc(lkeyword("allocated-bytes"), number(allocated * bytes), result);
     result = naive_assoc(lkeyword("available-bytes"), number(available * bytes), result);
     result = naive_assoc(lkeyword("total-bytes"), number((available + allocated) * bytes), result);
+    */
     return return_from_stack(result);
 }
 
