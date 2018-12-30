@@ -4,7 +4,7 @@
 
 #define FAST_CAR(o) (o->car)
 #define FAST_CDR(o) (o->cdr)
-#define symbol_cmp(o, s) (o != nil \
+#define FAST_SYMBOL_EQ(o, s) (o != nil \
     && o->type == type_symbol \
     && FAST_CSTR_EQ(o->resource, s) \
 )

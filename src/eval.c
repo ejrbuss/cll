@@ -24,13 +24,13 @@ static obj * quasi_quote(obj * expr, obj * env) {
     }
     obj * op   = FAST_CAR(expr);
     obj * args = FAST_CDR(expr);
-    if (symbol_cmp(op, "unquote") || symbol_cmp(op, "unquote-splice")) {
+    if (FAST_SYMBOL_EQ(op, "unquote") || FAST_SYMBOL_EQ(op, "unquote-splice")) {
         return return_from_stack(eval(car(args), env));
     }
     obj * new_expr = nil;
     while (expr != nil) {
         obj * o = FAST_CAR(expr);
-        if (o != nil && o->type == type_list && symbol_cmp(car(o), "unquote-splice")) {
+        if (o != nil && o->type == type_list && FAST_SYMBOL_EQ(car(o), "unquote-splice")) {
             o = quasi_quote(o, env);
             return_on_error(o);
             while (o) {
@@ -55,19 +55,19 @@ static obj * eval_list(obj * list, obj * env) {
 
     // Special form: quote
     // Should return its first arg unevaluated
-    if (symbol_cmp(op, "quote")) {
+    if (FAST_SYMBOL_EQ(op, "quote")) {
         return return_from_stack(car(args));
     }
 
     // Special form: quasi-quote
     // Iterates over quated form and replaces calls with (unquote) and 
     // (unqoute-splice) with their appropriate values.
-    if (symbol_cmp(op, "quasi-quote")) {
+    if (FAST_SYMBOL_EQ(op, "quasi-quote")) {
         return return_from_stack(quasi_quote(car(args), env));
     }
 
     // Special form: macro
-    if (symbol_cmp(op, "macro")) {
+    if (FAST_SYMBOL_EQ(op, "macro")) {
         return return_from_stack(macro(env, cdr(car(args)), car(cdr(args))));
     }
 
@@ -75,7 +75,7 @@ static obj * eval_list(obj * list, obj * env) {
     // If the first argument is truthy, if should evaluate and return its
     // second argument, otherwise it should evaluate and return its third
     // argument.
-    if (symbol_cmp(op, "if")) {
+    if (FAST_SYMBOL_EQ(op, "if")) {
         if (eval(car(args), env)) {
             return return_from_stack(eval(car(cdr(args)), env));
         } else {
@@ -83,7 +83,7 @@ static obj * eval_list(obj * list, obj * env) {
         }
     }
 
-    if (symbol_cmp(op, "do")) {
+    if (FAST_SYMBOL_EQ(op, "do")) {
         obj * o = nil;
         while(args) {
             o = eval(car(args), env);
@@ -93,7 +93,7 @@ static obj * eval_list(obj * list, obj * env) {
         return return_from_stack(o);
     }
 
-    if (symbol_cmp(op, "while")) {
+    if (FAST_SYMBOL_EQ(op, "while")) {
         obj * cond = car(args);
         obj * c = nil;
         obj * o = nil;
@@ -112,7 +112,7 @@ static obj * eval_list(obj * list, obj * env) {
     // Special form: def
     // Using the first argument as a key in the global environment, adds an
     // entry for the evaluated second argument.
-    if (symbol_cmp(op, "def")) {
+    if (FAST_SYMBOL_EQ(op, "def")) {
         check_type(lstring("def"), type_symbol, car(args));
         // We use naive_assoc here because we don't care about cleaning up old
         // definitions. Re-defs shouldn't be used for large amounts of data,
@@ -127,17 +127,17 @@ static obj * eval_list(obj * list, obj * env) {
     // Special form: fn
     // Creates a new function, using the first argument as the arguments and
     // the second argument as the function body.
-    if (symbol_cmp(op, "fn")) {
+    if (FAST_SYMBOL_EQ(op, "fn")) {
         return return_from_stack(fn(env, cdr(car(args)), car(cdr(args))));
     }
 
     // Special form: let
     // Evals an expr with the first argument (a dictionary) attached to the 
     // front of the environment.  
-    if (symbol_cmp(op, "let")) {
+    if (FAST_SYMBOL_EQ(op, "let")) {
         obj * map = car(args);
         args = cdr(args);
-        if (map != nil && map->type == type_list && symbol_cmp(car(map), "map")) {
+        if (map != nil && map->type == type_list && FAST_SYMBOL_EQ(car(map), "map")) {
             map = cdr(map);
         } else {
             check_type_or_nil(lstring("let"), type_map, map);
@@ -160,7 +160,7 @@ static obj * eval_list(obj * list, obj * env) {
     }
 
     // Special form: catch
-    if (symbol_cmp(op, "catch")) {
+    if (FAST_SYMBOL_EQ(op, "catch")) {
         obj * dangerous = car(args);
         args = cdr(args);
         obj * o = eval(dangerous, env);
