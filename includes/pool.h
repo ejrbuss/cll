@@ -14,7 +14,6 @@ struct pool {
     size_t step;      // The size (in bytes) between chunks
     pool_node * head; // The head of the available chunks
     char * data;      // The memory buffer
-    char * err;       // Error text if memory runs out
 };
 
 // Fast macros
@@ -23,7 +22,7 @@ struct pool {
 #define pool_node_chunk(n) ((void *) (n + 1))
 #define pool_chunk_node(c) (((pool_node *) c) - 1)
 
-extern pool * init_pool(size_t chunk, size_t chunks, char * err);
+extern pool * init_pool(size_t chunk, size_t chunks);
 extern int pool_free_chunks(pool * p);
 extern void * pool_alloc(pool * p);
 extern void pool_free(pool * p, void * chunk);

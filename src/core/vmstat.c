@@ -34,9 +34,13 @@ static obj * native_vm_force_gc(obj * args) {
     return vm_force_gc();
 }
 
-static obj * native_vm_debug(obj * args) {
-    gc();
-    vm_debug();
+static obj * native_vm_debug_stack(obj * args) {
+    vm_debug_stack();
+    return nil;
+}
+
+static obj * native_vm_debug_pool(obj * args) {
+    vm_debug_pool();
     return nil;
 }
 
@@ -44,6 +48,7 @@ obj * load_vmstat(obj * env) {
     prepare_stack();
     env = naive_assoc(lsymbol("vm-stat"), native(&native_vm_stat), env);
     env = naive_assoc(lsymbol("vm-force-gc"), native(&native_vm_force_gc), env);
-    env = naive_assoc(lsymbol("vm-debug"), native(&native_vm_debug), env);
+    env = naive_assoc(lsymbol("vm-debug-stack"), native(&native_vm_debug_stack), env);
+    env = naive_assoc(lsymbol("vm-debug-pool"), native(&native_vm_debug_pool), env);
     return return_from_stack(env);
 }

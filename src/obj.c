@@ -2,8 +2,6 @@
 
 vm * g_vm = nil;
 
-void vm_debug() {}
-
 /**
  * Initialzes a new global little lisp virtual machine.
  *
@@ -16,14 +14,13 @@ void vm_debug() {}
  *                             this VM
  */
 void init_vm(size_t available_bytes) {
-    
     // Do not overwrite a VM!
     assert(g_vm == nil);
     // Need at least enough memory to allocate a VM and the pools
     assert(available_bytes > 0);
     int obj_count = available_bytes / (sizeof(obj) + sizeof(pool_node *));
     g_vm = (vm *) must_malloc(sizeof(vm));
-    g_vm->obj_pool = init_pool(sizeof(obj), obj_count, "Ran out of memory!");
+    g_vm->obj_pool = init_pool(sizeof(obj), obj_count);
     g_vm->stack = nil;
 }
 
@@ -182,10 +179,14 @@ obj * stack_pop() {
  * can be popped to upon return.
  */
 void prepare_stack() {
-    if (!pool_can_alloc(g_vm->obj_pool)) {
-        gc();
-    }
     obj * o = pool_alloc(g_vm->obj_pool);
+    if (o == nil) {
+        gc();
+        o = pool_alloc(g_vm->obj_pool);
+        if (o == nil) {
+            panic("Ran out of memory!");
+        }
+    }
     o->gc_tag = gc_stack_return;
     stack_push(o);
 }
@@ -231,10 +232,15 @@ obj * return_from_stack(obj * o) {
  */
 static obj * init_obj() {
     assert(g_vm != nil);
-    if (!pool_can_alloc(g_vm->obj_pool)) {
-        gc();
-    }
     obj * o = pool_alloc(g_vm->obj_pool);
+    if (o == nil) {
+        gc();
+        o = pool_alloc(g_vm->obj_pool);
+        if (o == nil) {
+            panic("Ran out of memory!");
+        }
+    }
+    o->gc_tag = gc_unmarked;
     stack_push(o);
     return o;
 }

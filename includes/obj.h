@@ -20,7 +20,7 @@ enum gc_tag {
  */
 typedef enum type type;
 enum type {
- type_reference          = 0,
+    type_reference       = 0,
     type_error           = 1,
     type_symbol          = 2,
     type_keyword         = 3,
@@ -34,14 +34,14 @@ enum type {
 };
 
 /**
- * Used to represent all little lisp objects. `car` and `cdr` are shard by list
- * map and function impolementations.
+ * Used to represent all little lisp objects.
  */
 typedef struct obj obj;
 struct __attribute__((__packed__)) obj {
     char gc_tag;
     char type;
     union {
+        // Resource types
         struct {
             union {
                 char * resource; // generic resource
@@ -52,6 +52,7 @@ struct __attribute__((__packed__)) obj {
             int length;
             int owned;
         };
+        // List types
         struct {
             obj * car;
             obj * cdr;
@@ -85,7 +86,6 @@ extern vm * g_vm; // The gobal vm reference
 #define pkeyword(s) keyword(s, 0, 1)
 #define pstring(s) string(s, 0, 1)
 
-extern void vm_debug();
 extern void init_vm(size_t max_allocated);
 extern void free_vm();
 extern void gc();

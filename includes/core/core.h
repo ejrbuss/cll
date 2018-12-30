@@ -1,6 +1,7 @@
 #pragma once
 
 #include "obj.h"
+#include "debug.h"
 #include "print.h"
 #include "error.h"
 #include "fast.h"

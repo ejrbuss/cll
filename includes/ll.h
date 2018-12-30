@@ -34,7 +34,7 @@ extern int DEBUG_GC;
  * program.
  */
 #define panic(...) do { \
-    breakpoint_catch(); \
+    b(); \
     fflush(stdout); \
     fflush(stderr); \
     fprintf(stderr, "\npanic! "); \
@@ -61,4 +61,4 @@ extern int DEBUG_GC;
 } while(0)
 
 extern void * must_malloc(size_t bytes);
-extern void breakpoint_catch();
+extern void b();

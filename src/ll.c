@@ -1,9 +1,9 @@
 #include "ll.h"
 
 size_t MEMORY = 128000;
-int DEBUG_PARSE    = 0;
 int DEBUG_MACROEXP = 0;
-int DEBUG_GC       = 0;
+int DEBUG_PARSE = 0;
+int DEBUG_GC = 0;
 
 /**
  * Behaves like `malloc`, but garunteed to succeed or else panic.
@@ -18,4 +18,7 @@ void * must_malloc(size_t bytes) {
     return ptr;
 }
 
-void breakpoint_catch() {}
+/**
+ * Breakpoing catch b b
+ */ 
+void b() {}
