@@ -11,6 +11,7 @@ enum gc_tag {
     gc_free,    // The object has been sweeped (DEBUGING)
     gc_marked,   // The object will not be sweeped
     gc_unmarked, // The object may be sweeped
+    gc_stack_return,
 };
 
 /**

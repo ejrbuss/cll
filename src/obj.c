@@ -136,9 +136,11 @@ void gc_mark() {
     gc_node * node = g_vm->stack;
     while (node != nil) {
         if (node->car != nil) {
-            node->car->gc_tag = gc_unmarked;
+            if (node->car->gc_tag != gc_stack_return) {
+                node->car->gc_tag = gc_unmarked;
+                gc_mark_recursive(node->car);
+            }
         }
-        gc_mark_recursive(node->car);
         node = node->cdr;
     }
 }
@@ -227,11 +229,17 @@ obj * stack_pop() {
         gc_node * node = g_vm->stack;        
         obj * o = node->car;
         g_vm->stack = node->cdr;
-        if (o != nil) {
-            o->gc_tag = gc_unmarked;
-        }
         pool_free(g_vm->gc_node_pool, node);
-        return o;
+        if (o != nil) {
+            if (o->gc_tag == gc_stack_return) {
+                o->gc_tag = gc_free;
+                pool_free(g_vm->obj_pool, o);
+                return nil;
+            } else {
+                o->gc_tag = gc_unmarked;
+                return o;
+            }
+        }
     }
     return nil;
 }
@@ -241,7 +249,12 @@ obj * stack_pop() {
  * be popped to upon return.
  */
 void prepare_stack() {
-    stack_push(nil);
+    if (!pool_can_alloc(g_vm->obj_pool)) {
+        gc();
+    }
+    obj * o = pool_alloc(g_vm->obj_pool);
+    o->gc_tag = gc_stack_return;
+    stack_push(o);
 }
 
 /**
@@ -255,32 +268,20 @@ void prepare_stack() {
  * @returns obj *   the object passed in
  */
 obj * return_from_stack(obj * o) {
-    while(stack_pop() != nil); 
-    if (o != nil) {
+    int popped = 0;
+    for (;;) {
+        obj * p = stack_pop();
+        if (p == nil) {
+            break;
+        }
+        if (p == o) {
+            popped = 1;
+        }
+    }
+    if (popped) {
         stack_push(o);
     }
     return o;
-    // gc_node * node = nil;
-    /*{
-        // Ensure that we don't shift off the heap more than once
-        if (g_vm->heap->car == o && node == nil) {
-            node = g_vm->heap;
-            g_vm->heap = g_vm->heap->cdr;
-        }
-    }
-    */
-   /*
-    if (node != nil) {
-        if (o != nil) {
-            node->cdr = g_vm->stack;
-            g_vm->stack = node;
-        } else {
-            pool_free(g_vm->gc_node_pool, node);
-            // g_vm->allocated -= sizeof(gc_node);
-        }
-    }
-    */
-    // return o;
 }
 
 /**
