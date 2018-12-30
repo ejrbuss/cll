@@ -1,6 +1,6 @@
 #include "ll.h"
 
-size_t MEMORY = 256000;
+size_t MEMORY = 128000;
 int DEBUG_PARSE    = 0;
 int DEBUG_MACROEXP = 0;
 int DEBUG_GC       = 0;

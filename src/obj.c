@@ -1,75 +1,8 @@
 #include "obj.h"
 
-int has_resource(obj * o) {
-    return o != nil && (
-        o->type == type_string ||
-        o->type == type_symbol ||
-        o->type == type_keyword
-    );
-}
+vm * g_vm = nil;
 
-static void gc_mark();
-void vm_debug() {
-    char * gc_tag_lookup[] = {
-        "marked  ",
-        "unmarked",
-        "freed   ",
-    };
-    char * type_lookup[] = {
-        "type_reference",
-        "type_error",
-        "type_symbol",
-        "type_keyword",
-        "type_string",
-        "type_number",
-        "type_list",
-        "type_map",
-        "type_macro",
-        "type_function",
-        "type_native_function",
-    };
-    gc_mark();
-    gc_node * node;
-
-    printf("--- HEAP ---\n");
-    node = g_vm->heap;
-    while (node != nil) {
-        obj * o = node->car;
-        if (o == nil) {
-            printf("!!! nil !!!\n");
-        } else {
-            printf("%s | %s | %s\n", 
-                gc_tag_lookup[o->gc_tag], 
-                type_lookup[o->type],
-                has_resource(o) ? o->resource : ""
-            );
-        }
-        node = node->cdr;
-    }
-
-    printf("--- STACK ---\n");
-    node = g_vm->stack;
-    while (node != nil) {
-        obj * o = node->car;
-        if (o == nil) {
-            printf("!!! nil !!!\n");
-        } else {
-            printf("%s | %s | %s\n", 
-                gc_tag_lookup[o->gc_tag], 
-                type_lookup[o->type],
-                has_resource(o) ? o->resource : ""
-            );
-        }
-        node = node->cdr;
-    }
-    /*
-    printf("allocated: %u\nmax:       %u\n", 
-        (unsigned int) g_vm->allocated, 
-        (unsigned int) g_vm->max_allocated
-    );
-    */
-    fflush(stdout);
-}
+void vm_debug() {}
 
 /**
  * Initialzes a new global little lisp virtual machine.
@@ -88,11 +21,9 @@ void init_vm(size_t available_bytes) {
     assert(g_vm == nil);
     // Need at least enough memory to allocate a VM and the pools
     assert(available_bytes > 0);
-    int obj_count = available_bytes / (sizeof(obj) + sizeof(gc_node) + 2 * sizeof(pool_node *));
+    int obj_count = available_bytes / (sizeof(obj) + sizeof(pool_node *));
     g_vm = (vm *) must_malloc(sizeof(vm));
     g_vm->obj_pool = init_pool(sizeof(obj), obj_count, "Ran out of memory!");
-    g_vm->gc_node_pool = init_pool(sizeof(gc_node), obj_count, "Stack overflow!");
-    g_vm->heap = nil;
     g_vm->stack = nil;
 }
 
@@ -110,7 +41,12 @@ static void gc_mark_recursive(obj * o) {
     if (o == nil || o->gc_tag == gc_marked) {
         return;
     }
+    // A stack return should never be marked, 
+    // or have any of its fields inspected
+    assert(o->gc_tag != gc_stack_return);
+    // Mark the object
     o->gc_tag = gc_marked;
+    // Check for referenced objects
     switch (o->type) {
         case type_reference:
             gc_mark_recursive(o->ref);
@@ -133,13 +69,13 @@ static void gc_mark_recursive(obj * o) {
  */
 void gc_mark() {
     assert(g_vm != nil);
-    gc_node * node = g_vm->stack;
+    pool_node * node = g_vm->stack;
     while (node != nil) {
-        if (node->car != nil) {
-            if (node->car->gc_tag != gc_stack_return) {
-                node->car->gc_tag = gc_unmarked;
-                gc_mark_recursive(node->car);
-            }
+        obj * o = pool_node_chunk(node);
+        // We want to skip oveer stack returns
+        if (o->gc_tag != gc_stack_return) {
+            o->gc_tag = gc_unmarked;
+            gc_mark_recursive(o);
         }
         node = node->cdr;
     }
@@ -152,6 +88,10 @@ void gc_mark() {
  * will also have their resources freed.
  */
 static void free_obj(obj * o) {
+    // We don't handle nil
+    assert(o != nil);
+    // We don't handle stack returns
+    assert(o->gc_tag != gc_stack_return);
     switch (o->type) {
         case type_symbol:
         case type_keyword:
@@ -167,8 +107,8 @@ static void free_obj(obj * o) {
 }
 
 /**
- * Iterates over all objects on the heap and frees any unmarked objects. As the
- * heap is sweeped all objects are unmarked to prepare for the next gc.
+ * Iterates over all objects in thee pool and frees any unmarked objects. As the
+ * pool is sweeped all objects are unmarked to prepare for the next gc.
  */
 void gc_sweep() {
     assert(g_vm != nil);
@@ -204,49 +144,42 @@ void gc() {
 // ----------------
 
 /**
- * Pushes an object onto the stack. The nil object has a special meaning when
- * pushes onto the stack. it indicates where the stack can be safely popped
- * off too on a return. nil should never be manually pushed on the stack,
- * `prepare_stack` should always be called instead.
+ * Pushes an object onto the stack. 
  *
  * @param obj * o the object to push onto the stack
  */
 static void stack_push(obj * o) {
     assert(g_vm != nil);
-    gc_node * node = pool_alloc(g_vm->gc_node_pool);
-    node->car   = o;
+    assert(o != nil);
+    pool_node * node = pool_chunk_node(o);
     node->cdr   = g_vm->stack;
     g_vm->stack = node;
 }
 
 /**
- * Pops the top object off the stack and moves it to the heap. Otherwise just
- * returns nil.
+ * Pops the top object off the stack. Otherwise just returns nil.
  */
 obj * stack_pop() {
     assert(g_vm != nil);
     if (g_vm->stack != nil) {
-        gc_node * node = g_vm->stack;        
-        obj * o = node->car;
+        pool_node * node = g_vm->stack;
+        obj * o = pool_node_chunk(node);
         g_vm->stack = node->cdr;
-        pool_free(g_vm->gc_node_pool, node);
-        if (o != nil) {
-            if (o->gc_tag == gc_stack_return) {
-                o->gc_tag = gc_free;
-                pool_free(g_vm->obj_pool, o);
-                return nil;
-            } else {
-                o->gc_tag = gc_unmarked;
-                return o;
-            }
+        if (o->gc_tag == gc_stack_return) {
+            o->gc_tag = gc_free;
+            pool_free(g_vm->obj_pool, o);
+            return nil;
+        } else {
+            o->gc_tag = gc_unmarked;
+            return o;
         }
     }
     return nil;
 }
 
 /**
- * Prepares the stack. Pushes nil onto the stack indicating where the stack can
- * be popped to upon return.
+ * Prepares the stack. Pushes a stack_return object indicating where the stack 
+ * can be popped to upon return.
  */
 void prepare_stack() {
     if (!pool_can_alloc(g_vm->obj_pool)) {
@@ -262,7 +195,7 @@ void prepare_stack() {
  * back onto the stack to ensure it is retained. If the object being returned
  * is nil, it will be returned, but it will not be pushed onto the stack. If
  * the passed object is not on the currently prepared stack it will still be
- * returned, but it will no longer be on the stack.
+ * returned, but it will not be pushed back.
  *
  * @param   obj * o the object to return
  * @returns obj *   the object passed in
@@ -285,7 +218,7 @@ obj * return_from_stack(obj * o) {
 }
 
 /**
- * Allocates and initalizes a new object. If the heap is full a gc pause will
+ * Allocates and initalizes a new object. If the pool is full a gc pause will
  * occur. If the gc fails to create enough room for the object the allocation
  * will fail on an assert.
  *
@@ -307,23 +240,14 @@ static obj * init_obj() {
 }
 
 /**
- * Frees the current VM instance, this frees all heap resources. This is done
- * by removing all roots and then performing a gc.
+ * Frees the current VM instance, this frees all pool resources. 
  *
- * Sets the g_ll_vm pointer to ni. This will ensure functions that depend on
+ * Sets the g_vm pointer to ni. This will ensure functions that depend on
  * the VM to fail if they are called after free.
  */
 void free_vm() {
     assert(g_vm != nil);
-    /*
-    while(g_vm->stack != nil) {
-        stack_pop();
-    }
-    gc_sweep();
-    */
-    // assert(g_vm->allocated == sizeof(vm));
     free_pool(g_vm->obj_pool);
-    free_pool(g_vm->gc_node_pool);
     free(g_vm);
     g_vm = nil;
 }

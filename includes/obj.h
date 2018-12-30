@@ -8,10 +8,10 @@
  */
 typedef enum gc_tag gc_tag;
 enum gc_tag {
-    gc_free,    // The object has been sweeped (DEBUGING)
-    gc_marked,   // The object will not be sweeped
-    gc_unmarked, // The object may be sweeped
-    gc_stack_return,
+    gc_free,         // The object has been sweeped (DEBUGING)
+    gc_marked,       // The object will not be sweeped
+    gc_unmarked,     // The object may be sweeped
+    gc_stack_return, // Placeholder object indicating stack return
 };
 
 /**
@@ -62,21 +62,13 @@ struct obj {
     };
 };
 
-typedef struct gc_node gc_node;
-struct gc_node {
-    obj     * car; // The object managed by this node
-    gc_node * cdr; // The next node in a linked list of gc nodes
-};
-
 typedef struct vm vm;
 struct vm {
-    pool * obj_pool;
-    pool * gc_node_pool;
-    gc_node * heap;       // A linked list of nodes representing the heap
-    gc_node * stack;      // A linked list of nodes, representing the stack
+    pool * obj_pool;   // Object memory pool
+    pool_node * stack; // Object stack
 };
 
-vm * g_vm; // The gobal vm reference
+extern vm * g_vm; // The gobal vm reference
 
 // String literal macros
 #define lsymbol(s) symbol(s, 0, 0)
