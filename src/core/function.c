@@ -34,7 +34,7 @@ obj * call(obj * fn, obj * args) {
     obj * fn_body = car(cdr(cdr(fn)));
     while (fn_args != nil) {
         // Handle varargs
-        if (symbol_cmp(car(fn_args), "&")) {
+        if (FAST_SYMBOL_EQ(car(fn_args), "&")) {
             fn_env = assoc(car(cdr(fn_args)), args, fn_env);
             break;
         }
