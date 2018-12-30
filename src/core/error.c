@@ -11,6 +11,13 @@ obj * apply_error(obj * func, obj * o) {
 
 obj * error_format(obj * type, obj * fmt, obj * args) {
     prepare_stack();
+    breakpoint_catch();
+    /*
+    printf("error_format: %s %s\n", 
+        print(type)->string,
+        print(fmt)->string
+    );
+    */
     return return_from_stack(error(type, print_format(fmt, args)));
 }
 

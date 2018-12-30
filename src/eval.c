@@ -8,8 +8,8 @@ static obj * macro_expand(obj * op, obj * args) {
     prepare_stack();
     obj * o = call(op, args);
     if (o != nil && o->type == type_list) {
-        op = car(o);
-        args = cdr(o);
+        op = FAST_CAR(o);
+        args = FAST_CDR(o);
         if (op != nil && o->type == type_macro) {
             return return_from_stack(macro_expand(op, args));
         }
@@ -22,27 +22,27 @@ static obj * quasi_quote(obj * expr, obj * env) {
     if (expr == nil || expr->type != type_list) {
         return return_from_stack(expr);
     }
-    obj * op   = car(expr);
-    obj * args = cdr(expr);
+    obj * op   = FAST_CAR(expr);
+    obj * args = FAST_CDR(expr);
     if (symbol_cmp(op, "unquote") || symbol_cmp(op, "unquote-splice")) {
         return return_from_stack(eval(car(args), env));
     }
     obj * new_expr = nil;
     while (expr != nil) {
-        obj * o = car(expr);
+        obj * o = FAST_CAR(expr);
         if (o != nil && o->type == type_list && symbol_cmp(car(o), "unquote-splice")) {
             o = quasi_quote(o, env);
             return_on_error(o);
             while (o) {
-                new_expr = cons(car(o), new_expr);
-                o = cdr(o);
+                new_expr = cons(FAST_CAR(o), new_expr);
+                o = FAST_CDR(o);
             }
         } else {
             o = quasi_quote(o, env);
             return_on_error(o);
             new_expr = cons(o, new_expr);
         }
-        expr = cdr(expr);
+        expr = FAST_CDR(expr);
     }
     return return_from_stack(reverse(new_expr));
 }
@@ -50,8 +50,8 @@ static obj * quasi_quote(obj * expr, obj * env) {
 static obj * eval_list(obj * list, obj * env) {
     prepare_stack();
 
-    obj * op   = car(list);
-    obj * args = cdr(list);
+    obj * op   = FAST_CAR(list);
+    obj * args = FAST_CDR(list);
 
     // Special form: quote
     // Should return its first arg unevaluated
@@ -144,17 +144,17 @@ static obj * eval_list(obj * list, obj * env) {
         }
         obj * let_env = env;
         while(map != nil) {
-            obj * k = car(map);
+            obj * k = FAST_CAR(map);
             obj * v = eval(car(cdr(map)), env);
             return_on_error(v);
             let_env = naive_assoc(k, v, let_env);
-            map = cdr(cdr(map));
+            map = FAST_CDR(FAST_CDR(map));
         }
         obj * o = nil;
         while(args) {
-            o = eval(car(args), let_env);
+            o = eval(FAST_CAR(args), let_env);
             return_on_error(o);
-            args = cdr(args);
+            args = FAST_CDR(args);
         }
         return return_from_stack(o);
     }
@@ -208,14 +208,14 @@ static obj * eval_list(obj * list, obj * env) {
     // Eval arguments
     obj * evaled_args = nil;
     while (args != nil) {
-        obj * next = eval(car(args), env);
+        obj * next = eval(FAST_CAR(args), env);
         // If an argument is an error we need to propogate it
         if (next != nil && next->type == type_error) {
             return return_from_stack(next);
         }
         // Otherwise put it onto the evaluated argument list
         evaled_args = cons(next, evaled_args);
-        args = cdr(args);
+        args = FAST_CDR(args);
     }
     // We reversed the order when building the list, so now we need to undo that
     evaled_args = reverse(evaled_args);
@@ -246,6 +246,31 @@ void init_env() {
     return_from_stack(nil);
 }
 
+static obj * eval_symbol(obj * sym, obj * env) {
+    prepare_stack();
+    while (env != nil) {
+        if (equal(FAST_CAR(env), sym)) {
+            return return_from_stack(car(FAST_CDR(env)));
+        }
+        env = FAST_CDR(FAST_CDR(env));
+    }
+    env = g_env;
+    while (env != nil) {
+        if (equal(FAST_CAR(env), sym)) {
+            return return_from_stack(car(FAST_CDR(env)));
+        }
+        env = FAST_CDR(FAST_CDR(env));
+    }
+    obj * lookup_error = error_format(
+        lkeyword("Lookup-Error"),
+        lstring("`{}` is not defined!"),
+        cons(sym, nil)
+    );
+    lookup_error = cons(sym, lookup_error);
+    lookup_error->type = type_error;
+    return return_from_stack(lookup_error);
+}
+
 /**
  * Evaluates the given expresssion in the given environment. Value types (other
  * than lists) evaluate to themselves. Symbols are lookedup up in the provided
@@ -261,18 +286,7 @@ obj * eval(obj * expr, obj * env) {
     }
     switch (expr->type) {
         case type_symbol: 
-            prepare_stack();
-            obj * lookup_error = error_format(
-                lkeyword("Lookup-Error"),
-                lstring("`{}` is not defined!"),
-                cons(expr, nil)
-            );
-            lookup_error = cons(expr, lookup_error);
-            lookup_error->type = type_error;
-            return return_from_stack(
-                get(expr, env, 
-                get(expr, g_env, lookup_error)
-            ));
+            return eval_symbol(expr, env);
         case type_list:
             prepare_stack();
             obj * result = eval_list(expr, env);

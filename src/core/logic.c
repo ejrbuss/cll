@@ -82,7 +82,7 @@ obj * equal(obj * first, obj * second) {
         case type_symbol:
         case type_keyword:
         case type_string:
-            return strcmp(first->resource, second->resource) == 0
+            return FAST_STR_EQ(first, second)
                 ? lkeyword("true")
                 : nil;
         case type_number:
@@ -91,8 +91,8 @@ obj * equal(obj * first, obj * second) {
                 : nil;
         case type_list:
             return and(
-                equal(car(first), car(second)),
-                equal(cdr(first), cdr(second))
+                equal(FAST_CAR(first), FAST_CAR(second)),
+                equal(FAST_CDR(first), FAST_CDR(second))
             );
         case type_map:
             // Map equality needs to consider out of order keys
@@ -100,22 +100,22 @@ obj * equal(obj * first, obj * second) {
             obj * fst_keys = keys(first);
             while(fst_keys != nil) {
                 if (not(equal(
-                    get(car(fst_keys), first, nil),
-                    get(car(fst_keys), second, nil)
+                    get(FAST_CAR(fst_keys), first, nil),
+                    get(FAST_CAR(fst_keys), second, nil)
                 ))) {
                     return return_from_stack(nil);
                 }
-                fst_keys = cdr(fst_keys);
+                fst_keys = FAST_CDR(fst_keys);
             }
             obj * snd_keys = keys(second);
             while(snd_keys != nil) {
                 if (not(equal(
-                    get(car(snd_keys), first, nil),
-                    get(car(snd_keys), second, nil)
+                    get(FAST_CAR(snd_keys), first, nil),
+                    get(FAST_CAR(snd_keys), second, nil)
                 ))) {
                     return return_from_stack(nil);
                 }
-                snd_keys = cdr(snd_keys);
+                snd_keys = FAST_CDR(snd_keys);
             }
             return return_from_stack(lkeyword("true"));
         case type_macro:

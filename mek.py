@@ -18,6 +18,6 @@ flags = ['-Wall']
 # Provide a list to override the c compiler configuration default
 
 if options.release:
-    flags = flags + ['-O']
+    flags = flags + ['-O3']
 else:
     flags = flags + ['-g']

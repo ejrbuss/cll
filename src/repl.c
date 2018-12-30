@@ -106,6 +106,7 @@ char * wrap_readline(char * prompt) {
 }
 
 int main(int argc, char ** argv) {
+    printf("obj:      %zu\npool_node: %zu\n", sizeof(obj), sizeof(pool_node));
     parse_args(argc, argv);
     printf("cll v%s repl\n\n", VERSION);
     for (;;) {

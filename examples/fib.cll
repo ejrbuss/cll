@@ -19,5 +19,4 @@
 
 (println "(fib 5) = " (fib 5))
 (println "(ifib 50) = " (ifib 50))
-
-(println "(fib 20) in " (time-it (fib 20)) "s")
+(println "(fib 26) in " (time-it (fib 26)) "s")

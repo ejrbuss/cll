@@ -8,10 +8,10 @@
  */
 typedef enum gc_tag gc_tag;
 enum gc_tag {
-    gc_free,         // The object has been sweeped (DEBUGING)
-    gc_marked,       // The object will not be sweeped
-    gc_unmarked,     // The object may be sweeped
-    gc_stack_return, // Placeholder object indicating stack return
+    gc_free         = 0, // The object has been sweeped (DEBUGING)
+    gc_marked       = 1, // The object will not be sweeped
+    gc_unmarked     = 2, // The object may be sweeped
+    gc_stack_return = 3, // Placeholder object indicating stack return
 };
 
 /**
@@ -20,17 +20,17 @@ enum gc_tag {
  */
 typedef enum type type;
 enum type {
-    type_reference,
-    type_error,
-    type_symbol,
-    type_keyword,
-    type_string,
-    type_number,
-    type_list,
-    type_map,
-    type_macro,
-    type_function,
-    type_native_function, // Used to call into c
+ type_reference          = 0,
+    type_error           = 1,
+    type_symbol          = 2,
+    type_keyword         = 3,
+    type_string          = 4,
+    type_number          = 5,
+    type_list            = 6,
+    type_map             = 7,
+    type_macro           = 8,
+    type_function        = 9,
+    type_native_function = 10,
 };
 
 /**
@@ -38,9 +38,9 @@ enum type {
  * map and function impolementations.
  */
 typedef struct obj obj;
-struct obj {
-    gc_tag gc_tag;
-    type type;
+struct __attribute__((__packed__)) obj {
+    char gc_tag;
+    char type;
     union {
         struct {
             union {

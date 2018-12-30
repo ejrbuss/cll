@@ -110,7 +110,7 @@ static void free_obj(obj * o) {
  * Iterates over all objects in thee pool and frees any unmarked objects. As the
  * pool is sweeped all objects are unmarked to prepare for the next gc.
  */
-void gc_sweep() {
+static void gc_sweep() {
     assert(g_vm != nil);
     int c;
     int chunks =  g_vm->obj_pool->chunks;

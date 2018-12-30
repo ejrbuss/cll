@@ -2,11 +2,6 @@
 
 #include "obj.h"
 
-#define symbol_cmp(o, s) (o != nil \
-    && o->type == type_symbol \
-    && strcmp(o->resource, s) == 0 \
-)
-
 extern obj * g_env_ref;
 extern obj * g_env;
 

@@ -3,6 +3,7 @@
 #include "obj.h"
 #include "print.h"
 #include "error.h"
+#include "fast.h"
 #include "read.h"
 #include "function.h"
 #include "io.h"
