@@ -3,8 +3,15 @@
 obj * vm_stat() {
     prepare_stack();
     obj * result = nil;
-    // result = naive_assoc(lkeyword("max"), number(g_vm->max_allocated), result);
-    // result = naive_assoc(lkeyword("allocated"), number(g_vm->allocated), result);
+    int available = pool_free_chunks(g_vm->obj_pool);
+    int allocated = g_vm->obj_pool->chunks - available;
+    int bytes = sizeof(obj) + sizeof(gc_node) + 2 * sizeof(pool_node *);
+    result = naive_assoc(lkeyword("allocated"), number(allocated), result);
+    result = naive_assoc(lkeyword("available"), number(available), result);
+    result = naive_assoc(lkeyword("total"), number(available + allocated), result);
+    result = naive_assoc(lkeyword("allocated-bytes"), number(allocated * bytes), result);
+    result = naive_assoc(lkeyword("available-bytes"), number(available * bytes), result);
+    result = naive_assoc(lkeyword("total-bytes"), number((available + allocated) * bytes), result);
     return return_from_stack(result);
 }
 

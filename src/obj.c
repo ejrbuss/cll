@@ -82,14 +82,16 @@ void vm_debug() {
  * @param size_t max_allocated the maximum number of bytes allocatable by
  *                             this VM
  */
-void init_vm(size_t max_allocated) {
+void init_vm(size_t available_bytes) {
+    
     // Do not overwrite a VM!
     assert(g_vm == nil);
-    // Need at least enough memory to allocate a VM
-    assert(max_allocated >= sizeof(vm));
+    // Need at least enough memory to allocate a VM and the pools
+    assert(available_bytes > 0);
+    int obj_count = available_bytes / (sizeof(obj) + sizeof(gc_node) + 2 * sizeof(pool_node *));
     g_vm = (vm *) must_malloc(sizeof(vm));
-    g_vm->obj_pool = init_pool(sizeof(obj), max_allocated / sizeof(obj));
-    g_vm->gc_node_pool = init_pool(sizeof(gc_node), max_allocated / sizeof(obj));
+    g_vm->obj_pool = init_pool(sizeof(obj), obj_count, "Ran out of memory!");
+    g_vm->gc_node_pool = init_pool(sizeof(gc_node), obj_count, "Stack overflow!");
     g_vm->heap = nil;
     g_vm->stack = nil;
 }

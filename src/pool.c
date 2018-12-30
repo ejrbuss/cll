@@ -1,11 +1,12 @@
 #include "pool.h"
 
-pool * init_pool(size_t chunk, size_t chunks) {
+pool * init_pool(size_t chunk, size_t chunks, char * err) {
     pool * p = must_malloc(sizeof(pool));
     p->chunk = chunk;
     p->chunks = chunks;
     p->step = chunk + sizeof(pool_node *);
     p->data = must_malloc(chunks * p->step);
+    p->err = err;
     memset(p->data, 0, chunks * p->step);
     int c;
     p->head = (pool_node *) p->data;
@@ -19,9 +20,19 @@ pool * init_pool(size_t chunk, size_t chunks) {
     return p;
 }
 
+extern int pool_free_chunks(pool * p) {
+    int free_chunks = 0;
+    pool_node * node = p->head;
+    while(node != nil) {
+        free_chunks++;
+        node = node->cdr;
+    }
+    return free_chunks;
+}
+
 void * pool_alloc(pool * p) {
     if (!pool_can_alloc(p)) {
-        panic("Pool ran out of memory! chunk: %zu", p->chunk);
+        panic("%s", p->err);
     }
     pool_node * node = p->head;
     p->head = p->head->cdr;
