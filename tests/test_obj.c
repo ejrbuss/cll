@@ -1,7 +1,7 @@
 #include "ll.h"
 #include "test.h"
 #include "obj.h"
-
+/*
 size_t vm_size(int n_objs) {
     return (sizeof(obj) + sizeof(gc_node)) * n_objs + sizeof(vm);
 }
@@ -152,8 +152,11 @@ void test_simple_auto_gc() {
     free_vm();
 }
 
+*/
+
 int main() {
     test tests[] = {
+        /*
         { "test_init_and_free", test_init_and_free },
         { "test_number", test_number },
         { "test_simple_gc", test_simple_gc },
@@ -166,6 +169,7 @@ int main() {
         { "test_function", test_function },
         { "test_normal_gc", test_normal_gc },
         { "test_simple_auto_gc", test_simple_auto_gc },
+        */
         { 0 },
     };
     run_tests(tests);

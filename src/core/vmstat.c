@@ -3,8 +3,8 @@
 obj * vm_stat() {
     prepare_stack();
     obj * result = nil;
-    result = naive_assoc(lkeyword("max"), number(g_vm->max_allocated), result);
-    result = naive_assoc(lkeyword("allocated"), number(g_vm->allocated), result);
+    // result = naive_assoc(lkeyword("max"), number(g_vm->max_allocated), result);
+    // result = naive_assoc(lkeyword("allocated"), number(g_vm->allocated), result);
     return return_from_stack(result);
 }
 

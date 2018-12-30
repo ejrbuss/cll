@@ -1,15 +1,16 @@
 #pragma once
 
 #include "ll.h"
+#include "pool.h"
 
 /**
  * Indicates the current state of an object managed by the garbage collector.
  */
 typedef enum gc_tag gc_tag;
 enum gc_tag {
+    gc_free,    // The object has been sweeped (DEBUGING)
     gc_marked,   // The object will not be sweeped
     gc_unmarked, // The object may be sweeped
-    gc_freed,    // The object has been sweeped (DEBUGING)
 };
 
 /**
@@ -68,10 +69,10 @@ struct gc_node {
 
 typedef struct vm vm;
 struct vm {
-    gc_node * heap;    // A linked list of nodes representing the heap
-    gc_node * stack;   // A linked list of nodes, representing the stack
-    size_t max_allocated; // The maximum number of bytes allocatable by this VM
-    size_t allocated;     // The current number of allocated bytes
+    pool * obj_pool;
+    pool * gc_node_pool;
+    gc_node * heap;       // A linked list of nodes representing the heap
+    gc_node * stack;      // A linked list of nodes, representing the stack
 };
 
 vm * g_vm; // The gobal vm reference

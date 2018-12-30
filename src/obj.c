@@ -62,10 +62,12 @@ void vm_debug() {
         }
         node = node->cdr;
     }
+    /*
     printf("allocated: %u\nmax:       %u\n", 
         (unsigned int) g_vm->allocated, 
         (unsigned int) g_vm->max_allocated
     );
+    */
     fflush(stdout);
 }
 
@@ -86,10 +88,10 @@ void init_vm(size_t max_allocated) {
     // Need at least enough memory to allocate a VM
     assert(max_allocated >= sizeof(vm));
     g_vm = (vm *) must_malloc(sizeof(vm));
-    g_vm->heap  = nil;
+    g_vm->obj_pool = init_pool(sizeof(obj), max_allocated / sizeof(obj));
+    g_vm->gc_node_pool = init_pool(sizeof(gc_node), max_allocated / sizeof(obj));
+    g_vm->heap = nil;
     g_vm->stack = nil;
-    g_vm->max_allocated = max_allocated;
-    g_vm->allocated = sizeof(vm);
 }
 
 // Garbage Collection Operations
@@ -127,7 +129,7 @@ static void gc_mark_recursive(obj * o) {
 /**
  * Marks all objects connected to the VM's stack.
  */
-static void gc_mark() {
+void gc_mark() {
     assert(g_vm != nil);
     gc_node * node = g_vm->stack;
     while (node != nil) {
@@ -145,9 +147,7 @@ static void gc_mark() {
  * Objects that manage additional resources (symbols, keywords, and strings)
  * will also have their resources freed.
  */
-static void free_gc_node(gc_node * node) {
-    assert(g_vm != nil);
-    obj * o = node->car;
+static void free_obj(obj * o) {
     switch (o->type) {
         case type_symbol:
         case type_keyword:
@@ -158,13 +158,8 @@ static void free_gc_node(gc_node * node) {
         default:
             break;
     }
-    // Set for debugging
-    o->gc_tag = gc_freed;
-    free(o);
-    free(node);
-    // Indicate freed memory
-    g_vm->allocated -= sizeof(obj);
-    g_vm->allocated -= sizeof(gc_node);
+    o->gc_tag = gc_free;
+    pool_free(g_vm->obj_pool, o);
 }
 
 /**
@@ -173,26 +168,20 @@ static void free_gc_node(gc_node * node) {
  */
 void gc_sweep() {
     assert(g_vm != nil);
-    gc_node * node = g_vm->heap;
-    // Shift off unmarked heads
-    while (node != nil && node->car->gc_tag == gc_unmarked) {
-        g_vm->heap = node->cdr;
-        free_gc_node(node);
-        node = g_vm->heap;
-    }
-    // Handle the general case
-    while (node != nil) {
-        node->car->gc_tag = gc_unmarked;
-        while (node->cdr != nil && node->cdr->car->gc_tag == gc_marked) {
-            node->cdr->car->gc_tag = gc_unmarked;
-            node = node->cdr;
+    int c;
+    int chunks =  g_vm->obj_pool->chunks;
+    for (c = 0; c < chunks; c++) {
+        obj * o = pool_iter(g_vm->obj_pool, c);
+        switch(o->gc_tag) {
+            case gc_marked:
+                o->gc_tag = gc_unmarked;
+                continue;
+            case gc_unmarked:
+                free_obj(o);
+                continue;
+            default:
+                continue;
         }
-        if (node->cdr == nil) {
-            return;
-        }
-        gc_node * rem = node->cdr->cdr;
-        free_gc_node(node->cdr);
-        node->cdr = rem;
     }
 }
 
@@ -205,24 +194,6 @@ void gc() {
     }
     gc_mark();
     gc_sweep();
-}
-
-/**
- * Tries to allocate the bytes if there is room, otherwise initiates a gc
- * pause. If after the pause there is still no room, the function panics.
- */
-static void * try_malloc(size_t bytes) {
-    assert(g_vm != nil);
-    if (g_vm->allocated + bytes > g_vm->max_allocated) {
-        //printf("\nBefore: %u\n", g_vm->allocated);
-        gc();
-        //printf("\nAfter: %u\n", g_vm->allocated);
-    }
-    if (g_vm->allocated + bytes > g_vm->max_allocated) {
-        panic("Ran out of memory!");
-    }
-    g_vm->allocated += bytes;
-    return must_malloc(bytes);
 }
 
 // Stack Operations
@@ -238,7 +209,7 @@ static void * try_malloc(size_t bytes) {
  */
 static void stack_push(obj * o) {
     assert(g_vm != nil);
-    gc_node * node = (gc_node *) try_malloc(sizeof(gc_node));
+    gc_node * node = pool_alloc(g_vm->gc_node_pool);
     node->car   = o;
     node->cdr   = g_vm->stack;
     g_vm->stack = node;
@@ -251,17 +222,13 @@ static void stack_push(obj * o) {
 obj * stack_pop() {
     assert(g_vm != nil);
     if (g_vm->stack != nil) {
-        gc_node * node = g_vm->stack;
+        gc_node * node = g_vm->stack;        
         obj * o = node->car;
         g_vm->stack = node->cdr;
-        if (o == nil) {
-            free(node);
-            g_vm->allocated -= sizeof(gc_node);
-        } else {
-            node->cdr  = g_vm->heap;
-            g_vm->heap = node;
-            o->gc_tag  = gc_unmarked;
+        if (o != nil) {
+            o->gc_tag = gc_unmarked;
         }
+        pool_free(g_vm->gc_node_pool, node);
         return o;
     }
     return nil;
@@ -286,24 +253,32 @@ void prepare_stack() {
  * @returns obj *   the object passed in
  */
 obj * return_from_stack(obj * o) {
-    gc_node * node = nil;
-    while (stack_pop() != nil) {
+    while(stack_pop() != nil); 
+    if (o != nil) {
+        stack_push(o);
+    }
+    return o;
+    // gc_node * node = nil;
+    /*{
         // Ensure that we don't shift off the heap more than once
         if (g_vm->heap->car == o && node == nil) {
             node = g_vm->heap;
             g_vm->heap = g_vm->heap->cdr;
         }
     }
+    */
+   /*
     if (node != nil) {
         if (o != nil) {
             node->cdr = g_vm->stack;
             g_vm->stack = node;
         } else {
-            free(node);
-            g_vm->allocated -= sizeof(gc_node);
+            pool_free(g_vm->gc_node_pool, node);
+            // g_vm->allocated -= sizeof(gc_node);
         }
     }
-    return o;
+    */
+    // return o;
 }
 
 /**
@@ -320,7 +295,10 @@ obj * return_from_stack(obj * o) {
  */
 static obj * init_obj() {
     assert(g_vm != nil);
-    obj * o = (obj *) try_malloc(sizeof(obj));
+    if (!pool_can_alloc(g_vm->obj_pool)) {
+        gc();
+    }
+    obj * o = pool_alloc(g_vm->obj_pool);
     stack_push(o);
     return o;
 }
@@ -334,11 +312,15 @@ static obj * init_obj() {
  */
 void free_vm() {
     assert(g_vm != nil);
+    /*
     while(g_vm->stack != nil) {
         stack_pop();
     }
     gc_sweep();
-    assert(g_vm->allocated == sizeof(vm));
+    */
+    // assert(g_vm->allocated == sizeof(vm));
+    free_pool(g_vm->obj_pool);
+    free_pool(g_vm->gc_node_pool);
     free(g_vm);
     g_vm = nil;
 }
