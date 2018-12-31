@@ -1,0 +1,73 @@
+(def bf-root (ref nil))
+(def bf-pos (ref nil))
+(def bf-len (ref 0))
+
+(defn bf-print []
+  (let { r (ref @bf-root) }
+    (while @r
+      (print " " @(:val @r))
+      (set! r @(:nxt @r))))
+    (println))
+
+(defn bf-reset []
+  (set! bf-root { :val (ref 0)
+                 :nxt (ref nil) 
+                 :prv (ref nil) })
+  (set! bf-pos @bf-root)
+  (set! bf-len 1))
+
+(defn bf-adv []
+  (let { nxt (:nxt @bf-pos) }
+    (if (not @nxt)
+      (do
+        (set! bf-len (++ @bf-len))
+        (set! nxt { :val (ref 0) 
+                    :nxt (ref nil)
+                    :prv (ref @bf-pos) })))
+    (set! bf-pos @nxt)))
+
+(defn bf-dev []
+  (let { prv (:prv @bf-pos) }
+    (if @prv
+      (set! bf-pos @prv))))
+
+(defn bf-inc []
+  (let { val (:val @bf-pos) }
+    (set! val (++ @val))))
+
+(defn bf-dec []
+  (let { val (:val @bf-pos) }
+    (set! val (-- @val))))
+
+(defn bf-put []
+  (print (num-to-ascii @(:val @bf-pos))))
+
+(defn bf-get []
+  (let { val (:val @bf-pos) }
+    (set! val (ascii-to-num (input)))))
+
+(defn bf-loop []
+  (!= 0 @(:val @bf-pos)))
+
+(defn bf-trans [source]
+  (reduce 
+    (fn [s c] 
+      (str s (cond
+        (= c ">") "(bf-adv)"
+        (= c "<") "(bf-dev)"
+        (= c "+") "(bf-inc)"
+        (= c "-") "(bf-dec)"
+        (= c ".") "(bf-put)"
+        (= c ",") "(bf-get)"
+        (= c "[") "(while (bf-loop)"
+        (= c "]") ")")))
+    ""
+    source))
+(defn bf [s]
+  (bf-reset)
+  (str-eval (bf-trans s)))
+
+(def bf-hello-world "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.++
+  +++++..+++.>>.<-.<.+++.------.--------.>>+.>++.")
+
+(bf bf-hello-world)

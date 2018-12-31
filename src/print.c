@@ -55,7 +55,7 @@ obj * print(obj * o) {
     }
     switch (o->type) {
         case type_reference:
-            return return_from_stack(lstring("<ref>"));
+            return return_from_stack(format(lstring("<ref {}>"), cons(print(o->ref), nil)));
         case type_error:
             return return_from_stack(error_to_string(o));
         case type_symbol:

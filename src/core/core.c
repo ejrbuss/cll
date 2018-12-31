@@ -27,21 +27,36 @@ static obj * native_keyword(obj * args) {
     return return_from_stack(ckeyword(no_whitespace(s)->string));
 }
 
-extern obj * native_eval(obj * args) {
+static obj * native_eval(obj * args) {
     return eval(car(args), g_env);
 }
 
-extern obj * native_read(obj * args) {
+static obj * native_read(obj * args) {
     prepare_stack();
     check_type(lstring("read"), type_string, car(args));
     return return_from_stack(read(car(args)));
 }
 
-extern obj * native_load(obj * args) {
+static obj * native_load(obj * args) {
     prepare_stack();
     check_type(lstring("load"), type_string, car(args));
     obj * source = io_read(car(args));
     return_on_error(source);
+    obj * forms = read_all(source);
+    return_on_error(forms);
+    obj * o = nil;
+    while(forms != nil) {
+        o = eval(car(forms), g_env);
+        return_on_error(o);
+        forms = cdr(forms);
+    }
+    return return_from_stack(o);
+}
+
+static obj * native_str_eval(obj * args) {
+    prepare_stack();
+    check_type(lstring("str-eval"), type_string, car(args));
+    obj * source = car(args);
     obj * forms = read_all(source);
     return_on_error(forms);
     obj * o = nil;
@@ -61,6 +76,7 @@ obj * load_core(obj * env) {
     env = naive_assoc(lsymbol("eval"), native(&native_eval), env);
     env = naive_assoc(lsymbol("read"), native(&native_read), env);
     env = naive_assoc(lsymbol("load"), native(&native_load), env);
+    env = naive_assoc(lsymbol("str-eval"), native(&native_str_eval), env);
     env = naive_assoc(lsymbol("nil"), nil, env);
     // Load other libs
     env = load_io(env);

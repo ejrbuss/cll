@@ -171,6 +171,17 @@ static obj * native_count(obj * args) {
     return count(car(args));
 }
 
+obj * set_car(obj * list, obj * val) {
+    prepare_stack();
+    check_type(lstring("set-car!"), type_list, list);
+    list->car = val;
+    return return_from_stack(val);
+}
+
+static obj * native_set_car(obj * args) {
+    return set_car(car(args), car(cdr(args)));
+}
+
 /**
  * Loads all core list operations into the global environemnt.
  */
@@ -183,5 +194,6 @@ obj * load_list(obj * env) {
     env = naive_assoc(lsymbol("in"), native(&native_in), env);
     env = naive_assoc(lsymbol("count"), native(&native_count), env);
     env = naive_assoc(lsymbol("reverse"), native(&native_reverse), env);
+    env = naive_assoc(lsymbol("set-car!"), native(&native_set_car), env);
     return return_from_stack(env);
 }

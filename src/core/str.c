@@ -259,6 +259,43 @@ static obj * native_format(obj * args) {
     return format(car(args), cdr(args));
 }
 
+obj * str_to_num(obj * s) {
+    prepare_stack();
+    check_type(lstring("str-to-num"), type_string, s);
+    obj * n = read(s);
+    return_on_error(n);
+    check_type(lstring("str-to-num"), type_number, n);
+    return return_from_stack(n);
+}
+
+obj * native_str_to_num(obj * args) {
+    return str_to_num(car(args));
+}
+
+obj * num_to_ascii(obj * n) {
+    prepare_stack();
+    check_type(lstring("num-to-ascii"), type_number, n);
+    char * buffer = must_malloc(2);
+    memset(buffer, 0, 2);
+    buffer[0] = n->number;
+    return return_from_stack(pstring(buffer));
+}
+
+static obj * native_num_to_ascii(obj * args) {
+    return num_to_ascii(car(args));
+}
+
+obj * ascii_to_num(obj * s) {
+    prepare_stack();
+    check_type(lstring("ascii-to-num"), type_string, s);
+    char c = s->string[0];
+    return return_from_stack(number(c));
+}
+
+static obj * native_ascii_to_num(obj * args) {
+    return ascii_to_num(car(args));
+}
+
 obj * load_string(obj * env) {
     prepare_stack();
     env = naive_assoc(lsymbol("str"), native(&native_cat), env);
@@ -268,5 +305,8 @@ obj * load_string(obj * env) {
     env = naive_assoc(lsymbol("str-split"), native(&native_split), env);
     env = naive_assoc(lsymbol("str-sub"), native(&native_substr), env);
     env = naive_assoc(lsymbol("str-fmt"), native(&native_format), env);
+    env = naive_assoc(lsymbol("str-to-num"), native(&native_str_to_num), env);
+    env = naive_assoc(lsymbol("num-to-ascii"), native(&native_num_to_ascii), env);
+    env = naive_assoc(lsymbol("ascii-to-num"), native(&native_ascii_to_num), env);
     return return_from_stack(env);
 }

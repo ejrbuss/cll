@@ -19,7 +19,12 @@ obj * set(obj * ref, obj * val) {
 }
 
 static obj * native_set(obj * args) {
-    return set(car(args), car(cdr(args)));
+    prepare_stack();
+    if (car(args) != nil && car(args)->type == type_keyword) {
+        obj * o = get(car(args), car(cdr(args)), nil);
+        return return_from_stack(set(o, car(cdr(cdr(args)))));
+    }
+    return return_from_stack(set(car(args), car(cdr(args))));
 }
 
 /**

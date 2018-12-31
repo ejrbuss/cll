@@ -187,6 +187,55 @@ static obj * native_assoc(obj * args) {
     return assoc(car(args), car(cdr(args)), car(cdr(cdr(args))));
 }
 
+obj * fassoc(obj * key, obj * val, obj * map) {
+    if (map == nil) {
+        return naive_assoc(key, val, map);
+    }
+    switch(map->type) {
+        case type_map:
+            map = dissoc(key, map);
+            return naive_assoc(key, val, map);
+        case type_string: {
+            prepare_stack();
+            check_type(lstring("assoc"), type_number, key);
+            check_type(lstring("assoc"), type_string, val);
+            obj * o = cstring(map->string);
+            int idx = key->number;
+            o->string[idx] = val->string[0];
+            return return_from_stack(o);
+        }
+        case type_list: {
+            prepare_stack();
+            check_type(lstring("assoc"), type_number, key);
+            int int_key = key->number;
+            int idx = 0;
+            obj * start = nil;
+            obj * end = nil;
+            if (int_key < 0) {
+                int length = count(map)->number;
+                int_key = length + int_key;
+            }
+            printf("int_key: %d\n", int_key);
+            while (map) {
+                int last = idx == int_key;
+                obj * o = last 
+                    ? val
+                    : FAST_CAR(map);
+                FAST_REV_CONS(start, end, o);
+                map = FAST_CDR(map);
+                idx++;
+                if (last) {
+                    end->cdr = map;
+                    break;
+                }
+            }
+            return return_from_stack(start);
+        }
+        default:
+            return apply_error(lstring("assoc"), map);
+    }
+}
+
 obj * load_map(obj * env) {
     prepare_stack();
     env = naive_assoc(lsymbol("map"), native(&native_map), env);

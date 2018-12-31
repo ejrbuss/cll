@@ -195,8 +195,10 @@ static obj * eval_list(obj * list, obj * env) {
         return return_from_stack(op);
     }
     // Optimize lookups
-    if (lookup && (op->type == type_function || op->type == type_native_function)) {
-        list->car = op;
+    if (!DEBUG_LOOKUP) {
+        if (lookup && (op->type == type_function || op->type == type_native_function)) {
+            list->car = op;
+        }
     }
 
     // Expand macros

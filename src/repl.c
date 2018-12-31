@@ -35,13 +35,18 @@ void parse_args(int argc, char ** argv) {
             continue;
         }
         if (check_option(option, "-d", "--Debug-All")) {
+            DEBUG_LOOKUP   = 1;
             DEBUG_PARSE    = 1;
             DEBUG_MACROEXP = 1;
             DEBUG_GC       = 1;
             continue;
         }
+        if (check_option(option, "-dLookup", "--Debug-Lookup")) {
+            DEBUG_LOOKUP = 1;
+            continue;
+        }
         if (check_option(option, "-dParse", "--Debug-Parse")) {
-            DEBUG_PARSE    = 1;
+            DEBUG_PARSE = 1;
             continue;
         }
         if (check_option(option, "-dMacroexp", "--Debug-Macroexp")) {

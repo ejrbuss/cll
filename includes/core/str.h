@@ -11,4 +11,6 @@ extern obj * split(obj * delim, obj * s);
 extern obj * substr(obj * start, obj * length, obj * s);
 extern obj * format(obj * fmt, obj * args);
 extern obj * print_format(obj * fmt, obj * args);
+extern obj * str_to_num(obj * s);
+extern obj * num_to_ascii(obj * n);
 extern obj * load_string(obj * env);

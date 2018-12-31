@@ -20,6 +20,7 @@
 #define VERSION "0.0.1"
 
 extern size_t MEMORY;
+extern int DEBUG_LOOKUP;
 extern int DEBUG_PARSE;
 extern int DEBUG_MACROEXP;
 extern int DEBUG_GC;

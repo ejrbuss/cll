@@ -42,8 +42,8 @@
 
 (defn reduce [f first iter]
   (let { r (ref first) }
-    (each (fn [x idx] 
-      (set! r (f @r x idx))) iter)
+    (each (fn [x] 
+      (set! r (f @r x))) iter)
     @r))
 
 (defn fmap [f iter]
@@ -91,9 +91,6 @@
     (call f (concat curried-args args))))
 
 ;; Strings
-
-(defn str-eval [s]
-  (eval (read s)))
 
 (defn str-to-num [s]
   (let { n (read s) }
