@@ -89,7 +89,8 @@ obj * read(obj * source) {
 obj * read_all(obj * source) {
     char * stream = source->string;
     prepare_stack();
-    obj * forms = nil;
+    obj * forms_start = nil;
+    obj * forms_end = nil;
     while(next(&stream, 1) != '\0') {
         char * start = stream;
         obj * o = parse(&stream);
@@ -106,9 +107,9 @@ obj * read_all(obj * source) {
         }
         // Immediately return errors
         return_on_error(o);
-        forms = cons(o, forms);
+        FAST_REV_CONS(forms_start, forms_end, o);
     }
-    return return_from_stack(reverse(forms));
+    return return_from_stack(forms_start);
 }
 
 obj * need_more_input(obj * source) {
@@ -147,7 +148,7 @@ static obj * parse_string(char ** stream) {
     }
     int length = *stream - start;
     char * buffer = (char *) must_malloc(length + 1);
-    memset(buffer, '\0', length + 1);
+    memset(buffer, 0, length + 1);
     strncpy(buffer, start, length);
     obj * o = pstring(buffer);
     chomp(stream, 0);

@@ -35,10 +35,10 @@ obj * call(obj * fn, obj * args) {
     while (fn_args != nil) {
         // Handle varargs
         if (FAST_SYMBOL_EQ(car(fn_args), "&")) {
-            fn_env = assoc(car(cdr(fn_args)), args, fn_env);
+            fn_env = naive_assoc(car(cdr(fn_args)), args, fn_env);
             break;
         }
-        fn_env  = assoc(car(fn_args), car(args), fn_env);
+        fn_env  = naive_assoc(car(fn_args), car(args), fn_env);
         fn_args = cdr(fn_args);
         args    = cdr(args);
     }

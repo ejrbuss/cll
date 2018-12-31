@@ -32,39 +32,30 @@
 
 ;; Lists
 
-(defn nth [i iter]
-  (let { ref-iter (ref iter)
-         r         (ref 0) }
-    (while (!= @r i)
-      (set! r (+ @r 1))
-      (set! ref-iter (cdr @ref-iter)))
-    (car @ref-iter)))
-
-(defn != [x y] 
-  (not (= x y)))
-
 (defn each [f iter]
-  (let { ref-iter (ref iter) }
+  (let { ref-iter (ref iter) 
+         ref-idx  (ref 0) }
     (while @ref-iter
-      (f (car @ref-iter))
-      (set! ref-iter (cdr @ref-iter)))))
+      (f (car @ref-iter) @ref-idx)
+      (set! ref-iter (cdr @ref-iter))
+      (set! ref-idx (++ @ref-idx)))))
 
 (defn reduce [f first iter]
   (let { r (ref first) }
-    (each (fn [x] 
-      (set! r (f @r x))) iter)
+    (each (fn [x idx] 
+      (set! r (f @r x idx))) iter)
     @r))
 
 (defn fmap [f iter]
   (let { r (ref nil) }
-    (each (fn [x]
-      (set! r (cons (f x) @r))) iter)
+    (each (fn [x idx]
+      (set! r (cons (f x idx) @r))) iter)
     (reverse @r)))
 
 (defn filter [f iter]
   (let { r (ref nil) }
-    (each (fn [x]
-      (if (f x) 
+    (each (fn [x idx]
+      (if (f x idx) 
         (set! r (cons x @r)))) iter)
     (reverse @r)))
 
@@ -77,7 +68,7 @@
          l (ref nil) }
     (while (< @s @e)
       (set! l (cons @s @l))
-      (set! s (+ @s 1)))
+      (set! s (++ @s)))
     (reverse @l)))
 
 (defn concat [& lists]
@@ -103,6 +94,14 @@
 
 (defn str-eval [s]
   (eval (read s)))
+
+(defn str-to-num [s]
+  (let { n (read s) }
+    (if (number? n)
+      n
+      (throw 
+        :Parameter-Error 
+        (str-fmt "{} could not be converted to a number!" s)))))
 
 ;; Types
 
@@ -140,3 +139,20 @@
 
 (defn odd? [n]
   (not (even? n)))
+
+(defn pos? [n]
+  (> n 0))
+
+(defn neg? [n]
+  (< n 0))
+
+(defn ++ [n]
+  (+ n 1))
+
+(defn -- [n]
+  (- n 1))
+
+;; Logical
+
+(defn != [x y] 
+  (not (= x y)))

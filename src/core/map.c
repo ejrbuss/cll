@@ -40,18 +40,46 @@ obj * naive_get(obj * key, obj * map) {
 }
 
 obj * get(obj * key, obj * map, obj * def) {
-    prepare_stack();
-    check_type_or_nil(lstring("get"), type_map, map);
-    while (map != nil) {
-        if (equal(car(map), key)) {
-            return return_from_stack(car(cdr(map)));
-        }
-        map = cdr(map);
-        if (map != nil) {
-            map = cdr(map);
-        }
+    if (map == nil) {
+        return def;
     }
-    return return_from_stack(def);
+    prepare_stack();
+    switch(map->type) {
+        case type_map:
+            while (map != nil) {
+                if (equal(car(map), key)) {
+                    return return_from_stack(car(cdr(map)));
+                }
+                map = cdr(map);
+                if (map != nil) {
+                    map = cdr(map);
+                }
+            }
+            return return_from_stack(def);
+        case type_string:
+            check_type(lstring("get"), type_number, key);
+            obj * o = substr(key, number(1), map);
+            if (o == nil) {
+                return return_from_stack(def);
+            }
+            return return_from_stack(o);
+        case type_list:
+            check_type(lstring("get"), type_number, key);
+            int int_key = key->number;
+            int idx = 0;
+            if (int_key < 0) {
+                int length = count(map)->number;
+                int_key = length + int_key;
+            }
+            while (idx < int_key) {
+                map = cdr(map);
+                idx++;
+            }
+            return return_from_stack(car(map));
+        default:
+            return return_from_stack(apply_error(lstring("get"), map));
+            
+    }    
 }
 
 // Native binding
@@ -107,9 +135,52 @@ static obj * native_dissoc(obj * args) {
 }
 
 obj * assoc(obj * key, obj * val, obj * map) {
-    check_type_or_nil(lstring("assoc"), type_map, map);
-    map = dissoc(key, map);
-    return naive_assoc(key, val, map);
+    if (map == nil) {
+        return naive_assoc(key, val, map);
+    }
+    switch(map->type) {
+        case type_map:
+            map = dissoc(key, map);
+            return naive_assoc(key, val, map);
+        case type_string: {
+            prepare_stack();
+            check_type(lstring("assoc"), type_number, key);
+            check_type(lstring("assoc"), type_string, val);
+            obj * o = cstring(map->string);
+            int idx = key->number;
+            o->string[idx] = val->string[0];
+            return return_from_stack(o);
+        }
+        case type_list: {
+            prepare_stack();
+            check_type(lstring("assoc"), type_number, key);
+            int int_key = key->number;
+            int idx = 0;
+            obj * start = nil;
+            obj * end = nil;
+            if (int_key < 0) {
+                int length = count(map)->number;
+                int_key = length + int_key;
+            }
+            printf("int_key: %d\n", int_key);
+            while (map) {
+                int last = idx == int_key;
+                obj * o = last 
+                    ? val
+                    : FAST_CAR(map);
+                FAST_REV_CONS(start, end, o);
+                map = FAST_CDR(map);
+                idx++;
+                if (last) {
+                    end->cdr = map;
+                    break;
+                }
+            }
+            return return_from_stack(start);
+        }
+        default:
+            return apply_error(lstring("assoc"), map);
+    }
 }
 
 static obj * native_assoc(obj * args) {

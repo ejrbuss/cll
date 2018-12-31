@@ -1,0 +1,10 @@
+(defn get-number-from-user [] 
+  (let { done (ref) }
+    (while (not @done)
+      (catch 
+        (let { n (str-to-num (input "Input a number: ")) }
+          (set! done :true)
+          n)
+        (fn [] (println "Hey, that's not a number!"))))))
+
+(println "The number is: " (get-number-from-user))

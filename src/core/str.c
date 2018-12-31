@@ -70,7 +70,9 @@ obj * replace(obj * ref, obj * rep, obj * s) {
     check_type(lstring("replace"), type_string, rep);
     check_type(lstring("replace"), type_string, s);
     int replaced = 0;
-    char * buffer = (char *) must_malloc(s->length + rep->length);
+    int length = s->length + rep->length + 1;
+    char * buffer = (char *) must_malloc(length);
+    memset(buffer, 0, length);
     char * bp = buffer;
     char * sp = s->string;
     while (*sp != '\0') {
@@ -120,7 +122,9 @@ obj * replace_all(obj * ref, obj * rep, obj * s) {
         sp++;
     }
     // Perform the replacement
-    char * buffer = (char *) must_malloc(s->length + count * rep->length);
+    int length = s->length + count * rep->length + 1;
+    char * buffer = (char *) must_malloc(length);
+    memset(buffer, 0, length);
     char * bp;
     sp = s->string;
     bp = buffer;
@@ -177,13 +181,14 @@ obj * split(obj * delim, obj * s) {
     check_type(lstring("split"), type_string, delim);
     check_type(lstring("split"), type_string, s);    
     obj * copy = cstring(s->string);
-    obj * list = nil;
+    obj * start = nil;
+    obj * end = nil;
     char * token = strtok(copy->string, delim->string);
     while (token != nil) {
-        list = cons(cstring(token), list);
+        FAST_REV_CONS(start, end, cstring(token));
         token = strtok(nil, delim->string);
     }
-    return return_from_stack(reverse(list));
+    return return_from_stack(start);
 }
 
 static obj * native_split(obj * args) {
@@ -206,7 +211,7 @@ obj * substr(obj * start, obj * length, obj * s) {
     check_type(lstring("substr"), type_string, s);
     size_t max_len = s->length + 1 * sizeof(char);
     char * buffer = (char *) must_malloc(max_len);
-    memset(buffer, '\0', max_len);
+    memset(buffer, 0, max_len);
     length = nmin(length, number(max_len - 1));
     strncpy(buffer, s->string + ((int) start->number), ((int) length->number));
     obj * o = pstring(buffer);

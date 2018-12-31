@@ -27,24 +27,25 @@ static obj * quasi_quote(obj * expr, obj * env) {
     if (FAST_SYMBOL_EQ(op, "unquote") || FAST_SYMBOL_EQ(op, "unquote-splice")) {
         return return_from_stack(eval(car(args), env));
     }
-    obj * new_expr = nil;
+    obj * start = nil;
+    obj * end = nil;
     while (expr != nil) {
         obj * o = FAST_CAR(expr);
         if (o != nil && o->type == type_list && FAST_SYMBOL_EQ(car(o), "unquote-splice")) {
             o = quasi_quote(o, env);
             return_on_error(o);
             while (o) {
-                new_expr = cons(FAST_CAR(o), new_expr);
+                FAST_REV_CONS(start, end, FAST_CAR(o));
                 o = FAST_CDR(o);
             }
         } else {
             o = quasi_quote(o, env);
             return_on_error(o);
-            new_expr = cons(o, new_expr);
+            FAST_REV_CONS(start, end, o);
         }
         expr = FAST_CDR(expr);
     }
-    return return_from_stack(reverse(new_expr));
+    return return_from_stack(start);
 }
 
 static obj * eval_list(obj * list, obj * env) {
@@ -186,11 +187,16 @@ static obj * eval_list(obj * list, obj * env) {
     // Not a special form, evaluate as a function
 
     // Eval operator
+    int lookup = op != nil && op->type == type_symbol;
     op = eval(op, env);
 
     // Propogate error
     if (op != nil && op->type == type_error) {
         return return_from_stack(op);
+    }
+    // Optimize lookups
+    if (lookup && (op->type == type_function || op->type == type_native_function)) {
+        list->car = op;
     }
 
     // Expand macros
@@ -206,19 +212,20 @@ static obj * eval_list(obj * list, obj * env) {
     }
 
     // Eval arguments
-    obj * evaled_args = nil;
+    obj * start = nil;
+    obj * end = nil;
     while (args != nil) {
         obj * next = eval(FAST_CAR(args), env);
         // If an argument is an error we need to propogate it
         if (next != nil && next->type == type_error) {
             return return_from_stack(next);
         }
+        FAST_REV_CONS(start, end, next);
         // Otherwise put it onto the evaluated argument list
-        evaled_args = cons(next, evaled_args);
+        // evaled_args = cons(next, evaled_args);
         args = FAST_CDR(args);
     }
-    // We reversed the order when building the list, so now we need to undo that
-    evaled_args = reverse(evaled_args);
+    obj * evaled_args = start;
     // Call operator on evaled arguments
     return return_from_stack(call(op, evaled_args));
 }
@@ -285,18 +292,16 @@ obj * eval(obj * expr, obj * env) {
         return nil;
     }
     switch (expr->type) {
-        case type_symbol: 
-            return eval_symbol(expr, env);
-        case type_list:
-            prepare_stack();
+        case type_list: {
             obj * result = eval_list(expr, env);
             if (result != nil && result->type == type_error) {
                 result = cons(expr, result);
                 result->type = type_error;
             }
-            return return_from_stack(result);
-        default:         
-             return expr;
+            return result;
+        }
+        case type_symbol: return eval_symbol(expr, env);
+        default:          return expr;
     }
 }
 

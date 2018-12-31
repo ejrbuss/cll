@@ -72,11 +72,11 @@ void parse_args(int argc, char ** argv) {
     // Load command line arguments
     prepare_stack();
     obj * args = nil;
+    obj * args_end = nil;
     while(i < argc) {
-        args = cons(cstring(argv[i]), args);
+        FAST_REV_CONS(args, args_end, lstring(argv[i]));
         i++;
     }
-    args = reverse(args);
     args = cons(lsymbol("list"), args);
     obj * args_def = format(lstring("(def io-args {})"), cons(args, nil));
     obj * o = eval(read(args_def), g_env);

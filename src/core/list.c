@@ -54,7 +54,11 @@ obj * cdr(obj * list) {
             return list->cdr;
         case type_string:
             prepare_stack();
-            return return_from_stack(substr(number(1), number(list->length), list));
+            obj * o = substr(number(1), number(list->length), list);
+            if (FAST_STR_EQ(o, lstring(""))) {
+                return return_from_stack(nil);
+            }
+            return return_from_stack(o);
         default:
             return apply_error(lstring("cdr"), list);
 
@@ -89,8 +93,8 @@ obj * reverse(obj * list) {
     prepare_stack();
     obj * reversed = nil;
     while (list != nil) {
-        reversed = cons(car(list), reversed);
-        list = cdr(list);
+        reversed = cons(FAST_CAR(list), reversed);
+        list = FAST_CDR(list);
     }
     return return_from_stack(reversed);
 }

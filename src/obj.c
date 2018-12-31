@@ -156,7 +156,7 @@ static void stack_push(obj * o) {
 /**
  * Pops the top object off the stack. Otherwise just returns nil.
  */
-obj * stack_pop() {
+inline static obj * stack_pop() {
     assert(g_vm != nil);
     if (g_vm->stack != nil) {
         pool_node * node = g_vm->stack;
@@ -167,7 +167,6 @@ obj * stack_pop() {
             pool_free(g_vm->obj_pool, o);
             return nil;
         } else {
-            o->gc_tag = gc_unmarked;
             return o;
         }
     }
@@ -311,11 +310,20 @@ obj * number(double n) {
 }
 
 obj * cons(obj * x, obj * list) {
-    obj * obj = init_obj();
-    obj->type = type_list;
-    obj->car = x;
-    obj->cdr = list;
-    return obj;
+    obj * o = init_obj();
+    o->type = type_list;
+    o->car = x;
+    o->cdr = list;
+    return o;
+}
+
+obj * rev_cons(obj * list, obj * x) {
+    obj * o = init_obj();
+    o->type = type_list;
+    o->car = x;
+    o->cdr = nil;
+    list->cdr = o;
+    return o;
 }
 
 obj * naive_assoc(obj * key, obj * val, obj * map) {
