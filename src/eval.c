@@ -187,18 +187,11 @@ static obj * eval_list(obj * list, obj * env) {
     // Not a special form, evaluate as a function
 
     // Eval operator
-    int lookup = op != nil && op->type == type_symbol;
     op = eval(op, env);
 
     // Propogate error
     if (op != nil && op->type == type_error) {
         return return_from_stack(op);
-    }
-    // Optimize lookups
-    if (!DEBUG_LOOKUP) {
-        if (lookup && (op->type == type_function || op->type == type_native_function)) {
-            list->car = op;
-        }
     }
 
     // Expand macros
