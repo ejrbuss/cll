@@ -4,7 +4,7 @@ pool * init_pool(size_t chunk, size_t chunks) {
     pool * p = must_malloc(sizeof(pool));
     p->chunk = chunk;
     p->chunks = chunks;
-    p->step = chunk + sizeof(pool_node *);
+    p->step = chunk + sizeof(pool_node);
     p->data = must_malloc(chunks * p->step);
     memset(p->data, 0, chunks * p->step);
     int c;

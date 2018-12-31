@@ -18,7 +18,7 @@ void init_vm(size_t available_bytes) {
     assert(g_vm == nil);
     // Need at least enough memory to allocate a VM and the pools
     assert(available_bytes > 0);
-    int obj_count = available_bytes / (sizeof(obj) + sizeof(pool_node *));
+    int obj_count = available_bytes / (sizeof(obj) + sizeof(pool_node));
     g_vm = (vm *) must_malloc(sizeof(vm));
     g_vm->obj_pool = init_pool(sizeof(obj), obj_count);
     g_vm->stack = nil;
