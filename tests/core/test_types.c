@@ -1,5 +1,5 @@
-#include "ll.h"
 #include "test.h"
+#include "ll.h"
 #include "core.h"
 #include "eval.h"
 
@@ -26,6 +26,6 @@ int main() {
         { "test_type_of", test_type_of },
         { 0 },
     };
-    run_tests(tests);
+    run_tests("test_types.c", tests);
     free_vm();
 }

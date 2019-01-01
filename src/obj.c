@@ -85,10 +85,9 @@ void gc_mark() {
  * will also have their resources freed.
  */
 static void free_obj(obj * o) {
-    // We don't handle nil
-    assert(o != nil);
-    // We don't handle stack returns
-    assert(o->gc_tag != gc_stack_return);
+    assert(g_vm != nil);
+    assert(o != nil);                     // We don't handle nil
+    assert(o->gc_tag != gc_stack_return); // We don't handle stack returns
     switch (o->type) {
         case type_symbol:
         case type_keyword:
@@ -106,6 +105,9 @@ static void free_obj(obj * o) {
 /**
  * Iterates over all objects in thee pool and frees any unmarked objects. As the
  * pool is sweeped all objects are unmarked to prepare for the next gc.
+ * 
+ * Because GCs are only triggered when we run out of room in the pool, it's 
+ * relatively efficient to walk the entire pool.
  */
 static void gc_sweep() {
     assert(g_vm != nil);
@@ -154,7 +156,8 @@ static void stack_push(obj * o) {
 }
 
 /**
- * Pops the top object off the stack. Otherwise just returns nil.
+ * Pops the top object off the stack. Returns nil if the stack hits the top
+ * or a stack return.
  */
 inline static obj * stack_pop() {
     assert(g_vm != nil);
@@ -178,6 +181,7 @@ inline static obj * stack_pop() {
  * can be popped to upon return.
  */
 void prepare_stack() {
+    assert(g_vm != nil);
     obj * o = pool_alloc(g_vm->obj_pool);
     if (o == nil) {
         gc();
@@ -219,13 +223,7 @@ obj * return_from_stack(obj * o) {
 
 /**
  * Allocates and initalizes a new object. If the pool is full a gc pause will
- * occur. If the gc fails to create enough room for the object the allocation
- * will fail on an assert.
- *
- * Initialization requires the allocation of the object and a gc_node on the
- * stack.
- *
- * All objects start rooted.
+ * occur. All objects start on the stack.
  *
  * returns obj * an allocated object
  */
@@ -260,48 +258,83 @@ void free_vm() {
 // Object Initializers
 // -------------------
 
+/**
+ * Returns a new reference object.
+ * 
+ * @param   obj * r the object to reference
+ * @returns obj *   the reference
+ */
 obj * reference(obj * r) {
     obj * o = init_obj();
     o->type = type_reference;
-    o->ref = r;
+    o->ref  = r;
     return o;
 }
 
-obj * error(obj * type, obj * mes) {
+/**
+ * Returns a new error object.
+ * 
+ * @param   obj * type    the error type
+ * @param   obj * message the error message
+ * @returns obj *         the error
+ */
+obj * error(obj * type, obj * message) {
     prepare_stack();
-    obj * o = cons(mes, cons(type, nil));
+    obj * o = cons(message, cons(type, nil));
     o->type = type_error;
     return return_from_stack(o);
 }
 
+/**
+ * Returns a new resource object. Resources can copy or reference their 
+ * resource. Resources can own or not own their data. Copied resources are
+ * always owned. Owned rseources free their data on release.
+ * 
+ * @param char * rsc   the data
+ * @param int    copy  whether the data should be copied
+ * @param int    owned whether thee data is owned by this object
+ * @returns            the resource object
+ */
 static obj * resource(char * rsc, int copy, int owned, type type) {
     obj * o = init_obj();
-    int l = strlen(rsc);
+    int length = strlen(rsc);
     if (copy) {
-        o->resource = (char *) must_malloc(sizeof(char) * (l + 1));
+        o->resource = (char *) must_malloc(sizeof(char) * (length + 1));
         strcpy(o->resource, rsc);
         o->owned = 1;
     } else {
         o->resource = rsc;
         o->owned = owned;
     }
-    o->length = l;
+    o->length = length;
     o->type = type;
     return o;
 }
 
+/**
+ * Returns a nwe symbol object.
+ */
 obj * symbol(char * s, int copy, int owned) {
     return resource(s, copy, owned, type_symbol);
 }
 
+/**
+ * Returns a new keyword object.
+ */
 obj * keyword(char * k, int copy, int owned) {
     return resource(k, copy, owned, type_keyword);
 }
 
+/**
+ * Returns a new string object.
+ */
 obj * string(char * s, int copy, int owned) {
     return resource(s, copy, owned, type_string);
 }
 
+/**
+ * Returns a new number objeect.
+ */
 obj * number(double n) {
     obj * o = init_obj();
     o->type = type_number;
@@ -309,23 +342,46 @@ obj * number(double n) {
     return o;
 }
 
-obj * cons(obj * x, obj * list) {
+/**
+ * Returns a new list object.
+ * 
+ * @param   obj * item the item to add to the front of the list
+ * @param   obj * head the head of the list
+ * @returns obj *      the new head of the lisst
+ */
+obj * cons(obj * item, obj * head) {
     obj * o = init_obj();
     o->type = type_list;
-    o->car = x;
-    o->cdr = list;
+    o->car = item;
+    o->cdr = head;
     return o;
 }
 
-obj * rev_cons(obj * list, obj * x) {
+/**
+ * Returns a new list object by attaching to the tail of a list.
+ * 
+ * @param   obj * tail the tail of the list
+ * @param   obj * item the item to add to the eend of the elist
+ * @returns obj *      the enew tail of the list
+ */
+obj * rev_cons(obj * tail, obj * item) {
+    assert(tail != nil);
+    assert(tail->cdr == nil);
     obj * o = init_obj();
     o->type = type_list;
-    o->car = x;
+    o->car = item;
     o->cdr = nil;
-    list->cdr = o;
+    tail->cdr = o;
     return o;
 }
 
+/**
+ * Creates a new key value pair on a map (without checking for duplicate keys).
+ * 
+ * @param    obj * key the key
+ * @param    obj * val the value
+ * @retturns obj *     the map object
+ */
 obj * naive_assoc(obj * key, obj * val, obj * map) {
     prepare_stack();
     obj * v = cons(val, map);
@@ -335,6 +391,9 @@ obj * naive_assoc(obj * key, obj * val, obj * map) {
     return return_from_stack(k);
 }
 
+/**
+ * Returns a new macro object.
+ */
 obj * macro(obj * env, obj * args, obj * body) {
     prepare_stack();
     obj * o = cons(env, cons(args, cons(body, nil)));
@@ -342,6 +401,9 @@ obj * macro(obj * env, obj * args, obj * body) {
     return return_from_stack(o);
 }
 
+/**
+ * Returns a new function object.
+ */
 obj * fn(obj * env, obj * args, obj * body) {
     prepare_stack();
     obj * o = cons(env, cons(args, cons(body, nil)));
@@ -349,6 +411,9 @@ obj * fn(obj * env, obj * args, obj * body) {
     return return_from_stack(o);
 }
 
+/**
+ * Returns a nwe native_function object.
+ */
 obj * native(obj * (*fn)(obj *)) {
     obj * o = init_obj();
     o->type = type_native_function;

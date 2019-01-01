@@ -1,5 +1,5 @@
-#include "ll.h"
 #include "test.h"
+#include "ll.h"
 #include "core.h"
 
 void test_nil() {
@@ -127,6 +127,6 @@ int main() {
         { "test_map", test_map },
         { 0 },
     };
-    run_tests(tests);
+    run_tests("test_read.c", tests);
     free_vm();
 }

@@ -1,5 +1,5 @@
-#include "ll.h"
 #include "test.h"
+#include "ll.h"
 #include "obj.h"
 /*
 size_t vm_size(int n_objs) {
@@ -172,5 +172,5 @@ int main() {
         */
         { 0 },
     };
-    run_tests(tests);
+    run_tests("test_obj.c", tests);
 }

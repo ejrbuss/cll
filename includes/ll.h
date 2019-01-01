@@ -49,6 +49,8 @@ extern int DEBUG_GC;
     exit(1); \
 } while(0)
 
+#if defined(DEBUG) || defined(DEBUG_BUILD)
+
 /**
  * If the condition is false panics and prints debug information. Built in
  * assert is not used because it does not crash well on windows and sometimes
@@ -59,6 +61,12 @@ extern int DEBUG_GC;
         panic("Assert failed: %s", (#cond)); \
     } \
 } while(0)
+
+#else
+
+#define assert(cond) ;
+
+#endif
 
 extern void * must_malloc(size_t bytes);
 extern void b();

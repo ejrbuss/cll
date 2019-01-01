@@ -67,6 +67,7 @@ void vm_debug_stack() {
  *  Prints out the current state of the pool.
  */
 void vm_debug_pool() {
+    gc();
     int c;
     int free_count = 0;
     int chunks =  g_vm->obj_pool->chunks;

@@ -1,5 +1,5 @@
-#include "ll.h"
 #include "test.h"
+#include "ll.h"
 #include "core.h"
 #include "eval.h"
 
@@ -39,6 +39,6 @@ int main() {
         { "test_deref", test_deref },
         { 0 },
     };
-    run_tests(tests);
+    run_tests("test_references.c", tests);
     free_vm();
 }

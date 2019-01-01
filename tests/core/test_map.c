@@ -1,5 +1,5 @@
-#include "ll.h"
 #include "test.h"
+#include "ll.h"
 #include "core.h"
 #include "eval.h"
 
@@ -64,6 +64,6 @@ int main() {
         { "test_assoc", test_assoc },
         { 0 },
     };
-    run_tests(tests);
+    run_tests("test_map.c", tests);
     free_vm();
 }

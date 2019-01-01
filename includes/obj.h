@@ -44,7 +44,7 @@ struct __attribute__((__packed__)) obj {
         // Resource types
         struct {
             union {
-                char * resource; // generic resource
+                char * resource; // generic resource pointer
                 char * symbol;
                 char * keyword;
                 char * string;
@@ -69,19 +69,35 @@ struct vm {
     pool_node * stack; // Object stack
 };
 
-extern vm * g_vm; // The gobal vm reference
+// The gobal vm reference
+extern vm * g_vm; 
 
-// String literal macros
+/**
+ * Literal Macros
+ * 
+ * String literals can be safely referenced (not copied) and should never
+ * be freed (not owned).
+ */
 #define lsymbol(s) symbol(s, 0, 0)
 #define lkeyword(s) keyword(s, 0, 0)
 #define lstring(s) string(s, 0, 0)
 
-// Copy macros
+/**
+ * Copy Macros
+ * 
+ * These should be used for resources that need to be copied and owned by the
+ * object.
+ */
 #define csymbol(s) symbol(s, 1, 1)
 #define ckeyword(s) keyword(s, 1, 1)
 #define cstring(s) string(s, 1, 1)
 
-// Pre-allocated macros
+/**
+ * Pre-allocated macros
+ * 
+ * When initializing an object with pre-allocated data these macros will 
+ * directly reference it (not copy) but take ownership.
+ */
 #define psymbol(s) symbol(s, 0, 1)
 #define pkeyword(s) keyword(s, 0, 1)
 #define pstring(s) string(s, 0, 1)

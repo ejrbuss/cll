@@ -1,5 +1,5 @@
-#include "ll.h"
 #include "test.h"
+#include "ll.h"
 #include "print.h"
 #include "core.h"
 
@@ -84,6 +84,6 @@ int main() {
         { "test_function", test_function },
         { 0 },
     };
-    run_tests(tests);
+    run_tests("test_print.c", tests);
     free_vm();
 }

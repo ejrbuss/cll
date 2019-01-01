@@ -1,5 +1,5 @@
-#include "ll.h"
 #include "test.h"
+#include "ll.h"
 #include "core.h"
 #include "eval.h"
 
@@ -70,6 +70,6 @@ int main() {
         { "test_count", test_count },
         { 0 },
     };
-    run_tests(tests);
+    run_tests("test_list.c", tests);
     free_vm();
 }
