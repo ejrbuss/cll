@@ -56,6 +56,15 @@ static void gc_mark_recursive(obj * o) {
             gc_mark_recursive(o->car);
             gc_mark_recursive(o->cdr);
             break;
+        case type_hash_map: {
+            int i;
+            for (i = 0; i < o->hash_map->size; i++) {
+                if (o->hash_map->data[i].key != nil) {
+                    gc_mark_recursive(o->hash_map->data[i].ptr);
+                }
+            }
+            break;
+        }
         default:
             break;
     }
@@ -95,6 +104,10 @@ static void free_obj(obj * o) {
             if (o->owned) {
                 free(o->resource);
             }
+            break;
+        case type_hash_map:
+            free_hash_map(o->hash_map);
+            break;
         default:
             break;
     }
@@ -418,5 +431,15 @@ obj * native(obj * (*fn)(obj *)) {
     obj * o = init_obj();
     o->type = type_native_function;
     o->native = fn;
+    return o;
+}
+
+/**
+ * Returns a new hash_map object.
+ */
+obj * hash_map_obj(hash_map * h) {
+    obj * o = init_obj();
+    o->type = type_hash_map;
+    o->hash_map = h;
     return o;
 }

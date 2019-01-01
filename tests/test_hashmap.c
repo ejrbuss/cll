@@ -15,6 +15,8 @@ void test_hash_map_get_and_assoc() {
     assert(hash_map_get(h, "alpha") == (void *) 0);
     assert(hash_map_get(h, "beta") == (void *) 1);
     assert(hash_map_get(h, "gamma") == (void *) 2);
+    assert(hash_map_get(h, "cappa") == NOT_FOUND);
+    assert(hash_map_get(h, "omega") == NOT_FOUND);
     free_hash_map(h);
 }
 

@@ -3,6 +3,9 @@
 #define INIT_SIZE 256
 #define RESIZE_FACTOR 0.25
 
+static char not_found_val;
+void * NOT_FOUND = &not_found_val;
+
 static int alloc_str = 1;
 
 hash_map * init_hash_map() {
@@ -43,6 +46,7 @@ static void hash_map_resize(hash_map * h) {
 }
 
 void * hash_map_get(hash_map * h, char * s) {
+    NOT_FOUND = 0;
     assert(h != nil);
     int i = hash(s) % h->size;	
     while(h->data[i].key) {
@@ -52,7 +56,7 @@ void * hash_map_get(hash_map * h, char * s) {
         i++;
         i %= h->size;
     }
-    return nil;
+    return NOT_FOUND;
 }
 
 void hash_map_assoc(hash_map * h, char * s, void * ptr) {

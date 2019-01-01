@@ -3,6 +3,35 @@
 
 obj * g_env_ref = nil;
 obj * g_env = nil;
+hash_map * g_env_hash_map;
+
+/**
+ * Initializes the gobal environment, `g_env`. Loads all native functions into
+ * the stack and then buffers the stack with a nil to protect the global
+ * environment.
+ */
+void init_env() {
+    assert(g_env == nil);
+
+    // Load core
+    prepare_stack();
+    g_env_ref = reference(nil);
+    g_env = load_core(g_env);
+    g_env_hash_map = init_hash_map();
+    set(g_env_ref, g_env);
+    return_from_stack(g_env_ref);
+    prepare_stack();
+    return_from_stack(hash_map_obj(g_env_hash_map));
+    prepare_stack();
+
+    hash_map_assoc(g_env_hash_map, "test", number(4));
+
+    // Load prelude
+    prepare_stack();
+    obj * o = ceval("(load \"prelude.cll\")");
+    exit_on_error("Error during prelude!\n%s", o);
+    return_from_stack(nil);
+}
 
 static obj * macro_expand(obj * op, obj * args) {
     prepare_stack();
@@ -225,29 +254,6 @@ static obj * eval_list(obj * list, obj * env) {
     return return_from_stack(call(op, evaled_args));
 }
 
-/**
- * Initializes the gobal environment, `g_env`. Loads all native functions into
- * the stack and then buffers the stack with a nil to protect the global
- * environment.
- */
-void init_env() {
-    assert(g_env == nil);
-
-    // Load core
-    prepare_stack();
-    g_env_ref = reference(nil);
-    g_env = load_core(g_env);
-    set(g_env_ref, g_env);
-    return_from_stack(g_env_ref);
-    prepare_stack();
-
-    // Load prelude
-    prepare_stack();
-    obj * o = ceval("(load \"prelude.cll\")");
-    exit_on_error("Error during prelude!\n%s", o);
-    return_from_stack(nil);
-}
-
 static obj * eval_symbol(obj * sym, obj * env) {
     prepare_stack();
     while (env != nil) {
@@ -262,6 +268,10 @@ static obj * eval_symbol(obj * sym, obj * env) {
             return return_from_stack(car(FAST_CDR(env)));
         }
         env = FAST_CDR(FAST_CDR(env));
+    }
+    obj * o = hash_map_get(g_env_hash_map, sym->string);
+    if (o != NOT_FOUND) {
+        return return_from_stack(o);
     }
     obj * lookup_error = error_format(
         lkeyword("Lookup-Error"),

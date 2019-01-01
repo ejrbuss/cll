@@ -2,6 +2,7 @@
 
 #include "ll.h"
 #include "pool.h"
+#include "hashmap.h"
 
 /**
  * Indicates the current state of an object managed by the garbage collector.
@@ -28,9 +29,10 @@ enum type {
     type_number          = 5,
     type_list            = 6,
     type_map             = 7,
-    type_macro           = 8,
-    type_function        = 9,
-    type_native_function = 10,
+    type_hash_map        = 8,
+    type_macro           = 9,
+    type_function        = 10,
+    type_native_function = 11,
 };
 
 /**
@@ -60,6 +62,7 @@ struct __attribute__((__packed__)) obj {
         double number;
         obj * ref;
         obj * (*native)(obj *);
+        hash_map * hash_map;
     };
 };
 
@@ -119,3 +122,4 @@ extern obj * naive_assoc(obj * key, obj * val, obj * map);
 extern obj * macro(obj * eenv, obj * args, obj * body);
 extern obj * fn(obj * env, obj * args, obj * body);
 extern obj * native(obj * (*fn)(obj *));
+extern obj * hash_map_obj(hash_map *);

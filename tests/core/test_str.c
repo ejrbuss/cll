@@ -99,6 +99,6 @@ int main() {
         { "test_format", test_fromat },
         { 0 },
     };
-    run_tests("teset_str.c", tests);
+    run_tests("test_str.c", tests);
     free_vm();
 }

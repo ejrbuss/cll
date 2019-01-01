@@ -12,11 +12,12 @@ obj * type_of(obj * o) {
         case type_string:    return lkeyword("string");
         case type_number:    return lkeyword("number");
         case type_list:      return lkeyword("list");
-        case type_map:       return lkeyword("map");
         case type_macro:     return lkeyword("macro");
+        case type_map:       return lkeyword("map");
         case type_function:
         case type_native_function:
             return lkeyword("function");
+        case type_hash_map: panic("Should not lookup type of hashmap!");        
     }
     panic("Unreachable code execution!");
 }
