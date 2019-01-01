@@ -295,31 +295,29 @@ static obj * native_round(obj * args) {
     return return_from_stack(number(round(car(args)->number)));
 }
 
-obj * load_math(obj * env) {
-    prepare_stack();
-    env = naive_assoc(lsymbol("pi"), number(3.14159265358979323), env);
-    env = naive_assoc(lsymbol("e"), number(2.71828182845904523), env);    
-    env = naive_assoc(lsymbol("+"), native(&native_add), env);
-    env = naive_assoc(lsymbol("-"), native(&native_sub), env);
-    env = naive_assoc(lsymbol("*"), native(&native_mul), env);
-    env = naive_assoc(lsymbol("/"), native(&native_div), env);
-    env = naive_assoc(lsymbol("mod"), native(&native_mod), env);
-    env = naive_assoc(lsymbol("max"), native(&native_max), env);
-    env = naive_assoc(lsymbol("min"), native(&native_min), env);
-    env = naive_assoc(lsymbol("<"), native(&native_lt), env);
-    env = naive_assoc(lsymbol("<="), native(&native_lte), env);
-    env = naive_assoc(lsymbol(">"), native(&native_gt), env);
-    env = naive_assoc(lsymbol(">="), native(&native_gte), env);
-    env = naive_assoc(lsymbol("abs"), native(&native_abs), env);
-    env = naive_assoc(lsymbol("pow"), native(&native_pow), env);
-    env = naive_assoc(lsymbol("sin"), native(&native_sin), env);
-    env = naive_assoc(lsymbol("cos"), native(&native_cos), env);
-    env = naive_assoc(lsymbol("tan"), native(&native_tan), env);
-    env = naive_assoc(lsymbol("asin"), native(&native_asin), env);
-    env = naive_assoc(lsymbol("acos"), native(&native_acos), env);
-    env = naive_assoc(lsymbol("atan"), native(&native_atan), env);
-    env = naive_assoc(lsymbol("ceil"), native(&native_ceil), env);
-    env = naive_assoc(lsymbol("floor"), native(&native_floor), env);
-    env = naive_assoc(lsymbol("round"), native(&native_round), env);
-    return return_from_stack(env);
+void load_math(hash_map * env) {
+    hash_map_assoc(env, "pi", number(3.14159265358979323));
+    hash_map_assoc(env, "e", number(2.71828182845904523));    
+    hash_map_assoc(env, "+", native(&native_add));
+    hash_map_assoc(env, "-", native(&native_sub));
+    hash_map_assoc(env, "*", native(&native_mul));
+    hash_map_assoc(env, "/", native(&native_div));
+    hash_map_assoc(env, "mod", native(&native_mod));
+    hash_map_assoc(env, "max", native(&native_max));
+    hash_map_assoc(env, "min", native(&native_min));
+    hash_map_assoc(env, "<", native(&native_lt));
+    hash_map_assoc(env, "<=", native(&native_lte));
+    hash_map_assoc(env, ">", native(&native_gt));
+    hash_map_assoc(env, ">=", native(&native_gte));
+    hash_map_assoc(env, "abs", native(&native_abs));
+    hash_map_assoc(env, "pow", native(&native_pow));
+    hash_map_assoc(env, "sin", native(&native_sin));
+    hash_map_assoc(env, "cos", native(&native_cos));
+    hash_map_assoc(env, "tan", native(&native_tan));
+    hash_map_assoc(env, "asin", native(&native_asin));
+    hash_map_assoc(env, "acos", native(&native_acos));
+    hash_map_assoc(env, "atan", native(&native_atan));
+    hash_map_assoc(env, "ceil", native(&native_ceil));
+    hash_map_assoc(env, "floor", native(&native_floor));
+    hash_map_assoc(env, "round", native(&native_round));
 }

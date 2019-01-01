@@ -44,11 +44,9 @@ static obj * native_vm_debug_pool(obj * args) {
     return nil;
 }
 
-obj * load_vmstat(obj * env) {
-    prepare_stack();
-    env = naive_assoc(lsymbol("vm-stat"), native(&native_vm_stat), env);
-    env = naive_assoc(lsymbol("vm-force-gc"), native(&native_vm_force_gc), env);
-    env = naive_assoc(lsymbol("vm-debug-stack"), native(&native_vm_debug_stack), env);
-    env = naive_assoc(lsymbol("vm-debug-pool"), native(&native_vm_debug_pool), env);
-    return return_from_stack(env);
+void load_vmstat(hash_map * env) {
+    hash_map_assoc(env, "vm-stat", native(&native_vm_stat));
+    hash_map_assoc(env, "vm-force-gc", native(&native_vm_force_gc));
+    hash_map_assoc(env, "vm-debug-stack", native(&native_vm_debug_stack));
+    hash_map_assoc(env, "vm-debug-pool", native(&native_vm_debug_pool));
 }

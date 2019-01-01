@@ -138,11 +138,9 @@ static obj * native_equal(obj * args) {
     return return_from_stack(cond);
 }
 
-obj * load_logic(obj * env) {
-    prepare_stack();
-    env = naive_assoc(lsymbol("not"), native(&native_not), env);
-    env = naive_assoc(lsymbol("and"), native(&native_and), env);
-    env = naive_assoc(lsymbol("or"), native(&native_or), env);
-    env = naive_assoc(lsymbol("="), native(&native_equal), env);
-    return return_from_stack(env);
+void load_logic(hash_map * env) {
+    hash_map_assoc(env, "not", native(&native_not));
+    hash_map_assoc(env, "and", native(&native_and));
+    hash_map_assoc(env, "or", native(&native_or));
+    hash_map_assoc(env, "=", native(&native_equal));
 }

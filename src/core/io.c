@@ -132,14 +132,12 @@ obj * native_exit(obj * args) {
     }
 }
 
-obj * load_io(obj * env) {
-    prepare_stack();
-    env = naive_assoc(lsymbol("input"), native(&native_io_input), env);
-    env = naive_assoc(lsymbol("print"), native(&native_io_print), env);
-    env = naive_assoc(lsymbol("println"), native(&native_io_println), env);
-    env = naive_assoc(lsymbol("io-read"), native(&native_io_read), env);
-    env = naive_assoc(lsymbol("io-write"), native(&native_io_write), env);
-    env = naive_assoc(lsymbol("time"), native(&native_time), env);
-    env = naive_assoc(lsymbol("exit"), native(&native_exit), env);
-    return return_from_stack(env);
+void load_io(hash_map * env) {
+    hash_map_assoc(env, "input", native(&native_io_input));
+    hash_map_assoc(env, "print", native(&native_io_print));
+    hash_map_assoc(env, "println", native(&native_io_println));
+    hash_map_assoc(env, "io-read", native(&native_io_read));
+    hash_map_assoc(env, "io-write", native(&native_io_write));
+    hash_map_assoc(env, "time", native(&native_time));
+    hash_map_assoc(env, "exit", native(&native_exit));
 }

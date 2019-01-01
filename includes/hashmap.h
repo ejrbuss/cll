@@ -2,7 +2,7 @@
 
 #include "ll.h"
 
-void * NOT_FOUND;
+extern void * NOT_FOUND;
 
 typedef struct hash_item hash_item;
 struct hash_item {

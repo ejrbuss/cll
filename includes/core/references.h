@@ -4,4 +4,4 @@
 
 extern obj * set(obj * ref, obj * val);
 extern obj * deref(obj * ref);
-extern obj * load_references(obj * env);
+extern void load_references(hash_map * env);

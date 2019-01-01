@@ -3,4 +3,4 @@
 #include "core.h"
 
 extern obj * call(obj * fn, obj * args);
-extern obj * load_function(obj * env);
+extern void load_function(hash_map * env);

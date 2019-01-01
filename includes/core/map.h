@@ -7,4 +7,4 @@ extern obj * get(obj * key, obj * map, obj * def);
 extern obj * keys(obj * map);
 extern obj * dissoc(obj * key, obj * map);
 extern obj * assoc(obj * key, obj * val, obj * map);
-extern obj * load_map(obj * env);
+extern void load_map(hash_map * env);

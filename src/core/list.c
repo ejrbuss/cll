@@ -185,15 +185,13 @@ static obj * native_set_car(obj * args) {
 /**
  * Loads all core list operations into the global environemnt.
  */
-obj * load_list(obj * env) {
-    prepare_stack();
-    env = naive_assoc(lsymbol("list"), native(&native_list), env);
-    env = naive_assoc(lsymbol("car"), native(&native_car), env);
-    env = naive_assoc(lsymbol("cdr"), native(&native_cdr), env);
-    env = naive_assoc(lsymbol("cons"), native(&native_cons), env);
-    env = naive_assoc(lsymbol("in"), native(&native_in), env);
-    env = naive_assoc(lsymbol("count"), native(&native_count), env);
-    env = naive_assoc(lsymbol("reverse"), native(&native_reverse), env);
-    env = naive_assoc(lsymbol("set-car!"), native(&native_set_car), env);
-    return return_from_stack(env);
+void load_list(hash_map * env) {
+    hash_map_assoc(env, "list", native(&native_list));
+    hash_map_assoc(env, "car", native(&native_car));
+    hash_map_assoc(env, "cdr", native(&native_cdr));
+    hash_map_assoc(env, "cons", native(&native_cons));
+    hash_map_assoc(env, "in", native(&native_in));
+    hash_map_assoc(env, "count", native(&native_count));
+    hash_map_assoc(env, "reverse", native(&native_reverse));
+    hash_map_assoc(env, "set-car!", native(&native_set_car));
 }

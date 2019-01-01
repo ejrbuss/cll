@@ -10,7 +10,7 @@ void test_car() {
     assert(equal(car(ceval("[:x :y :z]")), ceval(":x")));
     assert(equal(car(ceval("{:key 4}")), ceval(":key")));
     assert(equal(car(ceval("\"hello\"")), ceval("\"h\"")));
-    assert(equal(type_of(car(ceval("(fn [x] x)"))), ceval(":map")));
+    assert(equal(type_of(car(ceval("(let {x 4} (fn [y] y))"))), ceval(":map")));
     assert(equal(type_of(car(ceval("4"))), ceval(":error")));
     return_from_stack(nil);
 }

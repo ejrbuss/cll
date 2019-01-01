@@ -296,17 +296,15 @@ static obj * native_ascii_to_num(obj * args) {
     return ascii_to_num(car(args));
 }
 
-obj * load_string(obj * env) {
-    prepare_stack();
-    env = naive_assoc(lsymbol("str"), native(&native_cat), env);
-    env = naive_assoc(lsymbol("str-replace"), native(&native_replace), env);
-    env = naive_assoc(lsymbol("str-replace-all"), native(&native_replace_all), env);
-    env = naive_assoc(lsymbol("str-no-whitespace"), native(&native_no_whitespace), env);
-    env = naive_assoc(lsymbol("str-split"), native(&native_split), env);
-    env = naive_assoc(lsymbol("str-sub"), native(&native_substr), env);
-    env = naive_assoc(lsymbol("str-fmt"), native(&native_format), env);
-    env = naive_assoc(lsymbol("str-to-num"), native(&native_str_to_num), env);
-    env = naive_assoc(lsymbol("num-to-ascii"), native(&native_num_to_ascii), env);
-    env = naive_assoc(lsymbol("ascii-to-num"), native(&native_ascii_to_num), env);
-    return return_from_stack(env);
+void load_string(hash_map * env) {
+    hash_map_assoc(env, "str", native(&native_cat));
+    hash_map_assoc(env, "str-replace", native(&native_replace));
+    hash_map_assoc(env, "str-replace-all", native(&native_replace_all));
+    hash_map_assoc(env, "str-no-whitespace", native(&native_no_whitespace));
+    hash_map_assoc(env, "str-split", native(&native_split));
+    hash_map_assoc(env, "str-sub", native(&native_substr));
+    hash_map_assoc(env, "str-fmt", native(&native_format));
+    hash_map_assoc(env, "str-to-num", native(&native_str_to_num));
+    hash_map_assoc(env, "num-to-ascii", native(&native_num_to_ascii));
+    hash_map_assoc(env, "ascii-to-num", native(&native_ascii_to_num));
 }

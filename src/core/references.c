@@ -43,10 +43,8 @@ static obj * native_deref(obj * args) {
     return deref(car(args));
 }
 
-obj * load_references(obj * env) {
-    prepare_stack();
-    env = naive_assoc(lsymbol("ref"), native(&native_ref), env);
-    env = naive_assoc(lsymbol("set!"), native(&native_set), env);
-    env = naive_assoc(lsymbol("deref"), native(&native_deref), env);
-    return return_from_stack(env);
+void load_references(hash_map * env) {
+    hash_map_assoc(env, "ref", native(&native_ref));
+    hash_map_assoc(env, "set!", native(&native_set));
+    hash_map_assoc(env, "deref", native(&native_deref));
 }

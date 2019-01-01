@@ -28,7 +28,7 @@ static obj * native_keyword(obj * args) {
 }
 
 static obj * native_eval(obj * args) {
-    return eval(car(args), g_env);
+    return eval(car(args), nil);
 }
 
 static obj * native_read(obj * args) {
@@ -46,7 +46,7 @@ static obj * native_load(obj * args) {
     return_on_error(forms);
     obj * o = nil;
     while(forms != nil) {
-        o = eval(car(forms), g_env);
+        o = eval(car(forms), nil);
         return_on_error(o);
         forms = cdr(forms);
     }
@@ -61,33 +61,31 @@ static obj * native_str_eval(obj * args) {
     return_on_error(forms);
     obj * o = nil;
     while(forms != nil) {
-        o = eval(car(forms), g_env);
+        o = eval(car(forms), nil);
         return_on_error(o);
         forms = cdr(forms);
     }
     return return_from_stack(o);
 }
 
-obj * load_core(obj * env) {
-    prepare_stack();
-    env = naive_assoc(lsymbol("throw"), native(&native_error), env);
-    env = naive_assoc(lsymbol("symbol"), native(&native_symbol), env);
-    env = naive_assoc(lsymbol("keyword"), native(&native_keyword), env);
-    env = naive_assoc(lsymbol("eval"), native(&native_eval), env);
-    env = naive_assoc(lsymbol("read"), native(&native_read), env);
-    env = naive_assoc(lsymbol("load"), native(&native_load), env);
-    env = naive_assoc(lsymbol("str-eval"), native(&native_str_eval), env);
-    env = naive_assoc(lsymbol("nil"), nil, env);
+void load_core(hash_map * env) {
+    hash_map_assoc(env, "throw", native(&native_error));
+    hash_map_assoc(env, "symbol", native(&native_symbol));
+    hash_map_assoc(env, "keyword", native(&native_keyword));
+    hash_map_assoc(env, "eval", native(&native_eval));
+    hash_map_assoc(env, "read", native(&native_read));
+    hash_map_assoc(env, "load", native(&native_load));
+    hash_map_assoc(env, "str-eval", native(&native_str_eval));
+    hash_map_assoc(env, "nil", nil);
     // Load other libs
-    env = load_io(env);
-    env = load_types(env);
-    env = load_list(env);
-    env = load_map(env);
-    env = load_logic(env);
-    env = load_math(env);
-    env = load_references(env);
-    env = load_string(env);
-    env = load_function(env);
-    env = load_vmstat(env);
-    return return_from_stack(env);
+    load_io(env);
+    load_types(env);
+    load_list(env);
+    load_map(env);
+    load_logic(env);
+    load_math(env);
+    load_references(env);
+    load_string(env);
+    load_function(env);
+    load_vmstat(env);
 }

@@ -1,9 +1,7 @@
 #include "eval.h"
 #include "core.h"
 
-obj * g_env_ref = nil;
-obj * g_env = nil;
-hash_map * g_env_hash_map;
+hash_map * g_env = nil;
 
 /**
  * Initializes the gobal environment, `g_env`. Loads all native functions into
@@ -15,16 +13,10 @@ void init_env() {
 
     // Load core
     prepare_stack();
-    g_env_ref = reference(nil);
-    g_env = load_core(g_env);
-    g_env_hash_map = init_hash_map();
-    set(g_env_ref, g_env);
-    return_from_stack(g_env_ref);
+    g_env = init_hash_map();
+    load_core(g_env);
+    return_from_stack(hash_map_obj(g_env));
     prepare_stack();
-    return_from_stack(hash_map_obj(g_env_hash_map));
-    prepare_stack();
-
-    hash_map_assoc(g_env_hash_map, "test", number(4));
 
     // Load prelude
     prepare_stack();
@@ -149,8 +141,7 @@ static obj * eval_list(obj * list, obj * env) {
         // refs should be used for that. In return we don't ever have to copy
         // over all of g_env just because of a redef, decreasing our memory 
         // footprint
-        g_env = naive_assoc(car(args), eval(car(cdr(args)), env), g_env);
-        g_env_ref->ref = g_env;
+        hash_map_assoc(g_env, car(args)->symbol, eval(car(cdr(args)), env));
         return return_from_stack(nil);
     }
 
@@ -262,17 +253,11 @@ static obj * eval_symbol(obj * sym, obj * env) {
         }
         env = FAST_CDR(FAST_CDR(env));
     }
-    env = g_env;
-    while (env != nil) {
-        if (equal(FAST_CAR(env), sym)) {
-            return return_from_stack(car(FAST_CDR(env)));
-        }
-        env = FAST_CDR(FAST_CDR(env));
-    }
-    obj * o = hash_map_get(g_env_hash_map, sym->string);
+    obj * o = hash_map_get(g_env, sym->string);
     if (o != NOT_FOUND) {
         return return_from_stack(o);
     }
+    printf("%p\n", NOT_FOUND);
     obj * lookup_error = error_format(
         lkeyword("Lookup-Error"),
         lstring("`{}` is not defined!"),
@@ -312,5 +297,5 @@ obj * eval(obj * expr, obj * env) {
 
 obj * ceval(char * source) {
     prepare_stack();
-    return return_from_stack(eval(cread(source), g_env));
+    return return_from_stack(eval(cread(source), nil));
 }

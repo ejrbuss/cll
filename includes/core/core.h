@@ -17,4 +17,4 @@
 #include "types.h"
 #include "vmstat.h"
 
-extern obj * load_core(obj * env);
+extern void load_core(hash_map * env);

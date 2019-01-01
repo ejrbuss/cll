@@ -26,8 +26,6 @@ static obj * native_type_of(obj * args) {
     return type_of(car(args));
 }
 
-obj * load_types(obj * env) {
-    prepare_stack();
-    env = naive_assoc(lsymbol("type-of"), native(&native_type_of), env);
-    return return_from_stack(env);
+void load_types(hash_map * env) {
+    hash_map_assoc(env, "type-of", native(&native_type_of));
 }

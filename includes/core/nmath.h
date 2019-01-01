@@ -8,4 +8,4 @@ extern obj * lt(obj * n, obj * m);
 extern obj * lte(obj * n, obj * m);
 extern obj * gt(obj * n, obj * m);
 extern obj * gte(obj * n, obj * m);
-extern obj * load_math(obj * env);
+extern void load_math(hash_map * env);

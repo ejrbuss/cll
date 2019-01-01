@@ -236,12 +236,10 @@ obj * fassoc(obj * key, obj * val, obj * map) {
     }
 }
 
-obj * load_map(obj * env) {
-    prepare_stack();
-    env = naive_assoc(lsymbol("map"), native(&native_map), env);
-    env = naive_assoc(lsymbol("get"), native(&native_get), env);
-    env = naive_assoc(lsymbol("keys"), native(&native_keys), env);
-    env = naive_assoc(lsymbol("dissoc"), native(&native_dissoc), env);
-    env = naive_assoc(lsymbol("assoc"), native(&native_assoc), env);
-    return return_from_stack(env);
+void load_map(hash_map * env) {
+    hash_map_assoc(env, "map", native(&native_map));
+    hash_map_assoc(env, "get", native(&native_get));
+    hash_map_assoc(env, "keys", native(&native_keys));
+    hash_map_assoc(env, "dissoc", native(&native_dissoc));
+    hash_map_assoc(env, "assoc", native(&native_assoc));
 }

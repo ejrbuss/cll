@@ -49,8 +49,6 @@ static obj * native_call(obj * args) {
     return call(car(args), car(cdr(args)));
 }
 
-obj * load_function(obj * env) {
-    prepare_stack();
-    env = naive_assoc(lsymbol("call"), native(&native_call), env);
-    return return_from_stack(env);
+void load_function(hash_map * env) {
+    hash_map_assoc(env, "call", native(&native_call));
 }
