@@ -43,10 +43,6 @@ cll>(time-it (fib 31))
 
 ## Broken
 
-HARD CRASH!!!!
-```
-cll>(load "examples/fib.cll")
-```
 
 ## TODO
 - Testing
