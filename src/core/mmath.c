@@ -3,23 +3,28 @@
 static obj * native_add(obj * args) {
     prepare_stack();
     double sum = 0;
+    int arg_n = 1;
     while(args != nil) {
-        check_type("+", type_number, car(args));
-        sum += car(args)->number;
-        args = cdr(args);
+        CHECK_FN_ARG_NS("+", arg_n, type_number, FAST_CAR(args));
+        sum += FAST_CAR(args)->number;
+        args = FAST_CDR(args);
+        arg_n++;
     }
     return return_from_stack(number(sum));
 }
 
 static obj * native_sub(obj * args) {
     prepare_stack();
-    check_type("-", type_number, car(args));
+    CHECK_FN_ARITY("-", 1, INFINITY, args);
+    CHECK_FN_ARG("-", 1, type_number, FAST_CAR(args));
     double diff = car(args)->number;
-    args = cdr(args);
+    int arg_n = 2;
+    args = FAST_CDR(args);
     while(args != nil) {
-        check_type("-", type_number, car(args));
-        diff -= car(args)->number;
-        args = cdr(args);
+        CHECK_FN_ARG("-", arg_n, type_number, FAST_CAR(args));
+        diff -= FAST_CAR(args)->number;
+        args = FAST_CDR(args);
+        arg_n++;
     }
     return return_from_stack(number(diff));
 }
@@ -27,103 +32,104 @@ static obj * native_sub(obj * args) {
 static obj * native_mul(obj * args) {
     prepare_stack();
     double prod = 1;
+    int arg_n = 1;
     while(args != nil) {
-        check_type("*", type_number, car(args));
-        prod *= car(args)->number;
-        args = cdr(args);
+        CHECK_FN_ARG_NS("*", arg_n, type_number, FAST_CAR(args));
+        prod *= FAST_CAR(args)->number;
+        args = FAST_CDR(args);
+        arg_n++;
     }
     return return_from_stack(number(prod));
 }
 
 static obj * native_div(obj * args) {
     prepare_stack();
-    check_type("/", type_number, car(args));
+    CHECK_FN_ARITY("/", 1, INFINITY, args);
+    CHECK_FN_ARG("/", 1, type_number, FAST_CAR(args));
     double dividend = car(args)->number;
-    args = cdr(args);
+    int arg_n = 2;
+    args = FAST_CDR(args);
     while(args != nil) {
-        check_type("-", type_number, car(args));
-        dividend /= car(args)->number;
-        args = cdr(args);
+        CHECK_FN_ARG("/", arg_n, type_number, FAST_CAR(args));
+        dividend /= FAST_CAR(args)->number;
+        args = FAST_CDR(args);
+        arg_n++;
     }
     return return_from_stack(number(dividend));
 }
 
 static obj * native_mod(obj * args) {
-    prepare_stack();
-    check_type("mod", type_number, car(args));
-    check_type("mod", type_number, car(cdr(args)));
-    int a = (int) car(args)->number;
-    int b = (int) car(cdr(args))->number;
+    CHECK_FN_ARITY_NS("mod", 2, 2, args);
+    CHECK_FN_ARG_NS("mod", 1, type_number, FAST_CAR(args));
+    CHECK_FN_ARG_NS("mod", 2, type_number, FAST_CAR(FAST_CDR(args)));
+    int a = FAST_CAR(args)->number;
+    int b = FAST_CAR(FAST_CDR(args))->number;
     return return_from_stack(number(a % b));
 }
 
 obj * nmax(obj * n, obj * m) {
-    prepare_stack();
-    check_type("max", type_number, n);
-    check_type("max", type_number, m);
     if (n->number > m->number) {
-        return return_from_stack(n);
+        return n;
     } else {
-        return return_from_stack(m);
+        return m;
     }
 }
 
 static obj * native_max(obj * args) {
     prepare_stack();
     obj * n = number(-INFINITY);
+    int arg_n = 1;
     while(args != nil) {
-        n = nmax(n, car(args));
-        check_type("max", type_number, n);
-        args = cdr(args);
+        CHECK_FN_ARG("max", arg_n, type_number, FAST_CAR(args));
+        n = nmax(n, FAST_CAR(args));
+        args = FAST_CDR(args);
+        arg_n++;
     }
     return return_from_stack(n);
 }
 
 obj * nmin(obj * n, obj * m) {
-    prepare_stack();
-    check_type("min", type_number, n);
-    check_type("min", type_number, m);
     if (n->number < m->number) {
-        return return_from_stack(n);
+        return n;
     } else {
-        return return_from_stack(m);
+        return m;
     }
 }
 
 static obj * native_min(obj * args) {
     prepare_stack();
     obj * n = number(INFINITY);
+    int arg_n = 1;
     while(args != nil) {
-        n = nmin(n, car(args));
-        check_type("min", type_number, n);
-        args = cdr(args);
+        CHECK_FN_ARG("min", arg_n, type_number, FAST_CAR(args));
+        n = nmin(n, FAST_CAR(args));
+        args = FAST_CDR(args);
     }
     return return_from_stack(n);
 }
 
 obj * lt(obj * n, obj * m) {
-    prepare_stack();
-    check_type("<", type_number, n);
-    check_type("<", type_number, m);
     if (n->number < m->number) {
-        return return_from_stack(lkeyword("true"));
+        return lkeyword("true");
     } else {
-        return return_from_stack(nil);
+        return nil;
     }
 }
 
 static obj * native_lt(obj * args) {
     prepare_stack();
+    CHECK_FN_ARITY("<", 1, INFINITY, args);
+    CHECK_FN_ARG("<", 1, type_number, FAST_CAR(args));
     int cond = 1;
-    obj * o = car(args);
-    args = cdr(args);
+    int arg_n = 2;
+    obj * o = FAST_CAR(args);
+    args = FAST_CDR(args);
     while(cond && args != nil) {
-        obj * r = lt(o, car(args));
-        if (r != nil && r->type == type_error) {
-            return return_from_stack(r);
-        }
+        CHECK_FN_ARG("<", arg_n, type_number, FAST_CAR(args));
+        obj * r = lt(o, FAST_CAR(args));
         cond = cond && r;
-        args = cdr(args);
+        args = FAST_CDR(args);
+        arg_n++;
     }
     if (cond) {
         return return_from_stack(lkeyword("true"));
@@ -133,28 +139,27 @@ static obj * native_lt(obj * args) {
 }
 
 obj * lte(obj * n, obj * m) {
-    prepare_stack();
-    check_type("<", type_number, n);
-    check_type("<", type_number, m);
     if (n->number <= m->number) {
-        return return_from_stack(lkeyword("true"));
+        return lkeyword("true");
     } else {
-        return return_from_stack(nil);
+        return nil;
     }
 }
 
 static obj * native_lte(obj * args) {
     prepare_stack();
+    CHECK_FN_ARITY("<=", 1, INFINITY, args);
+    CHECK_FN_ARG("<=", 1, type_number, FAST_CAR(args));
     int cond = 1;
-    obj * o = car(args);
-    args = cdr(args);
+    int arg_n = 2;
+    obj * o = FAST_CAR(args);
+    args = FAST_CDR(args);
     while(cond && args != nil) {
-        obj * r = lte(o, car(args));
-        if (r != nil && r->type == type_error) {
-            return return_from_stack(r);
-        }
+        CHECK_FN_ARG("<=", arg_n, type_number, FAST_CAR(args));
+        obj * r = lte(o, FAST_CAR(args));
         cond = cond && r;
-        args = cdr(args);
+        args = FAST_CDR(args);
+        arg_n++;
     }
     if (cond) {
         return return_from_stack(lkeyword("true"));
@@ -164,28 +169,27 @@ static obj * native_lte(obj * args) {
 }
 
 obj * gt(obj * n, obj * m) {
-    prepare_stack();
-    check_type("<", type_number, n);
-    check_type("<", type_number, m);
     if (n->number > m->number) {
-        return return_from_stack(lkeyword("true"));
+        return lkeyword("true");
     } else {
-        return return_from_stack(nil);
+        return nil;
     }
 }
 
 static obj * native_gt(obj * args) {
     prepare_stack();
+    CHECK_FN_ARITY(">", 1, INFINITY, args);
+    CHECK_FN_ARG(">", 1, type_number, FAST_CAR(args));
     int cond = 1;
-    obj * o = car(args);
-    args = cdr(args);
+    int arg_n = 2;
+    obj * o = FAST_CAR(args);
+    args = FAST_CDR(args);
     while(cond && args != nil) {
-        obj * r = gt(o, car(args));
-        if (r != nil && r->type == type_error) {
-            return return_from_stack(r);
-        }
+        CHECK_FN_ARG(">", arg_n, type_number, FAST_CAR(args));
+        obj * r = gt(o, FAST_CAR(args));
         cond = cond && r;
-        args = cdr(args);
+        args = FAST_CDR(args);
+        arg_n++;
     }
     if (cond) {
         return return_from_stack(lkeyword("true"));
@@ -195,28 +199,27 @@ static obj * native_gt(obj * args) {
 }
 
 obj * gte(obj * n, obj * m) {
-    prepare_stack();
-    check_type("<", type_number, n);
-    check_type("<", type_number, m);
     if (n->number >= m->number) {
-        return return_from_stack(lkeyword("true"));
+        return lkeyword("true");
     } else {
-        return return_from_stack(nil);
+        return nil;
     }
 }
 
 static obj * native_gte(obj * args) {
     prepare_stack();
+    CHECK_FN_ARITY(">=", 1, INFINITY, args);
+    CHECK_FN_ARG(">=", 1, type_number, FAST_CAR(args));
     int cond = 1;
-    obj * o = car(args);
-    args = cdr(args);
+    int arg_n = 2;
+    obj * o = FAST_CAR(args);
+    args = FAST_CDR(args);
     while(cond && args != nil) {
-        obj * r = gte(o, car(args));
-        if (r != nil && r->type == type_error) {
-            return return_from_stack(r);
-        }
+        CHECK_FN_ARG(">=", arg_n, type_number, FAST_CAR(args));
+        obj * r = gt(o, FAST_CAR(args));
         cond = cond && r;
-        args = cdr(args);
+        args = FAST_CDR(args);
+        arg_n++;
     }
     if (cond) {
         return return_from_stack(lkeyword("true"));
@@ -226,73 +229,73 @@ static obj * native_gte(obj * args) {
 }
 
 static obj * native_abs(obj * args) {
-    prepare_stack();
-    check_type("abs", type_number, car(args));
-    return return_from_stack(number(fabs(car(args)->number)));
+    CHECK_FN_ARITY_NS("abs", 1, 1, args);
+    CHECK_FN_ARG_NS("abs", 1, type_number, FAST_CAR(args));
+    return number(fabs(FAST_CAR(args)->number));
 }
 
 static obj * native_pow(obj * args) {
-    prepare_stack();
-    check_type("pow", type_number, car(args));
-    check_type("pow", type_number, car(cdr(args)));
-    return return_from_stack(number(pow(
-        car(args)->number, 
-        car(cdr(args))->number
-    )));
+    CHECK_FN_ARITY_NS("pow", 2, 2, args);
+    CHECK_FN_ARG_NS("pow", 1, type_number, FAST_CAR(args));
+    CHECK_FN_ARG_NS("pow", 1, type_number, FAST_CAR(FAST_CDR(args)));
+    return number(pow(
+        FAST_CAR(args)->number, 
+        FAST_CAR(FAST_CDR(args))->number
+    ));
 }
 
 static obj * native_sin(obj * args) {
-    prepare_stack();
-    check_type("sin", type_number, car(args));
-    return return_from_stack(number(sin(car(args)->number)));
+    CHECK_FN_ARITY_NS("sin", 1, 1, args);
+    CHECK_FN_ARG_NS("sin", 1, type_number, FAST_CAR(args));
+    return number(sin(FAST_CAR(args)->number));
 }
 
 static obj * native_cos(obj * args) {
-    prepare_stack();
-    check_type("cos", type_number, car(args));
-    return return_from_stack(number(cos(car(args)->number)));
+    CHECK_FN_ARITY_NS("cos", 1, 1, args);
+    CHECK_FN_ARG_NS("cos", 1, type_number, FAST_CAR(args));
+    return number(cos(FAST_CAR(args)->number));
 }
 
 static obj * native_tan(obj * args) {
-    prepare_stack();
-    check_type("tan", type_number, car(args));
-    return return_from_stack(number(tan(car(args)->number)));
+    CHECK_FN_ARITY_NS("tan", 1, 1, args);
+    CHECK_FN_ARG_NS("tan", 1, type_number, FAST_CAR(args));
+    return number(tan(FAST_CAR(args)->number));
 }
 
 static obj * native_asin(obj * args) {
-    prepare_stack();
-    check_type("asin", type_number, car(args));
-    return return_from_stack(number(asin(car(args)->number)));
+    CHECK_FN_ARITY_NS("asin", 1, 1, args);
+    CHECK_FN_ARG_NS("asin", 1, type_number, FAST_CAR(args));
+    return number(asin(FAST_CAR(args)->number));
 }
 
 static obj * native_acos(obj * args) {
-    prepare_stack();
-    check_type("acos", type_number, car(args));
-    return return_from_stack(number(acos(car(args)->number)));
+    CHECK_FN_ARITY_NS("acos", 1, 1, args);
+    CHECK_FN_ARG_NS("acos", 1, type_number, FAST_CAR(args));
+    return number(acos(FAST_CAR(args)->number));
 }
 
 static obj * native_atan(obj * args) {
-    prepare_stack();
-    check_type("atan", type_number, car(args));
-    return return_from_stack(number(atan(car(args)->number)));
+    CHECK_FN_ARITY_NS("atan", 1, 1, args);
+    CHECK_FN_ARG_NS("atan", 1, type_number, FAST_CAR(args));
+    return number(atan(FAST_CAR(args)->number));
 }
 
 static obj * native_ceil(obj * args) {
-    prepare_stack();
-    check_type("ceil", type_number, car(args));
-    return return_from_stack(number(ceil(car(args)->number)));
+    CHECK_FN_ARITY_NS("ceil", 1, 1, args);
+    CHECK_FN_ARG_NS("ceil", 1, type_number, FAST_CAR(args));
+    return number(ceil(FAST_CAR(args)->number));
 }
 
 static obj * native_floor(obj * args) {
-    prepare_stack();
-    check_type("floor", type_number, car(args));
-    return return_from_stack(number(floor(car(args)->number)));
+    CHECK_FN_ARITY_NS("floor", 1, 1, args);
+    CHECK_FN_ARG_NS("floor", 1, type_number, FAST_CAR(args));
+    return number(floor(FAST_CAR(args)->number));
 }
 
 static obj * native_round(obj * args) {
-    prepare_stack();
-    check_type("round", type_number, car(args));
-    return return_from_stack(number(round(car(args)->number)));
+    CHECK_FN_ARITY_NS("round", 1, 1, args);
+    CHECK_FN_ARG_NS("round", 1, type_number, FAST_CAR(args));
+    return number(round(FAST_CAR(args)->number));
 }
 
 void load_math(hash_map * env) {

@@ -90,15 +90,8 @@
   (fn [& args]
     (call f (concat curried-args args))))
 
-;; Strings
-
-(defn str-to-num [s]
-  (let { n (read s) }
-    (if (number? n)
-      n
-      (throw 
-        :Parameter-Error 
-        (str-fmt "{} could not be converted to a number!" s)))))
+(defn apply! [f r]
+  (set! r (f @r)))
 
 ;; Types
 

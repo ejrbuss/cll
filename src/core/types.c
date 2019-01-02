@@ -23,7 +23,8 @@ obj * type_of(obj * o) {
 }
 
 static obj * native_type_of(obj * args) {
-    return type_of(car(args));
+    CHECK_FN_ARITY_NS("type-of", 1, 1, args);
+    return type_of(FAST_CAR(args));
 }
 
 void load_types(hash_map * env) {

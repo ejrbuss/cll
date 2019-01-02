@@ -27,8 +27,6 @@ void test_keys() {
     assert(equal(keys(ceval("{}")), nil));
     assert(equal(keys(ceval("{:x 1 :y 2}")), ceval("[:x :y]")));
     assert(equal(keys(ceval("{:x 1 :y 2 :z 3 :x 2}")), ceval("[:z :y :x]")));
-    assert(equal(type_of(keys(ceval("4"))), ceval(":error")));
-    assert(equal(type_of(keys(ceval("[1 2 3 4]"))), ceval(":error")));
     return_from_stack(nil);
 }
 
@@ -38,8 +36,6 @@ void test_dissoc() {
     assert(equal(dissoc(ceval(":y"), ceval("{:x 4 :z 5}")), ceval("{:x 4 :z 5}")));
     assert(equal(dissoc(ceval(":z"), ceval("{:x 2 :z 5}")), ceval("{:x 2}")));
     assert(equal(dissoc(ceval(":x"), ceval("{:x 4 :x 6 :x 5}")), nil));
-    assert(equal(type_of(dissoc(ceval(":y"), ceval("[:y 5 :x 4]"))), ceval(":error")));
-    assert(equal(type_of(dissoc(nil, ceval("\"hello\""))), ceval(":error")));
     return_from_stack(nil);
 }
 

@@ -15,11 +15,11 @@ obj * vm_stat() {
     result = naive_assoc(lkeyword("total-bytes"), number((available + allocated) * bytes), result);
     result = naive_assoc(lkeyword("env-items"), number(g_env->size - g_env->available), result);
     result = naive_assoc(lkeyword("env-size"), number(g_env->size), result);
-    
     return return_from_stack(result);
 }
 
 static obj * native_vm_stat(obj * args) {
+    CHECK_FN_ARITY_NS("vm-stat", 0, 0, args);
     return vm_stat();
 }
 
@@ -35,15 +35,18 @@ obj * vm_force_gc() {
 }
 
 static obj * native_vm_force_gc(obj * args) {
+    CHECK_FN_ARITY_NS("vm-force-gc", 0, 0, args);
     return vm_force_gc();
 }
 
 static obj * native_vm_debug_stack(obj * args) {
+    CHECK_FN_ARITY_NS("vm-debug-stack", 0, 0, args);
     vm_debug_stack();
     return nil;
 }
 
 static obj * native_vm_debug_pool(obj * args) {
+    CHECK_FN_ARITY_NS("vm-debug-pool", 0, 0, args);
     vm_debug_pool();
     return nil;
 }

@@ -1,13 +1,16 @@
 #include "map.h"
 
 static obj * native_map(obj * args) {
+    if (FAST_COUNT(args) % 2 != 0) {
+        return THROW_FN_ARG("map", 0, "an even number of arguments", number(FAST_COUNT(args)));
+    }
     prepare_stack();
     obj * map = nil;
     while(args != nil) {
-        obj * k = car(args);
-        obj * v = car(cdr(args));
+        obj * k = FAST_CAR(args);
+        obj * v = FAST_CAR(FAST_CDR(args));
         map = assoc(k, v, map);
-        args = cdr(cdr(args));
+        args = FAST_CDR(FAST_CDR(args));
     }
     return return_from_stack(map);
 }
@@ -22,15 +25,12 @@ static obj * native_map(obj * args) {
  */
 obj * naive_get(obj * key, obj * map) {
     prepare_stack();
-    check_list_type("naive_get", type_map, map);
+    CHECK_FN_ARG("naive_get", 2, type_map, map);
     while (map != nil) {
-        if (equal(car(map), key)) {
-            return return_from_stack(car(cdr(map)));
+        if (equal(FAST_CAR(map), key)) {
+            return return_from_stack(FAST_CAR(FAST_CDR(map)));
         }
-        map = cdr(map);
-        if (map != nil) {
-            map = cdr(map);
-        }
+        map = FAST_CDR(FAST_CDR(map));
     }
     return return_from_stack(error_format(
         lkeyword("Lookup-Error"), 
@@ -47,44 +47,42 @@ obj * get(obj * key, obj * map, obj * def) {
     switch(map->type) {
         case type_map:
             while (map != nil) {
-                if (equal(car(map), key)) {
-                    return return_from_stack(car(cdr(map)));
+                if (equal(FAST_CAR(map), key)) {
+                    return return_from_stack(FAST_CAR(FAST_CDR(map)));
                 }
-                map = cdr(map);
-                if (map != nil) {
-                    map = cdr(map);
-                }
+                map = FAST_CDR(FAST_CDR(map));
             }
             return return_from_stack(def);
         case type_string:
-            check_type("get", type_number, key);
+            CHECK_FN_ARG("get", 1, type_number, key);
             obj * o = substr(key, number(1), map);
             if (o == nil) {
                 return return_from_stack(def);
             }
             return return_from_stack(o);
         case type_list:
-            check_type("get", type_number, key);
+            CHECK_FN_ARG("get", 1, type_number, key);
             int int_key = key->number;
             int idx = 0;
             if (int_key < 0) {
-                int length = count(map)->number;
+                int length = FAST_COUNT(map);
                 int_key = length + int_key;
             }
-            while (idx < int_key) {
-                map = cdr(map);
+            while (map != nil && idx < int_key) {
+                map = FAST_CDR(map);
                 idx++;
             }
             return return_from_stack(car(map));
         default:
-            return return_from_stack(apply_error(lstring("get"), type_map, map));
+            return return_from_stack(THROW_FN_ARG("get", 2, "an iterable", map));
             
     }    
 }
 
 // Native binding
 obj * native_get(obj * args) {
-    return get(car(args), car(cdr(args)), car(cdr(cdr(args))));
+    CHECK_FN_ARITY_NS("get", 2, 3, args);
+    return get(FAST_CAR(args), FAST_CAR(FAST_CDR(args)), car(FAST_CDR(FAST_CDR(args))));
 }
 
 /**
@@ -95,43 +93,46 @@ obj * native_get(obj * args) {
  */
 obj * keys(obj * map) {
     prepare_stack();
-    check_list_type("keys", type_map, map);
     obj * keys = nil;
     while(map != nil) {
-        keys = cons(car(map), keys);
-        map = cdr(map);
-        if (map != nil) {
-            map = cdr(map);
-        }
+        keys = cons(FAST_CAR(map), keys);
+        map = FAST_CDR(FAST_CDR(map));
     }
     return return_from_stack(keys);
 }
 
 // Native binding
 obj * native_keys(obj * args) {
-    return keys(car(args));
+    CHECK_FN_ARITY_NS("keys", 1, 1, args);
+    if (FAST_CAR(args) != nil) {
+        CHECK_FN_ARG_NS("keys", 1, type_map, FAST_CAR(args));
+    }
+    return keys(FAST_CAR(args));
 }
 
 obj * dissoc(obj * key, obj * map) {
     prepare_stack();
-    check_list_type("dissoc", type_map, map);
-    if (not(in(key, keys(map)))) {
+    if (!in(key, keys(map))) {
         return return_from_stack(map);
     }
     obj * m = nil;
     while(map != nil) {
-        obj * k = car(map);
-        obj * v = car(cdr(map));
-        if (not(equal(k, key))) {
+        obj * k = FAST_CAR(map);
+        obj * v = FAST_CAR(FAST_CDR(map));
+        if (!equal(k, key)) {
             m = naive_assoc(k, v, m);
         }
-        map = cdr(cdr(map));
+        map = FAST_CDR(FAST_CDR(map));
     }
     return return_from_stack(m);
 }
 
 static obj * native_dissoc(obj * args) {
-    return dissoc(car(args), car(cdr(args)));
+    CHECK_FN_ARITY_NS("dissoc", 2, 2, args);
+    if (FAST_CAR(FAST_CDR(args)) != nil) {
+        CHECK_FN_ARG_NS("dissoc", 2, type_map, args);
+    }
+    return dissoc(FAST_CAR(args), FAST_CAR(FAST_CDR(args)));
 }
 
 obj * assoc(obj * key, obj * val, obj * map) {
@@ -143,97 +144,47 @@ obj * assoc(obj * key, obj * val, obj * map) {
             map = dissoc(key, map);
             return naive_assoc(key, val, map);
         case type_string: {
-            prepare_stack();
-            check_type("assoc", type_number, key);
-            check_type("assoc", type_string, val);
+            CHECK_FN_ARG_NS("assoc", 1, type_number, key);
+            CHECK_FN_ARG_NS("assoc", 2, type_string, val);
             obj * o = cstring(map->string);
             int idx = key->number;
             o->string[idx] = val->string[0];
-            return return_from_stack(o);
+            return o;
         }
         case type_list: {
             prepare_stack();
-            check_type("assoc", type_number, key);
+            CHECK_FN_ARG("assoc", 1, type_number, key);
             int int_key = key->number;
             int idx = 0;
-            obj * start = nil;
-            obj * end = nil;
+            obj * head = nil;
+            obj * tail = nil;
             if (int_key < 0) {
-                int length = count(map)->number;
+                int length = FAST_COUNT(map);
                 int_key = length + int_key;
             }
-            printf("int_key: %d\n", int_key);
             while (map) {
                 int last = idx == int_key;
                 obj * o = last 
                     ? val
                     : FAST_CAR(map);
-                FAST_REV_CONS(start, end, o);
+                FAST_REV_CONS(head, tail, o);
                 map = FAST_CDR(map);
                 idx++;
                 if (last) {
-                    end->cdr = map;
+                    tail->cdr = map;
                     break;
                 }
             }
-            return return_from_stack(start);
+            return return_from_stack(head);
         }
         default:
-            return apply_error(lstring("assoc"), type_map, map);
+            return THROW_FN_ARG("assoc", 3, "an iterable", map);
     }
 }
 
 static obj * native_assoc(obj * args) {
-    return assoc(car(args), car(cdr(args)), car(cdr(cdr(args))));
-}
-
-obj * fassoc(obj * key, obj * val, obj * map) {
-    if (map == nil) {
-        return naive_assoc(key, val, map);
-    }
-    switch(map->type) {
-        case type_map:
-            map = dissoc(key, map);
-            return naive_assoc(key, val, map);
-        case type_string: {
-            prepare_stack();
-            check_type("assoc", type_number, key);
-            check_type("assoc", type_string, val);
-            obj * o = cstring(map->string);
-            int idx = key->number;
-            o->string[idx] = val->string[0];
-            return return_from_stack(o);
-        }
-        case type_list: {
-            prepare_stack();
-            check_type("assoc", type_number, key);
-            int int_key = key->number;
-            int idx = 0;
-            obj * start = nil;
-            obj * end = nil;
-            if (int_key < 0) {
-                int length = count(map)->number;
-                int_key = length + int_key;
-            }
-            printf("int_key: %d\n", int_key);
-            while (map) {
-                int last = idx == int_key;
-                obj * o = last 
-                    ? val
-                    : FAST_CAR(map);
-                FAST_REV_CONS(start, end, o);
-                map = FAST_CDR(map);
-                idx++;
-                if (last) {
-                    end->cdr = map;
-                    break;
-                }
-            }
-            return return_from_stack(start);
-        }
-        default:
-            return apply_error(lstring("assoc"), type_map, map);
-    }
+    CHECK_FN_ARITY_NS("assoc", 3, 3, args);
+    return assoc(FAST_CAR(args), FAST_CAR(FAST_CDR(args)), FAST_CAR(FAST_CDR(FAST_CDR(args))));
 }
 
 void load_map(hash_map * env) {

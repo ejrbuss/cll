@@ -8,9 +8,6 @@
  * @returns obj *        the concatenated string
  */
 obj * cat(obj * first, obj * second) {
-    prepare_stack();
-    check_type("str", type_string, first);
-    check_type("str", type_string, second);
     char * buffer = (char *) must_malloc(
         first->length +
         second->length + 1
@@ -18,22 +15,19 @@ obj * cat(obj * first, obj * second) {
     strcpy(buffer, first->string);
     strcat(buffer, second->string);
     obj * catted = pstring(buffer);
-    return return_from_stack(catted);
+    return catted;
 }
 
 static obj * native_cat(obj * args) {
     prepare_stack();
     obj * s = lstring("");
     while(args != nil) {
-        if (car(args) != nil && car(args)->type == type_string) {
-            s = cat(s, car(args));
+        if (FAST_CAR(args) != nil && FAST_CAR(args)->type == type_string) {
+            s = cat(s, FAST_CAR(args));
         } else {
-            s = cat(s, print(car(args)));
+            s = cat(s, print(FAST_CAR(args)));
         }
-        if (s->type == type_error) {
-            return return_from_stack(s);
-        }
-        args = cdr(args);
+        args = FAST_CDR(args);
     }
     return return_from_stack(s);
 }
@@ -46,7 +40,7 @@ static obj * native_cat(obj * args) {
  */
 obj * number_to_string(obj * n) {
     prepare_stack();
-    check_type("number_to_string", type_number, n);
+    CHECK_FN_ARG("number_to_string", 1, type_number, n);
     size_t max_len = sizeof(char) * 32;
     char * buffer = (char *) must_malloc(max_len + 1);
     snprintf(buffer, max_len, "%lg", n->number);
@@ -65,10 +59,6 @@ obj * number_to_string(obj * n) {
  * @returns obj *     the new string
  */
 obj * replace(obj * ref, obj * rep, obj * s) {
-    prepare_stack();
-    check_type("replace", type_string, ref);
-    check_type("replace", type_string, rep);
-    check_type("replace", type_string, s);
     int replaced = 0;
     int length = s->length + rep->length + 1;
     char * buffer = (char *) must_malloc(length);
@@ -88,12 +78,19 @@ obj * replace(obj * ref, obj * rep, obj * s) {
         }
     }
     *bp = '\0';
-    obj * r = pstring(buffer);
-    return return_from_stack(r);
+    return pstring(buffer);
 }
 
 static obj * native_replace(obj * args) {
-    return replace(car(args), car(cdr(args)), car(cdr(cdr(args))));
+    CHECK_FN_ARITY_NS("str-replace", 3, 3, args);
+    CHECK_FN_ARG_NS("str-replace", 1, type_string, FAST_CAR(args));
+    CHECK_FN_ARG_NS("str-replace", 2, type_string, FAST_CAR(FAST_CDR(args)));
+    CHECK_FN_ARG_NS("str-replace", 3, type_string, FAST_CAR(FAST_CDR(FAST_CDR(args))));
+    return replace(
+        FAST_CAR(args), 
+        FAST_CAR(FAST_CDR(args)), 
+        FAST_CAR(FAST_CDR(FAST_CDR(args)))
+    );
 }
 
 /**
@@ -107,10 +104,6 @@ static obj * native_replace(obj * args) {
  * @returns obj *     the new string
  */
 obj * replace_all(obj * ref, obj * rep, obj * s) {
-    prepare_stack();
-    check_type("replace", type_string, ref);
-    check_type("replace", type_string, rep);
-    check_type("replace", type_string, s);
     // count the number of occurences
     int count = 0;
     char * sp;
@@ -140,12 +133,19 @@ obj * replace_all(obj * ref, obj * rep, obj * s) {
         }
     }
     *bp = '\0';
-    obj * r = pstring(buffer);
-    return return_from_stack(r);
+    return pstring(buffer);
 }
 
 static obj * native_replace_all(obj * args) {
-    return replace_all(car(args), car(cdr(args)), car(cdr(cdr(args))));
+    CHECK_FN_ARITY_NS("str-replace-all", 3, 3, args);
+    CHECK_FN_ARG_NS("str-replace-all", 1, type_string, FAST_CAR(args));
+    CHECK_FN_ARG_NS("str-replace-all", 2, type_string, FAST_CAR(FAST_CDR(args)));
+    CHECK_FN_ARG_NS("str-replace-all", 3, type_string, FAST_CAR(FAST_CDR(FAST_CDR(args))));
+    return replace_all(
+        FAST_CAR(args), 
+        FAST_CAR(FAST_CDR(args)), 
+        FAST_CAR(FAST_CDR(FAST_CDR(args)))
+    );
 }
 
 /**
@@ -156,7 +156,6 @@ static obj * native_replace_all(obj * args) {
  */
 obj * no_whitespace(obj * s) {
     prepare_stack();
-    check_type("no_whitespace", type_string, s);
     s = replace_all(lstring(" "), lstring(""), s);
     s = replace_all(lstring("\t"), lstring(""), s);
     s = replace_all(lstring("\n"), lstring(""), s);
@@ -165,7 +164,9 @@ obj * no_whitespace(obj * s) {
 }
 
 static obj * native_no_whitespace(obj * args) {
-    return no_whitespace(car(args));
+    CHECK_FN_ARITY_NS("str-no-whitespace", 1, 1, args);
+    CHECK_FN_ARG_NS("str-no-whitespace", 1, type_string, FAST_CAR(args));
+    return no_whitespace(FAST_CAR(args));
 }
 
 /**
@@ -178,8 +179,6 @@ static obj * native_no_whitespace(obj * args) {
  */
 obj * split(obj * delim, obj * s) {
     prepare_stack();
-    check_type("split", type_string, delim);
-    check_type("split", type_string, s);    
     obj * copy = cstring(s->string);
     obj * start = nil;
     obj * end = nil;
@@ -192,7 +191,10 @@ obj * split(obj * delim, obj * s) {
 }
 
 static obj * native_split(obj * args) {
-    return split(car(args), car(cdr(args)));
+    CHECK_FN_ARITY_NS("str-split", 2, 2, args);
+    CHECK_FN_ARG_NS("str-split", 1, type_string, FAST_CAR(args));
+    CHECK_FN_ARG_NS("str-split", 2, type_string, FAST_CAR(FAST_CDR(args)));
+    return split(FAST_CAR(args), FAST_CAR(FAST_CDR(args)));
 }
 
 /**
@@ -205,21 +207,24 @@ static obj * native_split(obj * args) {
  * @returns obj *        the substring
  */
 obj * substr(obj * start, obj * length, obj * s) {
-    prepare_stack();
-    check_type("substr", type_number, start);
-    check_type("substr", type_number, length);
-    check_type("substr", type_string, s);
     size_t max_len = s->length + 1 * sizeof(char);
     char * buffer = (char *) must_malloc(max_len);
     memset(buffer, 0, max_len);
-    length = nmin(length, number(max_len - 1));
-    strncpy(buffer, s->string + ((int) start->number), ((int) length->number));
-    obj * o = pstring(buffer);
-    return return_from_stack(o);
+    max_len = fmin(length->number, max_len - 1);
+    strncpy(buffer, s->string + ((int) start->number), max_len);
+    return pstring(buffer);
 }
 
 static obj * native_substr(obj * args) {
-    return substr(car(args), car(cdr(args)), car(cdr(cdr(args))));
+    CHECK_FN_ARITY_NS("str-sub", 3, 3, args);
+    CHECK_FN_ARG_NS("str-sub", 1, type_number, FAST_CAR(args));
+    CHECK_FN_ARG_NS("str-sub", 2, type_number, FAST_CAR(FAST_CDR(args)));
+    CHECK_FN_ARG_NS("str-rsub", 3, type_string, FAST_CAR(FAST_CDR(FAST_CDR(args))));
+    return substr(
+        FAST_CAR(args), 
+        FAST_CAR(FAST_CDR(args)), 
+        FAST_CAR(FAST_CDR(FAST_CDR(args)))
+    );
 }
 
 /**
@@ -232,68 +237,69 @@ static obj * native_substr(obj * args) {
  */
 obj * format(obj * fmt, obj * args) {
     prepare_stack();
-    check_type("format", type_string, fmt);
+    obj * ref = lstring("{}");
     while(args != nil) {
-        obj * ref = lstring("{}");
-        if (car(args) != nil && car(args)->type == type_string) {
-            fmt = replace(ref, car(args), fmt);
+        if (FAST_CAR(args) != nil && FAST_CAR(args)->type == type_string) {
+            fmt = replace(ref, FAST_CAR(args), fmt);
         } else {
-            fmt = replace(ref, print(car(args)), fmt);
+            fmt = replace(ref, print(FAST_CAR(args)), fmt);
         }
-        args = cdr(args);
+        args = FAST_CDR(args);
     }
     return return_from_stack(fmt);
 }
 
 obj * print_format(obj * fmt, obj * args) {
-    prepare_stack();
-    check_type("format", type_string, fmt);
+    prepare_stack();    
+    obj * ref = lstring("{}");
     while(args != nil) {
-        fmt = replace(lstring("{}"), print(car(args)), fmt);
-        args = cdr(args);
+        fmt = replace(ref, print(FAST_CAR(args)), fmt);
+        args = FAST_CDR(args);
     }
     return return_from_stack(fmt);
 }
 
 static obj * native_format(obj * args) {
-    return format(car(args), cdr(args));
+    CHECK_FN_ARITY("str-fmt", 1, INFINITY, args);
+    CHECK_FN_ARG("str-fmt", 1, type_string, FAST_CAR(args));
+    return format(FAST_CAR(args), FAST_CDR(args));
 }
 
 obj * str_to_num(obj * s) {
-    prepare_stack();
-    check_type("str-to-num", type_string, s);
     obj * n = read(s);
-    return_on_error(n);
-    check_type("str-to-num", type_number, n);
-    return return_from_stack(n);
+    RETURN_ON_ERROR(n);
+    CHECK_FN_ARG_NS("str-to-num", 1, type_number, n);
+    return n;
 }
 
 obj * native_str_to_num(obj * args) {
-    return str_to_num(car(args));
+    CHECK_FN_ARITY_NS("str-to-num", 1, 1, args);
+    CHECK_FN_ARG_NS("str-to-num", 1, type_string, FAST_CAR(args));
+    return str_to_num(FAST_CAR(args));
 }
 
 obj * num_to_ascii(obj * n) {
-    prepare_stack();
-    check_type("num-to-ascii", type_number, n);
     char * buffer = must_malloc(2);
     memset(buffer, 0, 2);
     buffer[0] = n->number;
-    return return_from_stack(pstring(buffer));
+    return pstring(buffer);
 }
 
 static obj * native_num_to_ascii(obj * args) {
-    return num_to_ascii(car(args));
+    CHECK_FN_ARITY_NS("num-to-ascii", 1, 1, args);
+    CHECK_FN_ARG_NS("num-to-ascii", 1, type_number, FAST_CAR(args));
+    return num_to_ascii(FAST_CAR(args));
 }
 
 obj * ascii_to_num(obj * s) {
-    prepare_stack();
-    check_type("ascii-to-num", type_string, s);
     char c = s->string[0];
-    return return_from_stack(number(c));
+    return number(c);
 }
 
 static obj * native_ascii_to_num(obj * args) {
-    return ascii_to_num(car(args));
+    CHECK_FN_ARITY_NS("ascii-to-num", 1, 1, args);
+    CHECK_FN_ARG_NS("ascii-to-num", 1, type_string, FAST_CAR(args));
+    return ascii_to_num(FAST_CAR(args));
 }
 
 void load_string(hash_map * env) {

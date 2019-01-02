@@ -20,7 +20,7 @@ void init_env() {
     // Load prelude
     prepare_stack();
     obj * o = ceval("(load \"prelude.cll\")");
-    exit_on_error("Error during prelude!\n%s", o);
+    EXIT_ON_ERROR("Error during prelude!\n%s", o);
     return_from_stack(nil);
 }
 
@@ -45,7 +45,7 @@ static obj * quasi_quote(obj * expr, obj * env) {
     obj * op   = FAST_CAR(expr);
     obj * args = FAST_CDR(expr);
     if (FAST_SYMBOL_EQ(op, "unquote") || FAST_SYMBOL_EQ(op, "unquote-splice")) {
-        check_arity("unquote", 1, args);
+        CHECK_FN_ARITY("unquote", 1, 1, args);
         return return_from_stack(eval(car(args), env));
     }
     obj * head = nil;
@@ -54,14 +54,14 @@ static obj * quasi_quote(obj * expr, obj * env) {
         obj * o = FAST_CAR(expr);
         if (o != nil && o->type == type_list && FAST_SYMBOL_EQ(car(o), "unquote-splice")) {
             o = quasi_quote(o, env);
-            return_on_error(o);
+            RETURN_ON_ERROR(o);
             while (o) {
                 FAST_REV_CONS(head, tail, FAST_CAR(o));
                 o = FAST_CDR(o);
             }
         } else {
             o = quasi_quote(o, env);
-            return_on_error(o);
+            RETURN_ON_ERROR(o);
             FAST_REV_CONS(head, tail, o);
         }
         expr = FAST_CDR(expr);
@@ -120,7 +120,7 @@ static obj * eval_list(obj * list, obj * env) {
         obj * o = nil;
         while(args) {
             o = eval(FAST_CAR(args), env);
-            return_on_error(o);
+            RETURN_ON_ERROR(o);
             args = FAST_CDR(args);
         }
         return return_from_stack(o);
@@ -139,14 +139,14 @@ static obj * eval_list(obj * list, obj * env) {
         while((c = eval(cond, env)) != nil) {
             if (c->type == type_error) { 
                 return_from_stack(c);
-                return_on_error(c);
+                RETURN_ON_ERROR(c);
             }
             obj * body = FAST_CDR(args);
             while(body) {
                 o = eval(FAST_CAR(body), env);
                 if (o != nil && o->type == type_error) {
                     return_from_stack(o);
-                    return_on_error(o);
+                    RETURN_ON_ERROR(o);
                 }
                 body = FAST_CDR(body);
             }
@@ -200,14 +200,14 @@ static obj * eval_list(obj * list, obj * env) {
         while(map != nil) {
             obj * k = FAST_CAR(map);
             obj * v = eval(FAST_CAR(FAST_CDR(map)), let_env);
-            return_on_error(v);
+            RETURN_ON_ERROR(v);
             let_env = naive_assoc(k, v, let_env);
             map = FAST_CDR(FAST_CDR(map));
         }
         obj * o = nil;
         while(args) {
             o = eval(FAST_CAR(args), let_env);
-            return_on_error(o);
+            RETURN_ON_ERROR(o);
             args = FAST_CDR(args);
         }
         return return_from_stack(o);
@@ -225,7 +225,7 @@ static obj * eval_list(obj * list, obj * env) {
         obj * err_map = error_to_map(o);
         obj * err_type = get(lkeyword("type"), err_map, nil);
         obj * handler = eval(car(args), env);
-        return_on_error(handler);
+        RETURN_ON_ERROR(handler);
         if (handler != nil && handler->type == type_map) {
             handler = get(err_type, handler, nil);
         }

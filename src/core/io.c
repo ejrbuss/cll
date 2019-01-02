@@ -13,9 +13,9 @@ obj * io_input(obj * prompt) {
 }
 
 obj * native_io_input(obj * args) {
-    CHECK_FN_ARITY("input", 0, 1, args);
+    CHECK_FN_ARITY_NS("input", 0, 1, args);
     if (car(args) != nil) {
-        CHECK_FN_ARG("input", 1, type_string, FAST_CAR(args));
+        CHECK_FN_ARG_NS("input", 1, type_string, FAST_CAR(args));
     }
     return io_input(car(args));
 }
@@ -76,8 +76,8 @@ obj * io_read(obj * path) {
 }
 
 obj * native_io_read(obj * args) {
-    CHECK_FN_ARITY("io-read", 1, 1, args);
-    CHECK_FN_ARG("io-read", 1, type_string, FAST_CAR(args));
+    CHECK_FN_ARITY_NS("io-read", 1, 1, args);
+    CHECK_FN_ARG_NS("io-read", 1, type_string, FAST_CAR(args));
     return io_read(FAST_CAR(args));
 }
 
@@ -118,8 +118,8 @@ obj * io_write(obj * method, obj * path, obj * data) {
 }
 
 obj * native_io_write(obj * args) {
-    CHECK_FN_ARITY("io-write", 3, 3, args);
-    CHECK_FN_ARG("io-write", 1, type_string, FAST_CAR(args));
+    CHECK_FN_ARITY_NS("io-write", 3, 3, args);
+    CHECK_FN_ARG_NS("io-write", 1, type_string, FAST_CAR(args));
     return io_write(
         FAST_CAR(FAST_CDR(args)), 
         FAST_CAR(args), 
@@ -128,12 +128,12 @@ obj * native_io_write(obj * args) {
 }
 
 obj * native_time(obj * args) {
-    CHECK_FN_ARITY("time", 0, 0, args);
+    CHECK_FN_ARITY_NS("time", 0, 0, args);
     return number(time(nil));
 }
 
 obj * native_exit(obj * args) {
-    CHECK_FN_ARITY("exit", 0, 1, args);
+    CHECK_FN_ARITY_NS("exit", 0, 1, args);
     if (car(args) != nil) {
         CHECK_FN_ARG("exit", 1, type_number, FAST_CAR(args));
         exit((int) FAST_CAR(args)->number);

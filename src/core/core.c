@@ -49,13 +49,13 @@ static obj * native_load(obj * args) {
     CHECK_FN_ARITY("load", 1, 2, args);
     CHECK_FN_ARG("load", 1, type_string, FAST_CAR(args));
     obj * source = io_read(FAST_CAR(args));
-    return_on_error(source);
+    RETURN_ON_ERROR(source);
     obj * forms = read_all(source);
-    return_on_error(forms);
+    RETURN_ON_ERROR(forms);
     obj * o = nil;
     while(forms != nil) {
         o = eval(car(forms), car(FAST_CDR(args)));
-        return_on_error(o);
+        RETURN_ON_ERROR(o);
         forms = cdr(forms);
     }
     return return_from_stack(o);
@@ -70,11 +70,11 @@ static obj * native_str_eval(obj * args) {
     }
     obj * source = FAST_CAR(args);
     obj * forms = read_all(source);
-    return_on_error(forms);
+    RETURN_ON_ERROR(forms);
     obj * o = nil;
     while(forms != nil) {
         o = eval(car(forms), car(FAST_CDR(args)));
-        return_on_error(o);
+        RETURN_ON_ERROR(o);
         forms = cdr(forms);
     }
     return return_from_stack(o);

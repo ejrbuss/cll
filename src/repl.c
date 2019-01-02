@@ -80,7 +80,7 @@ void parse_args(int argc, char ** argv) {
     args = cons(lsymbol("list"), args);
     obj * args_def = format(lstring("(def io-args {})"), cons(args, nil));
     obj * o = eval(read(args_def), nil);
-    exit_on_error("Error during command line argument parsing!\n%s", o);
+    EXIT_ON_ERROR("Error during command line argument parsing!\n%s", o);
     return_from_stack(nil);
 
     // Further arguments mean we run a file
@@ -89,7 +89,7 @@ void parse_args(int argc, char ** argv) {
         obj * load_program = print_format(lstring("(load {})"), cons(cstring(program), nil));
         o = eval(read(load_program), nil);
         if (!interactive) {
-            exit_on_error("%s", o);
+            EXIT_ON_ERROR("%s", o);
             exit(EXIT_SUCCESS);
         }
         puts(print(o)->string);

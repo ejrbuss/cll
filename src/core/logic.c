@@ -14,7 +14,8 @@ obj * not(obj * o) {
 }
 
 static obj * native_not(obj * args) {
-    return not(car(args));
+    CHECK_FN_ARITY_NS("not", 1, 1, args);
+    return not(FAST_CAR(args));
 }
 
 /**
@@ -36,8 +37,8 @@ static obj * native_and(obj * args) {
     prepare_stack();
     obj * cond = lkeyword("true");
     while (args != nil && cond) {
-        cond = and(cond, car(args));
-        args = cdr(args);
+        cond = and(cond, FAST_CAR(args));
+        args = FAST_CDR(args);
     }
     return return_from_stack(cond);
 }
@@ -52,8 +53,8 @@ static obj * native_or(obj * args) {
     prepare_stack();
     obj * cond = nil;
     while(args != nil && not(cond)) {
-        cond = or(cond, car(args));
-        args = cdr(args);
+        cond = or(cond, FAST_CAR(args));
+        args = FAST_CDR(args);
     }
     return return_from_stack(cond);
 }
@@ -76,9 +77,6 @@ obj * equal(obj * first, obj * second) {
         return nil;
     }
     switch (first->type) {
-        case type_reference:
-            return equal(first->ref, second->ref);
-        case type_error:
         case type_symbol:
         case type_keyword:
         case type_string:
@@ -118,6 +116,8 @@ obj * equal(obj * first, obj * second) {
                 snd_keys = FAST_CDR(snd_keys);
             }
             return return_from_stack(lkeyword("true"));
+        case type_reference:        
+        case type_error:
         case type_macro:
         case type_function:
         case type_native_function:
@@ -132,8 +132,8 @@ static obj * native_equal(obj * args) {
     obj * cond = lkeyword("true");
     args = cdr(args);
     while (args != nil) {
-        cond = equal(first, car(args));
-        args = cdr(args);
+        cond = equal(first, FAST_CAR(args));
+        args = FAST_CDR(args);
     }
     return return_from_stack(cond);
 }

@@ -1,6 +1,7 @@
 #include "references.h"
 
 static obj * native_ref(obj * args) {
+    CHECK_FN_ARITY_NS("ref", 0, 1, args);
     return reference(car(args));
 }
 
@@ -12,35 +13,20 @@ static obj * native_ref(obj * args) {
  * @returns nil       if success
  */
 obj * set(obj * ref, obj * val) {
-    prepare_stack();
-    check_type("set!", type_reference, ref);
     ref->ref = val;
-    return return_from_stack(nil);
+    return nil;
 }
 
 static obj * native_set(obj * args) {
-    prepare_stack();
-    if (car(args) != nil && car(args)->type == type_keyword) {
-        obj * o = get(car(args), car(cdr(args)), nil);
-        return return_from_stack(set(o, car(cdr(cdr(args)))));
-    }
-    return return_from_stack(set(car(args), car(cdr(args))));
-}
-
-/**
- * Safely dereferences a reference.
- * 
- * @param   obj * ref the reference
- * @returns obj *     the value
- */
-obj * deref(obj * ref) {
-    prepare_stack();
-    check_type("deref", type_reference, ref);
-    return return_from_stack(ref->ref);
+    CHECK_FN_ARITY_NS("set!", 2, 2, args);
+    CHECK_FN_ARG_NS("set!", 1, type_reference, FAST_CAR(args));
+    return set(FAST_CAR(args), FAST_CAR(FAST_CDR(args)));
 }
 
 static obj * native_deref(obj * args) {
-    return deref(car(args));
+    CHECK_FN_ARITY_NS("deref", 1, 1, args);
+    CHECK_FN_ARG_NS("deref", 1, type_reference, FAST_CAR(args));
+    return FAST_CAR(args)->ref;
 }
 
 void load_references(hash_map * env) {

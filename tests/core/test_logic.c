@@ -39,7 +39,7 @@ void test_equal() {
     assert(not(equal(ceval(":y"), ceval(":Y"))));
     assert(equal(ceval("\"hello\""), ceval("\"hello\"")));
     assert(not(equal(ceval("\"test\""), ceval("\"tests\""))));
-    assert(equal(ceval("(ref nil)"), ceval("(ref nil)")));
+    assert(not(equal(ceval("(ref nil)"), ceval("(ref nil)"))));
     assert(not(equal(ceval("(ref \"test\")"), ceval("(ref :test)"))));
     assert(equal(ceval("+"), ceval("+")));
     assert(not(equal(ceval("(fn [x] x)"), ceval("(fn [x] x)"))));

@@ -30,7 +30,7 @@ obj * car(obj * list) {
 }
 
 static obj * native_car(obj * args) {
-    CHECK_FN_ARITY("car", 1, 1, args);
+    CHECK_FN_ARITY_NS("car", 1, 1, args);
     return car(FAST_CAR(args));
 }
 
@@ -60,17 +60,22 @@ obj * cdr(obj * list) {
             }
             return return_from_stack(o);
         default:
-            return apply_error(lstring("cdr"), type_list, list);
+            return THROW_FN_ARG("cdr", 1, "an iterable", list);
 
     }
 }
 
 static obj * native_cdr(obj * args) {
-    return cdr(car(args));
+    CHECK_FN_ARITY_NS("cdr", 1, 1, args);
+    return cdr(FAST_CAR(args));
 }
 
 static obj * native_cons(obj * args) {
-    return cons(car(args), car(cdr(args)));
+    CHECK_FN_ARITY_NS("cons", 1, 2, args);
+    if (car(FAST_CDR(args)) != nil) {
+        CHECK_FN_ARG_NS("cons", 2, type_list, FAST_CAR(FAST_CDR(args)));
+    }
+    return cons(FAST_CAR(args), car(FAST_CDR(args)));
 }
 
 /**
@@ -88,7 +93,7 @@ obj * reverse(obj * list) {
         case type_map:
             break;
         default:
-            return apply_error(lstring("reverse"), type_list, list);
+            return THROW_FN_ARG("reverse", 1, "an iterable", list);
     }
     prepare_stack();
     obj * reversed = nil;
@@ -100,7 +105,8 @@ obj * reverse(obj * list) {
 }
 
 static obj * native_reverse(obj * args) {
-    return reverse(car(args));
+    CHECK_FN_ARITY_NS("reverse", 1, 1, args);
+    return reverse(FAST_CAR(args));
 }
 
 /**
@@ -120,26 +126,25 @@ obj * in(obj * item, obj * list) {
         case type_list:
         case type_map:
             while (list != nil) {
-                if (equal(item, car(list))) {
+                if (equal(item, FAST_CAR(list))) {
                     return return_from_stack(lkeyword("true"));
                 }
-                list = cdr(list);
+                list = FAST_CDR(list);
             }
             return return_from_stack(nil);
         case type_string:
-            if (item == nil || item->type != type_string) {
-                return return_from_stack(apply_error(lstring("in"), type_string, item));
-            }
+            CHECK_FN_ARG("in", 2, type_string, item);
             obj * rep = replace(item, cat(item, lstring("$")), list);
             return return_from_stack(not(equal(list, rep)));
         default:
-            return return_from_stack(apply_error(lstring("in"), type_list, list));            
+            return return_from_stack(THROW_FN_ARG("in", 1, "an iterable", list));
     }
     
 }
 
 static obj * native_in(obj * args) {
-    return in(car(args), car(cdr(args)));
+    CHECK_FN_ARITY_NS("in", 2, 2, args);
+    return in(FAST_CAR(args), FAST_CAR(FAST_CDR(args)));
 }
 
 /**
@@ -149,37 +154,26 @@ static obj * native_in(obj * args) {
  * @returns obj *      the number of items in the list
  */
 obj * count(obj * list) {
-    prepare_stack();
-    int count = 0;
     switch(list->type) {
         case type_list:
         case type_map:
             break;
         case type_string:
-            return return_from_stack(number(list->length));
+            return number(list->length);
         default:
-            return return_from_stack(apply_error(lstring("count"), type_list, list));
+            return THROW_FN_ARG("count", 1, "an iterable", list);
     }
+    int count = 0;
     while (list != nil) {
         count++;
-        list = cdr(list);
+        list = FAST_CDR(list);
     }
-    return return_from_stack(number(count));
+    return number(count);
 }
 
 static obj * native_count(obj * args) {
-    return count(car(args));
-}
-
-obj * set_car(obj * list, obj * val) {
-    prepare_stack();
-    check_type("set-car!", type_list, list);
-    list->car = val;
-    return return_from_stack(val);
-}
-
-static obj * native_set_car(obj * args) {
-    return set_car(car(args), car(cdr(args)));
+    CHECK_FN_ARITY_NS("count", 1, 1, args);
+    return count(FAST_CAR(args));
 }
 
 /**
@@ -193,5 +187,4 @@ void load_list(hash_map * env) {
     hash_map_assoc(env, "in", native(&native_in));
     hash_map_assoc(env, "count", native(&native_count));
     hash_map_assoc(env, "reverse", native(&native_reverse));
-    hash_map_assoc(env, "set-car!", native(&native_set_car));
 }

@@ -68,7 +68,6 @@ static obj * parse(char ** stream);
  */
 obj * read(obj * source) {
     prepare_stack();
-    check_type("read", type_string, source);
     char * stream = source->string;
     obj * o = parse(&stream);
     if (DEBUG_PARSE) {
@@ -106,7 +105,7 @@ obj * read_all(obj * source) {
             free(form_buffer);
         }
         // Immediately return errors
-        return_on_error(o);
+        RETURN_ON_ERROR(o);
         FAST_REV_CONS(forms_start, forms_end, o);
     }
     return return_from_stack(forms_start);

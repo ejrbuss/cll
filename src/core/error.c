@@ -56,55 +56,6 @@ obj * init_fn_error(obj * name, obj * n, obj * expected, obj * arg) {
     ));
 }
 
-obj * apply_error(obj * name, type t, obj * o) {
-    static char * type_names[] = {
-        "reference",
-        "error",
-        "symbol",
-        "keyword",
-        "string",
-        "number",
-        "list",
-        "map",
-        "map",
-        "macro",
-        "function",
-        "function",
-    };
-    prepare_stack();
-    return return_from_stack(error_format(
-        lkeyword("Type-Error"),
-        lstring("`{}` expected {} but found {}!"), 
-        cons(name, cons(lstring(type_names[t]), cons(type_of(o), nil)))
-    ));
-}
-
-obj * arity_error(obj * func, obj * arity, obj * nargs) {
-    prepare_stack();
-    return return_from_stack(error_format(
-        lkeyword("Arity-Error"),
-        lstring("`{}` expected {} arguments but recieved {}!"), 
-        cons(func, cons(arity, cons(nargs, nil)))
-    ));
-}
-
-obj * arity_error_gt(obj * func, obj * arity, obj * nargs) {
-    prepare_stack();
-    return return_from_stack(error_format(
-        lkeyword("Arity-Error"),
-        lstring("`{}` expected no more than {} arguments but recieved {}!"), 
-        cons(func, cons(arity, cons(nargs, nil)))
-    ));
-}
-
-obj * arity_error_lt(obj * func, obj * arity, obj * nargs) {
-    prepare_stack();
-    return return_from_stack(error_format(
-        lkeyword("Arity-Error"),
-        lstring("`{}` expected no less than {} arguments but recieved {}!"), 
-        cons(func, cons(arity, cons(nargs, nil)))
-    ));
-}
 
 obj * error_format(obj * type, obj * fmt, obj * args) {
     prepare_stack();
