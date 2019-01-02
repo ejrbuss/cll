@@ -29,6 +29,17 @@ to (unoptimized)
 cll>(time-it (fib 20))
 1
 ```
+to (unoptimiized)
+```
+cll>(time-it (fib 24))
+1
+```
+and (optimized)
+```
+cll>(time-it (fib 31))
+15
+```
+
 
 ## Broken
 

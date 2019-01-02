@@ -1,5 +1,14 @@
 #include "fast.h"
 
+extern int FAST_COUNT(obj * list) {
+    int count = 0;
+    while(list != nil) {
+        list = FAST_CDR(list);
+        count++;
+    }
+    return count;
+}
+
 extern int FAST_STR_EQ(obj * s1, obj * s2) {
     // Check if they are both pointing to the same string
     if (s1->resource == s2->resource) {

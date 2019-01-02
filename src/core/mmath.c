@@ -4,7 +4,7 @@ static obj * native_add(obj * args) {
     prepare_stack();
     double sum = 0;
     while(args != nil) {
-        check_type(lstring("+"), type_number, car(args));
+        check_type("+", type_number, car(args));
         sum += car(args)->number;
         args = cdr(args);
     }
@@ -13,11 +13,11 @@ static obj * native_add(obj * args) {
 
 static obj * native_sub(obj * args) {
     prepare_stack();
-    check_type(lstring("-"), type_number, car(args));
+    check_type("-", type_number, car(args));
     double diff = car(args)->number;
     args = cdr(args);
     while(args != nil) {
-        check_type(lstring("-"), type_number, car(args));
+        check_type("-", type_number, car(args));
         diff -= car(args)->number;
         args = cdr(args);
     }
@@ -28,7 +28,7 @@ static obj * native_mul(obj * args) {
     prepare_stack();
     double prod = 1;
     while(args != nil) {
-        check_type(lstring("*"), type_number, car(args));
+        check_type("*", type_number, car(args));
         prod *= car(args)->number;
         args = cdr(args);
     }
@@ -37,11 +37,11 @@ static obj * native_mul(obj * args) {
 
 static obj * native_div(obj * args) {
     prepare_stack();
-    check_type(lstring("/"), type_number, car(args));
+    check_type("/", type_number, car(args));
     double dividend = car(args)->number;
     args = cdr(args);
     while(args != nil) {
-        check_type(lstring("-"), type_number, car(args));
+        check_type("-", type_number, car(args));
         dividend /= car(args)->number;
         args = cdr(args);
     }
@@ -50,8 +50,8 @@ static obj * native_div(obj * args) {
 
 static obj * native_mod(obj * args) {
     prepare_stack();
-    check_type(lstring("mod"), type_number, car(args));
-    check_type(lstring("mod"), type_number, car(cdr(args)));
+    check_type("mod", type_number, car(args));
+    check_type("mod", type_number, car(cdr(args)));
     int a = (int) car(args)->number;
     int b = (int) car(cdr(args))->number;
     return return_from_stack(number(a % b));
@@ -59,8 +59,8 @@ static obj * native_mod(obj * args) {
 
 obj * nmax(obj * n, obj * m) {
     prepare_stack();
-    check_type(lstring("max"), type_number, n);
-    check_type(lstring("max"), type_number, m);
+    check_type("max", type_number, n);
+    check_type("max", type_number, m);
     if (n->number > m->number) {
         return return_from_stack(n);
     } else {
@@ -73,7 +73,7 @@ static obj * native_max(obj * args) {
     obj * n = number(-INFINITY);
     while(args != nil) {
         n = nmax(n, car(args));
-        check_type(lstring("max"), type_number, n);
+        check_type("max", type_number, n);
         args = cdr(args);
     }
     return return_from_stack(n);
@@ -81,8 +81,8 @@ static obj * native_max(obj * args) {
 
 obj * nmin(obj * n, obj * m) {
     prepare_stack();
-    check_type(lstring("min"), type_number, n);
-    check_type(lstring("min"), type_number, m);
+    check_type("min", type_number, n);
+    check_type("min", type_number, m);
     if (n->number < m->number) {
         return return_from_stack(n);
     } else {
@@ -95,7 +95,7 @@ static obj * native_min(obj * args) {
     obj * n = number(INFINITY);
     while(args != nil) {
         n = nmin(n, car(args));
-        check_type(lstring("min"), type_number, n);
+        check_type("min", type_number, n);
         args = cdr(args);
     }
     return return_from_stack(n);
@@ -103,8 +103,8 @@ static obj * native_min(obj * args) {
 
 obj * lt(obj * n, obj * m) {
     prepare_stack();
-    check_type(lstring("<"), type_number, n);
-    check_type(lstring("<"), type_number, m);
+    check_type("<", type_number, n);
+    check_type("<", type_number, m);
     if (n->number < m->number) {
         return return_from_stack(lkeyword("true"));
     } else {
@@ -134,8 +134,8 @@ static obj * native_lt(obj * args) {
 
 obj * lte(obj * n, obj * m) {
     prepare_stack();
-    check_type(lstring("<"), type_number, n);
-    check_type(lstring("<"), type_number, m);
+    check_type("<", type_number, n);
+    check_type("<", type_number, m);
     if (n->number <= m->number) {
         return return_from_stack(lkeyword("true"));
     } else {
@@ -165,8 +165,8 @@ static obj * native_lte(obj * args) {
 
 obj * gt(obj * n, obj * m) {
     prepare_stack();
-    check_type(lstring("<"), type_number, n);
-    check_type(lstring("<"), type_number, m);
+    check_type("<", type_number, n);
+    check_type("<", type_number, m);
     if (n->number > m->number) {
         return return_from_stack(lkeyword("true"));
     } else {
@@ -196,8 +196,8 @@ static obj * native_gt(obj * args) {
 
 obj * gte(obj * n, obj * m) {
     prepare_stack();
-    check_type(lstring("<"), type_number, n);
-    check_type(lstring("<"), type_number, m);
+    check_type("<", type_number, n);
+    check_type("<", type_number, m);
     if (n->number >= m->number) {
         return return_from_stack(lkeyword("true"));
     } else {
@@ -227,14 +227,14 @@ static obj * native_gte(obj * args) {
 
 static obj * native_abs(obj * args) {
     prepare_stack();
-    check_type(lstring("abs"), type_number, car(args));
+    check_type("abs", type_number, car(args));
     return return_from_stack(number(fabs(car(args)->number)));
 }
 
 static obj * native_pow(obj * args) {
     prepare_stack();
-    check_type(lstring("pow"), type_number, car(args));
-    check_type(lstring("pow"), type_number, car(cdr(args)));
+    check_type("pow", type_number, car(args));
+    check_type("pow", type_number, car(cdr(args)));
     return return_from_stack(number(pow(
         car(args)->number, 
         car(cdr(args))->number
@@ -243,55 +243,55 @@ static obj * native_pow(obj * args) {
 
 static obj * native_sin(obj * args) {
     prepare_stack();
-    check_type(lstring("sin"), type_number, car(args));
+    check_type("sin", type_number, car(args));
     return return_from_stack(number(sin(car(args)->number)));
 }
 
 static obj * native_cos(obj * args) {
     prepare_stack();
-    check_type(lstring("cos"), type_number, car(args));
+    check_type("cos", type_number, car(args));
     return return_from_stack(number(cos(car(args)->number)));
 }
 
 static obj * native_tan(obj * args) {
     prepare_stack();
-    check_type(lstring("tan"), type_number, car(args));
+    check_type("tan", type_number, car(args));
     return return_from_stack(number(tan(car(args)->number)));
 }
 
 static obj * native_asin(obj * args) {
     prepare_stack();
-    check_type(lstring("asin"), type_number, car(args));
+    check_type("asin", type_number, car(args));
     return return_from_stack(number(asin(car(args)->number)));
 }
 
 static obj * native_acos(obj * args) {
     prepare_stack();
-    check_type(lstring("acos"), type_number, car(args));
+    check_type("acos", type_number, car(args));
     return return_from_stack(number(acos(car(args)->number)));
 }
 
 static obj * native_atan(obj * args) {
     prepare_stack();
-    check_type(lstring("atan"), type_number, car(args));
+    check_type("atan", type_number, car(args));
     return return_from_stack(number(atan(car(args)->number)));
 }
 
 static obj * native_ceil(obj * args) {
     prepare_stack();
-    check_type(lstring("ceil"), type_number, car(args));
+    check_type("ceil", type_number, car(args));
     return return_from_stack(number(ceil(car(args)->number)));
 }
 
 static obj * native_floor(obj * args) {
     prepare_stack();
-    check_type(lstring("floor"), type_number, car(args));
+    check_type("floor", type_number, car(args));
     return return_from_stack(number(floor(car(args)->number)));
 }
 
 static obj * native_round(obj * args) {
     prepare_stack();
-    check_type(lstring("round"), type_number, car(args));
+    check_type("round", type_number, car(args));
     return return_from_stack(number(round(car(args)->number)));
 }
 

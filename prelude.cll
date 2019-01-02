@@ -18,7 +18,7 @@
 
 (defmacro for [e iter & body]
   ~'(reverse (reduce (fn [__for_0 ~e] 
-    (cons (do 
+    (cons (do
       ~~body) __for_0)) nil ~iter)))
 
 (defmacro time-it [& body]

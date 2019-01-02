@@ -23,15 +23,15 @@ obj * car(obj * list) {
         case type_function:
             return list->car;
         case type_string:
-            prepare_stack();
-            return return_from_stack(substr(number(0), number(1), list));
+            return substr(number(0), number(1), list);
         default:
-            return apply_error(lstring("car"), list);
+            return THROW_FN_ARG("car", 1, "an iterable", list);
     }
 }
 
 static obj * native_car(obj * args) {
-    return car(car(args));
+    CHECK_FN_ARITY("car", 1, 1, args);
+    return car(FAST_CAR(args));
 }
 
 /**
@@ -60,7 +60,7 @@ obj * cdr(obj * list) {
             }
             return return_from_stack(o);
         default:
-            return apply_error(lstring("cdr"), list);
+            return apply_error(lstring("cdr"), type_list, list);
 
     }
 }
@@ -88,7 +88,7 @@ obj * reverse(obj * list) {
         case type_map:
             break;
         default:
-            return apply_error(lstring("reverse"), list);
+            return apply_error(lstring("reverse"), type_list, list);
     }
     prepare_stack();
     obj * reversed = nil;
@@ -128,12 +128,12 @@ obj * in(obj * item, obj * list) {
             return return_from_stack(nil);
         case type_string:
             if (item == nil || item->type != type_string) {
-                return return_from_stack(apply_error(lstring("in"), item));
+                return return_from_stack(apply_error(lstring("in"), type_string, item));
             }
             obj * rep = replace(item, cat(item, lstring("$")), list);
             return return_from_stack(not(equal(list, rep)));
         default:
-            return return_from_stack(apply_error(lstring("in"), list));            
+            return return_from_stack(apply_error(lstring("in"), type_list, list));            
     }
     
 }
@@ -158,7 +158,7 @@ obj * count(obj * list) {
         case type_string:
             return return_from_stack(number(list->length));
         default:
-            return return_from_stack(apply_error(lstring("count"), list));
+            return return_from_stack(apply_error(lstring("count"), type_list, list));
     }
     while (list != nil) {
         count++;
@@ -173,7 +173,7 @@ static obj * native_count(obj * args) {
 
 obj * set_car(obj * list, obj * val) {
     prepare_stack();
-    check_type(lstring("set-car!"), type_list, list);
+    check_type("set-car!", type_list, list);
     list->car = val;
     return return_from_stack(val);
 }

@@ -12,7 +12,7 @@
  */
 obj * call(obj * fn, obj * args) {
     if (fn == nil) {
-        return apply_error(lstring("call"), fn);
+        return THROW_FN_ARG("call", 1, "a function", fn);
     }
     switch (fn->type) {            
         case type_keyword:
@@ -25,28 +25,31 @@ obj * call(obj * fn, obj * args) {
         case type_macro:
             break;
         default:
-            prepare_stack();
-            return return_from_stack(apply_error(lstring("call"), fn));
+            return THROW_FN_ARG("call", 1, "a function", fn);
     }
     prepare_stack();
-    obj * fn_env  = car(fn);
-    obj * fn_args = car(cdr(fn));
-    obj * fn_body = car(cdr(cdr(fn)));
+    obj * fn_env  = FAST_CAR(fn);
+    obj * fn_args = FAST_CAR(FAST_CDR(fn));
+    obj * fn_body = FAST_CAR(FAST_CDR(FAST_CDR(fn)));
     while (fn_args != nil) {
         // Handle varargs
-        if (FAST_SYMBOL_EQ(car(fn_args), "&")) {
-            fn_env = naive_assoc(car(cdr(fn_args)), args, fn_env);
+        if (FAST_SYMBOL_EQ(FAST_CAR(fn_args), "&")) {
+            fn_env = naive_assoc(car(FAST_CDR(fn_args)), args, fn_env);
             break;
         }
-        fn_env  = naive_assoc(car(fn_args), car(args), fn_env);
-        fn_args = cdr(fn_args);
+        fn_env  = naive_assoc(FAST_CAR(fn_args), car(args), fn_env);
+        fn_args = FAST_CDR(fn_args);
         args    = cdr(args);
     }
     return return_from_stack(eval(fn_body, fn_env));
 }
 
 static obj * native_call(obj * args) {
-    return call(car(args), car(cdr(args)));
+    CHECK_FN_ARITY_NS("call", 1, 2, args);
+    if (car(FAST_CDR(args)) != nil) {
+        CHECK_FN_ARG("call", 2, type_list, FAST_CAR(FAST_CDR(args)));
+    }
+    return call(FAST_CAR(args), car(FAST_CDR(args)));
 }
 
 void load_function(hash_map * env) {

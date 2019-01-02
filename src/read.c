@@ -68,7 +68,7 @@ static obj * parse(char ** stream);
  */
 obj * read(obj * source) {
     prepare_stack();
-    check_type(lstring("read"), type_string, source);
+    check_type("read", type_string, source);
     char * stream = source->string;
     obj * o = parse(&stream);
     if (DEBUG_PARSE) {

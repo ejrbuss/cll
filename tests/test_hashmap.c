@@ -7,7 +7,7 @@ void test_init_and_free_hash_map() {
     free_hash_map(h);
 }
 
-void test_hash_map_get_and_assoc() {
+void test_hash_map_get() {
     hash_map * h = init_hash_map();
     hash_map_assoc(h, "alpha", (void *) 0);
     hash_map_assoc(h, "beta", (void *) 1);
@@ -17,6 +17,15 @@ void test_hash_map_get_and_assoc() {
     assert(hash_map_get(h, "gamma") == (void *) 2);
     assert(hash_map_get(h, "cappa") == NOT_FOUND);
     assert(hash_map_get(h, "omega") == NOT_FOUND);
+    free_hash_map(h);
+}
+
+void test_hash_map_assoc() {
+    hash_map * h = init_hash_map();
+    hash_map_assoc(h, "alpha", (void *) 0);
+    assert(hash_map_get(h, "alpha") == (void *) 0);
+    hash_map_assoc(h, "alpha", (void *) 1);
+    assert(hash_map_get(h, "alpha") == (void *) 1);
     free_hash_map(h);
 }
 
@@ -40,7 +49,8 @@ void test_hash_map_resize() {
 int main() {
     test tests[] = {
         { "test_init_and_free_hash_map", test_init_and_free_hash_map },
-        { "test_hash_map_get_and_assoc", test_hash_map_get_and_assoc },
+        { "test_hash_map_get", test_hash_map_get },
+        { "test_hash_map_assoc", test_hash_map_assoc },
         { "test_hash_map_resize", test_hash_map_resize },
         { 0 },
     };

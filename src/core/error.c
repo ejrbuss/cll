@@ -1,11 +1,108 @@
 #include "error.h"
 
-obj * apply_error(obj * func, obj * o) {
+obj * init_arity_error(obj * name, obj * min, obj * max, obj * act) {
+    prepare_stack();
+    if (min->number == 1 && max->number == 1) {
+        return return_from_stack(error_format(
+            lkeyword("Arity-Error"),
+            lstring("`{}` expected {} argument, received {}!"),
+            cons(name, cons(min, cons(act, nil)))
+        ));
+    }
+    if (min->number == max->number) {
+        return return_from_stack(error_format(
+            lkeyword("Arity-Error"),
+            lstring("`{}` expected {} arguments, received {}!"),
+            cons(name, cons(min, cons(act, nil)))
+        ));
+    } else {
+        return return_from_stack(error_format(
+            lkeyword("Arity-Error"),
+            lstring("`{}` expected between {} and {} arguments, received {}!"),
+            cons(name, cons(min, cons(max, cons(act, nil))))
+        ));
+    }
+}
+
+obj * init_type_error(obj * name, obj * n, type t, obj * arg) {
+    static char * type_names[] = {
+        "reference",
+        "error",
+        "symbol",
+        "keyword",
+        "string",
+        "number",
+        "list",
+        "map",
+        "map",
+        "macro",
+        "function",
+        "function",
+    };
     prepare_stack();
     return return_from_stack(error_format(
         lkeyword("Type-Error"),
-        lstring("Cannot apply `{}` to `{}`!"), 
-        cons(o, cons(csymbol(func->resource), nil))
+        lstring("`{}`, for argument {}, expected {}, received {}!"),
+        cons(name, cons(n, cons(lkeyword(type_names[t]), cons(type_of(arg), nil))))
+    ));
+}
+
+obj * init_fn_error(obj * name, obj * n, obj * expected, obj * arg) {
+    prepare_stack();
+    return return_from_stack(error_format(
+        lkeyword("Parameter-Error"),
+        lstring("`{}`, for argument {}, expected {}, received {}!"),
+        cons(name, cons(n, cons(expected, cons(arg, nil))))
+    ));
+}
+
+obj * apply_error(obj * name, type t, obj * o) {
+    static char * type_names[] = {
+        "reference",
+        "error",
+        "symbol",
+        "keyword",
+        "string",
+        "number",
+        "list",
+        "map",
+        "map",
+        "macro",
+        "function",
+        "function",
+    };
+    prepare_stack();
+    return return_from_stack(error_format(
+        lkeyword("Type-Error"),
+        lstring("`{}` expected {} but found {}!"), 
+        cons(name, cons(lstring(type_names[t]), cons(type_of(o), nil)))
+    ));
+}
+
+obj * arity_error(obj * func, obj * arity, obj * nargs) {
+    prepare_stack();
+    return return_from_stack(error_format(
+        lkeyword("Arity-Error"),
+        lstring("`{}` expected {} arguments but recieved {}!"), 
+        cons(func, cons(arity, cons(nargs, nil)))
+    ));
+}
+
+obj * arity_error_gt(obj * func, obj * arity, obj * nargs) {
+    prepare_stack();
+    return return_from_stack(error_format(
+        lkeyword("Arity-Error"),
+        lstring("`{}` expected no more than {} arguments but recieved {}!"), 
+        cons(func, cons(arity, cons(nargs, nil)))
+    ));
+}
+
+obj * arity_error_lt(obj * func, obj * arity, obj * nargs) {
+    prepare_stack();
+    return return_from_stack(error_format(
+        lkeyword("Arity-Error"),
+        lstring("`{}` expected no less than {} arguments but recieved {}!"), 
+        cons(func, cons(arity, cons(nargs, nil)))
     ));
 }
 

@@ -24,6 +24,8 @@ extern int DEBUG_PARSE;
 extern int DEBUG_MACROEXP;
 extern int DEBUG_GC;
 
+#define SAFE_MACRO(expr) do { expr } while(0)
+
 /**
  * `nil` in Little Lisp is equivalent to C `NULL`.
  */
@@ -33,7 +35,7 @@ extern int DEBUG_GC;
  * A formatted print function that prints to standard error and then exits the
  * program.
  */
-#define panic(...) do { \
+#define panic(...) SAFE_MACRO({ \
     b(); \
     fflush(stdout); \
     fflush(stderr); \
@@ -47,7 +49,7 @@ extern int DEBUG_GC;
     ); \
     fflush(stderr); \
     exit(1); \
-} while(0)
+})
 
 #if defined(DEBUG) || defined(DEBUG_BUILD)
 
@@ -56,11 +58,11 @@ extern int DEBUG_GC;
  * assert is not used because it does not crash well on windows and sometimes
  * the output is not visible (even in the debugger).
  */
-#define assert(cond) do { \
+#define assert(cond) SAFE_MACRO({ \
     if (!(cond)) { \
         panic("Assert failed: %s", (#cond)); \
     } \
-} while(0)
+})
 
 #else
 

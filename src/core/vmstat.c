@@ -1,4 +1,5 @@
 #include "vmstat.h"
+#include "eval.h"
 
 obj * vm_stat() {
     prepare_stack();
@@ -12,6 +13,9 @@ obj * vm_stat() {
     result = naive_assoc(lkeyword("allocated-bytes"), number(allocated * bytes), result);
     result = naive_assoc(lkeyword("available-bytes"), number(available * bytes), result);
     result = naive_assoc(lkeyword("total-bytes"), number((available + allocated) * bytes), result);
+    result = naive_assoc(lkeyword("env-items"), number(g_env->size - g_env->available), result);
+    result = naive_assoc(lkeyword("env-size"), number(g_env->size), result);
+    
     return return_from_stack(result);
 }
 

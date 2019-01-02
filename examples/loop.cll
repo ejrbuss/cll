@@ -1,0 +1,7 @@
+(defn loop [n]
+  (let { i (ref 0) }
+    (while (< @i n)
+      (set! i (++ @i)))
+  @i))
+
+(println (loop 1e6))

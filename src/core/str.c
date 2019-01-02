@@ -9,8 +9,8 @@
  */
 obj * cat(obj * first, obj * second) {
     prepare_stack();
-    check_type(lstring("str"), type_string, first);
-    check_type(lstring("str"), type_string, second);
+    check_type("str", type_string, first);
+    check_type("str", type_string, second);
     char * buffer = (char *) must_malloc(
         first->length +
         second->length + 1
@@ -46,7 +46,7 @@ static obj * native_cat(obj * args) {
  */
 obj * number_to_string(obj * n) {
     prepare_stack();
-    check_type(lstring("number_to_string"), type_number, n);
+    check_type("number_to_string", type_number, n);
     size_t max_len = sizeof(char) * 32;
     char * buffer = (char *) must_malloc(max_len + 1);
     snprintf(buffer, max_len, "%lg", n->number);
@@ -66,9 +66,9 @@ obj * number_to_string(obj * n) {
  */
 obj * replace(obj * ref, obj * rep, obj * s) {
     prepare_stack();
-    check_type(lstring("replace"), type_string, ref);
-    check_type(lstring("replace"), type_string, rep);
-    check_type(lstring("replace"), type_string, s);
+    check_type("replace", type_string, ref);
+    check_type("replace", type_string, rep);
+    check_type("replace", type_string, s);
     int replaced = 0;
     int length = s->length + rep->length + 1;
     char * buffer = (char *) must_malloc(length);
@@ -108,9 +108,9 @@ static obj * native_replace(obj * args) {
  */
 obj * replace_all(obj * ref, obj * rep, obj * s) {
     prepare_stack();
-    check_type(lstring("replace"), type_string, ref);
-    check_type(lstring("replace"), type_string, rep);
-    check_type(lstring("replace"), type_string, s);
+    check_type("replace", type_string, ref);
+    check_type("replace", type_string, rep);
+    check_type("replace", type_string, s);
     // count the number of occurences
     int count = 0;
     char * sp;
@@ -156,7 +156,7 @@ static obj * native_replace_all(obj * args) {
  */
 obj * no_whitespace(obj * s) {
     prepare_stack();
-    check_type(lstring("no_whitespace"), type_string, s);
+    check_type("no_whitespace", type_string, s);
     s = replace_all(lstring(" "), lstring(""), s);
     s = replace_all(lstring("\t"), lstring(""), s);
     s = replace_all(lstring("\n"), lstring(""), s);
@@ -178,8 +178,8 @@ static obj * native_no_whitespace(obj * args) {
  */
 obj * split(obj * delim, obj * s) {
     prepare_stack();
-    check_type(lstring("split"), type_string, delim);
-    check_type(lstring("split"), type_string, s);    
+    check_type("split", type_string, delim);
+    check_type("split", type_string, s);    
     obj * copy = cstring(s->string);
     obj * start = nil;
     obj * end = nil;
@@ -206,9 +206,9 @@ static obj * native_split(obj * args) {
  */
 obj * substr(obj * start, obj * length, obj * s) {
     prepare_stack();
-    check_type(lstring("substr"), type_number, start);
-    check_type(lstring("substr"), type_number, length);
-    check_type(lstring("substr"), type_string, s);
+    check_type("substr", type_number, start);
+    check_type("substr", type_number, length);
+    check_type("substr", type_string, s);
     size_t max_len = s->length + 1 * sizeof(char);
     char * buffer = (char *) must_malloc(max_len);
     memset(buffer, 0, max_len);
@@ -232,7 +232,7 @@ static obj * native_substr(obj * args) {
  */
 obj * format(obj * fmt, obj * args) {
     prepare_stack();
-    check_type(lstring("format"), type_string, fmt);
+    check_type("format", type_string, fmt);
     while(args != nil) {
         obj * ref = lstring("{}");
         if (car(args) != nil && car(args)->type == type_string) {
@@ -247,7 +247,7 @@ obj * format(obj * fmt, obj * args) {
 
 obj * print_format(obj * fmt, obj * args) {
     prepare_stack();
-    check_type(lstring("format"), type_string, fmt);
+    check_type("format", type_string, fmt);
     while(args != nil) {
         fmt = replace(lstring("{}"), print(car(args)), fmt);
         args = cdr(args);
@@ -261,10 +261,10 @@ static obj * native_format(obj * args) {
 
 obj * str_to_num(obj * s) {
     prepare_stack();
-    check_type(lstring("str-to-num"), type_string, s);
+    check_type("str-to-num", type_string, s);
     obj * n = read(s);
     return_on_error(n);
-    check_type(lstring("str-to-num"), type_number, n);
+    check_type("str-to-num", type_number, n);
     return return_from_stack(n);
 }
 
@@ -274,7 +274,7 @@ obj * native_str_to_num(obj * args) {
 
 obj * num_to_ascii(obj * n) {
     prepare_stack();
-    check_type(lstring("num-to-ascii"), type_number, n);
+    check_type("num-to-ascii", type_number, n);
     char * buffer = must_malloc(2);
     memset(buffer, 0, 2);
     buffer[0] = n->number;
@@ -287,7 +287,7 @@ static obj * native_num_to_ascii(obj * args) {
 
 obj * ascii_to_num(obj * s) {
     prepare_stack();
-    check_type(lstring("ascii-to-num"), type_string, s);
+    check_type("ascii-to-num", type_string, s);
     char c = s->string[0];
     return return_from_stack(number(c));
 }

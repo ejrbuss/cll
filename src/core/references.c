@@ -13,7 +13,7 @@ static obj * native_ref(obj * args) {
  */
 obj * set(obj * ref, obj * val) {
     prepare_stack();
-    check_type(lstring("set!"), type_reference, ref);
+    check_type("set!", type_reference, ref);
     ref->ref = val;
     return return_from_stack(nil);
 }
@@ -35,7 +35,7 @@ static obj * native_set(obj * args) {
  */
 obj * deref(obj * ref) {
     prepare_stack();
-    check_type(lstring("deref"), type_reference, ref);
+    check_type("deref", type_reference, ref);
     return return_from_stack(ref->ref);
 }
 

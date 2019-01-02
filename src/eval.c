@@ -10,14 +10,13 @@ hash_map * g_env = nil;
  */
 void init_env() {
     assert(g_env == nil);
-
-    // Load core
     prepare_stack();
     g_env = init_hash_map();
+    // Load core
     load_core(g_env);
+    // Protect g_env
     return_from_stack(hash_map_obj(g_env));
     prepare_stack();
-
     // Load prelude
     prepare_stack();
     obj * o = ceval("(load \"prelude.cll\")");
@@ -46,27 +45,28 @@ static obj * quasi_quote(obj * expr, obj * env) {
     obj * op   = FAST_CAR(expr);
     obj * args = FAST_CDR(expr);
     if (FAST_SYMBOL_EQ(op, "unquote") || FAST_SYMBOL_EQ(op, "unquote-splice")) {
+        check_arity("unquote", 1, args);
         return return_from_stack(eval(car(args), env));
     }
-    obj * start = nil;
-    obj * end = nil;
+    obj * head = nil;
+    obj * tail = nil;
     while (expr != nil) {
         obj * o = FAST_CAR(expr);
         if (o != nil && o->type == type_list && FAST_SYMBOL_EQ(car(o), "unquote-splice")) {
             o = quasi_quote(o, env);
             return_on_error(o);
             while (o) {
-                FAST_REV_CONS(start, end, FAST_CAR(o));
+                FAST_REV_CONS(head, tail, FAST_CAR(o));
                 o = FAST_CDR(o);
             }
         } else {
             o = quasi_quote(o, env);
             return_on_error(o);
-            FAST_REV_CONS(start, end, o);
+            FAST_REV_CONS(head, tail, o);
         }
         expr = FAST_CDR(expr);
     }
-    return return_from_stack(start);
+    return return_from_stack(head);
 }
 
 static obj * eval_list(obj * list, obj * env) {
@@ -78,6 +78,7 @@ static obj * eval_list(obj * list, obj * env) {
     // Special form: quote
     // Should return its first arg unevaluated
     if (FAST_SYMBOL_EQ(op, "quote")) {
+        CHECK_FN_ARITY("quote", 1, 1, args);
         return return_from_stack(car(args));
     }
 
@@ -85,12 +86,18 @@ static obj * eval_list(obj * list, obj * env) {
     // Iterates over quated form and replaces calls with (unquote) and 
     // (unqoute-splice) with their appropriate values.
     if (FAST_SYMBOL_EQ(op, "quasi-quote")) {
+        CHECK_FN_ARITY("quasi-quote", 1, 1, args);
         return return_from_stack(quasi_quote(car(args), env));
     }
 
     // Special form: macro
     if (FAST_SYMBOL_EQ(op, "macro")) {
-        return return_from_stack(macro(env, cdr(car(args)), car(cdr(args))));
+        CHECK_FN_ARITY("macro", 2, 2, args);
+        CHECK_FN_ARG("macro", 1, type_list, FAST_CAR(args));
+        if (!FAST_SYMBOL_EQ(FAST_CAR(FAST_CAR(args)), "list")) {
+            return return_from_stack(THROW_FN_ARG("macro", 1, "a list literal", FAST_CAR(args)));
+        }
+        return return_from_stack(macro(env, FAST_CDR(FAST_CAR(args)), FAST_CAR(FAST_CDR(args))));
     }
 
     // Special form: if
@@ -98,36 +105,55 @@ static obj * eval_list(obj * list, obj * env) {
     // second argument, otherwise it should evaluate and return its third
     // argument.
     if (FAST_SYMBOL_EQ(op, "if")) {
-        if (eval(car(args), env)) {
-            return return_from_stack(eval(car(cdr(args)), env));
+        CHECK_FN_ARITY("if", 2, 3, args);
+        if (eval(FAST_CAR(args), env)) {
+            return return_from_stack(eval(FAST_CAR(FAST_CDR(args)), env));
         } else {
-            return return_from_stack(eval(car(cdr(cdr(args))), env));
+            return return_from_stack(eval(car(cdr(FAST_CDR(args))), env));
         }
     }
 
+    // Special form: do
+    // Evaluates all of the arguments as their own forms, returning the value 
+    // of the final form.
     if (FAST_SYMBOL_EQ(op, "do")) {
         obj * o = nil;
         while(args) {
-            o = eval(car(args), env);
+            o = eval(FAST_CAR(args), env);
             return_on_error(o);
-            args = cdr(args);
+            args = FAST_CDR(args);
         }
         return return_from_stack(o);
     }
 
+    // Special form: while
+    // Evaluates all of the arguments as their own forms, repeatedly, until the
+    // first argument has a value of nil. Returns the final value of the forms
+    // after the final iteration.
     if (FAST_SYMBOL_EQ(op, "while")) {
-        obj * cond = car(args);
+        CHECK_FN_ARITY("while", 1, INFINITY, args);
+        obj * cond = FAST_CAR(args);
         obj * c = nil;
         obj * o = nil;
+        prepare_stack();
         while((c = eval(cond, env)) != nil) {
-            return_on_error(c);
-            obj * body = cdr(args);
-            while(body) {
-                o = eval(car(body), env);
-                return_on_error(o);
-                body = cdr(body);
+            if (c->type == type_error) { 
+                return_from_stack(c);
+                return_on_error(c);
             }
+            obj * body = FAST_CDR(args);
+            while(body) {
+                o = eval(FAST_CAR(body), env);
+                if (o != nil && o->type == type_error) {
+                    return_from_stack(o);
+                    return_on_error(o);
+                }
+                body = FAST_CDR(body);
+            }
+            return_from_stack(body);
+            prepare_stack();
         }
+        return_from_stack(o);
         return return_from_stack(o);
     }
 
@@ -135,13 +161,14 @@ static obj * eval_list(obj * list, obj * env) {
     // Using the first argument as a key in the global environment, adds an
     // entry for the evaluated second argument.
     if (FAST_SYMBOL_EQ(op, "def")) {
-        check_type(lstring("def"), type_symbol, car(args));
+        CHECK_FN_ARITY("def", 1, 2, args);
+        CHECK_FN_ARG("def", 1, type_symbol, FAST_CAR(args));
         // We use naive_assoc here because we don't care about cleaning up old
         // definitions. Re-defs shouldn't be used for large amounts of data,
         // refs should be used for that. In return we don't ever have to copy
         // over all of g_env just because of a redef, decreasing our memory 
         // footprint
-        hash_map_assoc(g_env, car(args)->symbol, eval(car(cdr(args)), env));
+        hash_map_assoc(g_env, FAST_CAR(args)->symbol, eval(car(FAST_CDR(args)), env));
         return return_from_stack(nil);
     }
 
@@ -149,24 +176,30 @@ static obj * eval_list(obj * list, obj * env) {
     // Creates a new function, using the first argument as the arguments and
     // the second argument as the function body.
     if (FAST_SYMBOL_EQ(op, "fn")) {
-        return return_from_stack(fn(env, cdr(car(args)), car(cdr(args))));
+        CHECK_FN_ARITY("fn", 2, 2, args);
+        CHECK_FN_ARG("fn", 1, type_list, FAST_CAR(args));
+        if (!FAST_SYMBOL_EQ(FAST_CAR(FAST_CAR(args)), "list")) {
+            return return_from_stack(THROW_FN_ARG("fn", 1, "a list literal", FAST_CAR(args)));
+        }
+        return return_from_stack(fn(env, FAST_CDR(FAST_CAR(args)), FAST_CAR(FAST_CDR(args))));
     }
 
     // Special form: let
     // Evals an expr with the first argument (a dictionary) attached to the 
     // front of the environment.  
     if (FAST_SYMBOL_EQ(op, "let")) {
+        CHECK_FN_ARITY("let", 1, INFINITY, args);
         obj * map = car(args);
         args = cdr(args);
         if (map != nil && map->type == type_list && FAST_SYMBOL_EQ(car(map), "map")) {
             map = cdr(map);
-        } else {
-            check_type_or_nil(lstring("let"), type_map, map);
+        } else if  (map != nil) {
+            CHECK_FN_ARG("let", 1, type_map, map);
         }
         obj * let_env = env;
         while(map != nil) {
             obj * k = FAST_CAR(map);
-            obj * v = eval(car(cdr(map)), env);
+            obj * v = eval(FAST_CAR(FAST_CDR(map)), let_env);
             return_on_error(v);
             let_env = naive_assoc(k, v, let_env);
             map = FAST_CDR(FAST_CDR(map));
@@ -182,8 +215,9 @@ static obj * eval_list(obj * list, obj * env) {
 
     // Special form: catch
     if (FAST_SYMBOL_EQ(op, "catch")) {
-        obj * dangerous = car(args);
-        args = cdr(args);
+        CHECK_FN_ARITY("catch", 2, 2, args);
+        obj * dangerous = FAST_CAR(args);
+        args = FAST_CDR(args);
         obj * o = eval(dangerous, env);
         if (o == nil || o->type != type_error) {
             return return_from_stack(o);
@@ -201,7 +235,7 @@ static obj * eval_list(obj * list, obj * env) {
         )) {
             return return_from_stack(call(handler, cons(err_map, nil)));
         }
-        return return_from_stack(apply_error(lstring("catch"), handler));
+        return return_from_stack(THROW_FN_ARG("catch", 2, "an error handler", handler));
     }
 
     // Not a special form, evaluate as a function
@@ -227,29 +261,27 @@ static obj * eval_list(obj * list, obj * env) {
     }
 
     // Eval arguments
-    obj * start = nil;
-    obj * end = nil;
+    obj * args_head = nil;
+    obj * args_tail = nil;
     while (args != nil) {
         obj * next = eval(FAST_CAR(args), env);
         // If an argument is an error we need to propogate it
         if (next != nil && next->type == type_error) {
             return return_from_stack(next);
         }
-        FAST_REV_CONS(start, end, next);
         // Otherwise put it onto the evaluated argument list
-        // evaled_args = cons(next, evaled_args);
+        FAST_REV_CONS(args_head, args_tail, next);
         args = FAST_CDR(args);
     }
-    obj * evaled_args = start;
     // Call operator on evaled arguments
-    return return_from_stack(call(op, evaled_args));
+    return return_from_stack(call(op, args_head));
 }
 
 static obj * eval_symbol(obj * sym, obj * env) {
     prepare_stack();
     while (env != nil) {
-        if (equal(FAST_CAR(env), sym)) {
-            return return_from_stack(car(FAST_CDR(env)));
+        if (FAST_SYMBOL_EQ(FAST_CAR(env), sym->symbol)) {
+            return return_from_stack(FAST_CAR(FAST_CDR(env)));
         }
         env = FAST_CDR(FAST_CDR(env));
     }
@@ -257,7 +289,6 @@ static obj * eval_symbol(obj * sym, obj * env) {
     if (o != NOT_FOUND) {
         return return_from_stack(o);
     }
-    printf("%p\n", NOT_FOUND);
     obj * lookup_error = error_format(
         lkeyword("Lookup-Error"),
         lstring("`{}` is not defined!"),

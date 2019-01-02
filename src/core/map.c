@@ -22,7 +22,7 @@ static obj * native_map(obj * args) {
  */
 obj * naive_get(obj * key, obj * map) {
     prepare_stack();
-    check_type_or_nil(lstring("naive_get"), type_map, map);
+    check_list_type("naive_get", type_map, map);
     while (map != nil) {
         if (equal(car(map), key)) {
             return return_from_stack(car(cdr(map)));
@@ -57,14 +57,14 @@ obj * get(obj * key, obj * map, obj * def) {
             }
             return return_from_stack(def);
         case type_string:
-            check_type(lstring("get"), type_number, key);
+            check_type("get", type_number, key);
             obj * o = substr(key, number(1), map);
             if (o == nil) {
                 return return_from_stack(def);
             }
             return return_from_stack(o);
         case type_list:
-            check_type(lstring("get"), type_number, key);
+            check_type("get", type_number, key);
             int int_key = key->number;
             int idx = 0;
             if (int_key < 0) {
@@ -77,7 +77,7 @@ obj * get(obj * key, obj * map, obj * def) {
             }
             return return_from_stack(car(map));
         default:
-            return return_from_stack(apply_error(lstring("get"), map));
+            return return_from_stack(apply_error(lstring("get"), type_map, map));
             
     }    
 }
@@ -95,7 +95,7 @@ obj * native_get(obj * args) {
  */
 obj * keys(obj * map) {
     prepare_stack();
-    check_type_or_nil(lstring("keys"), type_map, map);
+    check_list_type("keys", type_map, map);
     obj * keys = nil;
     while(map != nil) {
         keys = cons(car(map), keys);
@@ -114,7 +114,7 @@ obj * native_keys(obj * args) {
 
 obj * dissoc(obj * key, obj * map) {
     prepare_stack();
-    check_type_or_nil(lstring("dissoc"), type_map, map);
+    check_list_type("dissoc", type_map, map);
     if (not(in(key, keys(map)))) {
         return return_from_stack(map);
     }
@@ -144,8 +144,8 @@ obj * assoc(obj * key, obj * val, obj * map) {
             return naive_assoc(key, val, map);
         case type_string: {
             prepare_stack();
-            check_type(lstring("assoc"), type_number, key);
-            check_type(lstring("assoc"), type_string, val);
+            check_type("assoc", type_number, key);
+            check_type("assoc", type_string, val);
             obj * o = cstring(map->string);
             int idx = key->number;
             o->string[idx] = val->string[0];
@@ -153,7 +153,7 @@ obj * assoc(obj * key, obj * val, obj * map) {
         }
         case type_list: {
             prepare_stack();
-            check_type(lstring("assoc"), type_number, key);
+            check_type("assoc", type_number, key);
             int int_key = key->number;
             int idx = 0;
             obj * start = nil;
@@ -179,7 +179,7 @@ obj * assoc(obj * key, obj * val, obj * map) {
             return return_from_stack(start);
         }
         default:
-            return apply_error(lstring("assoc"), map);
+            return apply_error(lstring("assoc"), type_map, map);
     }
 }
 
@@ -197,8 +197,8 @@ obj * fassoc(obj * key, obj * val, obj * map) {
             return naive_assoc(key, val, map);
         case type_string: {
             prepare_stack();
-            check_type(lstring("assoc"), type_number, key);
-            check_type(lstring("assoc"), type_string, val);
+            check_type("assoc", type_number, key);
+            check_type("assoc", type_string, val);
             obj * o = cstring(map->string);
             int idx = key->number;
             o->string[idx] = val->string[0];
@@ -206,7 +206,7 @@ obj * fassoc(obj * key, obj * val, obj * map) {
         }
         case type_list: {
             prepare_stack();
-            check_type(lstring("assoc"), type_number, key);
+            check_type("assoc", type_number, key);
             int int_key = key->number;
             int idx = 0;
             obj * start = nil;
@@ -232,7 +232,7 @@ obj * fassoc(obj * key, obj * val, obj * map) {
             return return_from_stack(start);
         }
         default:
-            return apply_error(lstring("assoc"), map);
+            return apply_error(lstring("assoc"), type_map, map);
     }
 }
 
