@@ -179,6 +179,36 @@ static obj * native_count(obj * args) {
     return count(FAST_CAR(args));
 }
 
+obj * concat(obj * a, obj * b) {
+    prepare_stack();
+    obj * head = nil;
+    obj * tail = nil;
+    while(a != nil) {
+        FAST_REV_CONS(head, tail, FAST_CAR(a));
+        a = FAST_CDR(a);
+    }
+    if (head == nil) {
+        return return_from_stack(b);
+    }
+    tail->cdr = b;
+    return return_from_stack(head);
+}
+
+static obj * native_concat(obj * args) {
+    prepare_stack();
+    obj * list = nil;
+    int arg_n = 1;
+    while(args != nil) {
+        if (FAST_CAR(args) != nil) {
+            CHECK_FN_ARG("concat", arg_n, type_list, FAST_CAR(args));
+        }
+        list = concat(list, FAST_CAR(args));
+        args = FAST_CDR(args);
+        arg_n++;
+    }
+    return return_from_stack(list);
+}
+
 /**
  * Loads all core list operations into the global environemnt.
  */
@@ -190,4 +220,5 @@ void load_list(hash_map * env) {
     hash_map_assoc(env, "in", native(&native_in));
     hash_map_assoc(env, "count", native(&native_count));
     hash_map_assoc(env, "reverse", native(&native_reverse));
+    hash_map_assoc(env, "concat", native(&native_concat));
 }

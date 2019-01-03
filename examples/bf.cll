@@ -20,7 +20,7 @@
   (let { nxt (:nxt @bf-pos) }
     (if (not @nxt)
       (do
-        (set! bf-len (++ @bf-len))
+        (inc! bf-len)
         (set! nxt { :val (ref 0) 
                     :nxt (ref nil)
                     :prv (ref @bf-pos) })))
@@ -32,12 +32,10 @@
       (set! bf-pos @prv))))
 
 (defn bf-inc []
-  (let { val (:val @bf-pos) }
-    (set! val (++ @val))))
+  (inc! (:val @bf-pos)))
 
 (defn bf-dec []
-  (let { val (:val @bf-pos) }
-    (set! val (-- @val))))
+  (dec! (:val @bf-pos)))
 
 (defn bf-put []
   (print (num-to-ascii @(:val @bf-pos))))

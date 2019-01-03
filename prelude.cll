@@ -9,7 +9,7 @@
 
 (defmacro comment [] nil)
 
-(defmacro cond [& conds] 
+(defmacro cond [& conds]
   (if conds
     ~'(if ~(car conds) 
       ~(car (cdr conds)) 
@@ -31,16 +31,16 @@
   (cond
     (= mode :true) (let { condition (car args) }
       ~'(if (not ~condition)
-        (throw :Assertion-Error (str-fmt "Expected `{}`!" '~(car args)))))
+        (throw :Assertion-Error (str-fmt "Expected `{}`!" '~condition))))
     (= mode :false) (let { condition (car args) }
       ~'(if (not ~condition)
-        (throw :Assertion-Error (str-fmt "Expected not `{}`!" '~(car args)))))
-    (= mode :equal) (let { a (car args) b (car (cdr args)) }
-      ~'(if (not (= ~a ~b))
-        (throw :Assertion-Error (str-fmt "Expected `{}` to equal `{}`!" ~a ~b))))
-    (= mode :not-equal) (let { a (car args) b (car (cdr args)) }
-      ~'(if (= ~a ~b)
-        (throw :Assertion-Error (str-fmt "Expected `{}` to equal `{}`!" ~a ~b))))
+        (throw :Assertion-Error (str-fmt "Expected not `{}`!" '~condition))))
+    (= mode :equal)
+      ~'(if (!= ~~args)
+        (throw :Assertion-Error (str-fmt "Expected `{}` to all be equal!" [~~args])))
+    (= mode :not-equal) 
+      ~'(if (= ~~args)
+        (throw :Assertion-Error (str-fmt "Expected `{}` to not be equal!" [~~args])))
     :else (throw :Parameter-Error 
       (str-fmt "`assert` expected a mode (:true, :false, :equal) but received `{}`", mode))))
 
@@ -73,7 +73,7 @@
     (while @ref-iter
       (f (car @ref-iter) @ref-idx)
       (set! ref-iter (cdr @ref-iter))
-      (set! ref-idx (++ @ref-idx)))))
+      (set! ref-idx (inc @ref-idx)))))
 
 (defn map [f iter]
   (let { r (ref nil) }
@@ -94,30 +94,27 @@
       (set! r (f @r x))) iter)
     @r))
 
-(defn range [start end]
-  (if (> start end)
-    (throw :Parameter-Error "start must be less than end!")
-    nil)
-  (let { s (ref start)
-         e (ref end) 
-         l (ref nil) }
-    (while (< @s @e)
-      (set! l (cons @s @l))
-      (set! s (++ @s)))
-    (reverse @l)))
-
-(defn concat [& lists]
-  (if lists
-    (if (cdr lists)
-      (let { r    (ref nil)
-             xs   (reverse (car lists))
-             rest (call concat (cdr lists)) }
-        (set! r rest)
-        (each (fn [x] 
-          (set! r (cons x @r))) xs)
-        @r)
-      (car lists))
-  nil))
+(defn range [start end step]
+  (let { step (if step step (if (> end start) 1 -1)) }
+    (cond
+      (and (pos? step) (> end start))
+        (let { s (ref start)
+               e (ref end) 
+               l (ref nil) }
+          (while (< @s @e)
+            (set! l (cons @s @l))
+            (set! s (+ @s step)))
+          (reverse @l))
+      (and (neg? step) (< end start))
+        (let { s (ref start)
+               e (ref end) 
+               l (ref nil) }
+          (while (> @s @e)
+            (set! l (cons @s @l))
+            (set! s (+ @s step)))
+          (reverse @l))
+      :else
+        (throw :Parameter-Error (str-fmt "`{}` cannot be reached from `{}` by steps of `{}`", end, start, step)))))
 
 ;; Functions
 
@@ -171,11 +168,17 @@
 (defn neg? [n]
   (< n 0))
 
-(defn ++ [n]
+(defn inc [n]
   (+ n 1))
 
-(defn -- [n]
+(defn dec [n]
   (- n 1))
+
+(defn inc! [r]
+  (set! r (+ @r 1)))
+
+(defn dec! [r]
+  (set! r (- @r 1)))
 
 ;; Logical
 

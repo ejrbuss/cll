@@ -64,7 +64,7 @@ static obj * native_mod(obj * args) {
     CHECK_FN_ARG_NS("mod", 2, type_number, FAST_CAR(FAST_CDR(args)));
     int a = FAST_CAR(args)->number;
     int b = FAST_CAR(FAST_CDR(args))->number;
-    return return_from_stack(number(a % b));
+    return number(a % b);
 }
 
 obj * nmax(obj * n, obj * m) {

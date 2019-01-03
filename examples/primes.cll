@@ -2,8 +2,8 @@
     (cond 
         (< n 2) nil
         (< n 4) :true
-        :else   (not (call or (for f (range 2 (/ (++ n) 2)) (= 0 (mod n f)))))))
+        :else   (not (call or (for f (range 2 (/ (inc n) 2)) (= 0 (mod n f)))))))
 
 (def n 100)
 (println "All primes less than or equal to " n)
-(println (filter prime? (for n (range 0 n) n)))
+(println (filter prime? (range 0 n)))
