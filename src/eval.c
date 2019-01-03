@@ -24,6 +24,44 @@ void init_env() {
     return_from_stack(nil);
 }
 
+obj * destructure(obj * binding, obj * value, obj * env) {
+    b();
+    if (binding == nil) {
+        return nil;
+    }
+    switch(binding->type) {
+        case type_symbol:
+            return naive_assoc(binding, value, env);
+        case type_list:
+            if (FAST_SYMBOL_EQ(FAST_CAR(binding), "dict")) {
+                return init_destructure_error(binding, value);
+            }
+            if (FAST_SYMBOL_EQ(FAST_CAR(binding), "list")) {
+                binding = FAST_CDR(binding);
+            }
+            if (value != nil && value->type != type_list) {
+                return init_destructure_error(binding, value);
+            }
+            prepare_stack();
+            while(binding != nil) {
+                obj * sym = FAST_CAR(binding);
+                if (FAST_SYMBOL_EQ(sym, "&")) {
+                    sym = car(FAST_CDR(binding));
+                    if (sym == nil || sym->type != type_symbol) {
+                        return return_from_stack(init_destructure_error(sym, value));
+                    }
+                    return return_from_stack(naive_assoc(sym, value, env));
+                }
+                env = destructure(sym, car(value), env);
+                binding = FAST_CDR(binding);
+                value = cdr(value);
+            }
+            return return_from_stack(env);
+        default:
+            return init_destructure_error(binding, value);
+    }
+}
+
 static obj * macro_expand(obj * op, obj * args) {
     prepare_stack();
     obj * o = call(op, args);
@@ -168,7 +206,9 @@ static obj * eval_list(obj * list, obj * env) {
         // refs should be used for that. In return we don't ever have to copy
         // over all of g_env just because of a redef, decreasing our memory 
         // footprint
-        hash_map_assoc(g_env, FAST_CAR(args)->symbol, eval(car(FAST_CDR(args)), env));
+        obj * o = eval(car(FAST_CDR(args)), env);
+        RETURN_ON_ERROR(o);
+        hash_map_assoc(g_env, FAST_CAR(args)->symbol, o);
         return return_from_stack(nil);
     }
 
@@ -201,34 +241,8 @@ static obj * eval_list(obj * list, obj * env) {
             obj * k = FAST_CAR(dict);
             obj * v = eval(FAST_CAR(FAST_CDR(dict)), let_env);
             RETURN_ON_ERROR(v);
-            if (k == nil) {
-                    return return_from_stack(THROW_FN_ARG("let", 1, "a symbol or destructure", k));
-            }
-            switch(k->type) {
-                case type_symbol:
-                    let_env = naive_assoc(k, v, let_env);
-                    break;
-                case type_list:
-                    CHECK_FN_ARG("let", 1, type_list, v);
-                    if (FAST_SYMBOL_EQ(FAST_CAR(k), "list")) {
-                        k = FAST_CDR(k);
-                    }
-                    while(k != nil) {
-                        CHECK_FN_ARG("let", 1, type_symbol, FAST_CAR(k));
-                        if (FAST_SYMBOL_EQ(FAST_CAR(k), "&")) {
-                            CHECK_FN_ARG("let", 1, type_symbol, car(FAST_CDR(k)));
-                            let_env = naive_assoc(FAST_CAR(FAST_CDR(k)), v, let_env);
-                            break;
-                        }
-                        let_env = naive_assoc(FAST_CAR(k), car(v), let_env);
-                        k = FAST_CDR(k);
-                        v = cdr(v);
-                    }
-                    break;
-                default:
-                    return return_from_stack(THROW_FN_ARG("let", 1, "a symbol or destructure", k));
-
-            }
+            let_env = destructure(k, v, let_env);
+            RETURN_ON_ERROR(let_env);
             dict = FAST_CDR(FAST_CDR(dict));
         }
         obj * o = nil;

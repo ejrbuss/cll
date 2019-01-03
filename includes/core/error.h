@@ -2,7 +2,6 @@
 
 #include "core.h"
 
-
 #define CHECK_FN_ARITY(fn_name, min_args, max_args, args) SAFE_MACRO({ \
     int _count = FAST_COUNT(args); \
     if (_count < min_args || _count > max_args) { \
@@ -77,6 +76,7 @@
 extern obj * init_arity_error(obj * name, obj * min, obj * max, obj * act);
 extern obj * init_type_error(obj * name, obj * n, type t, obj * arg);
 extern obj * init_fn_error(obj * name, obj * n, obj * expected, obj * arg);
+extern obj * init_destructure_error(obj * binding, obj * value);
 
 extern obj * error_format(obj * type, obj * fmt, obj * args);
 extern obj * error_to_dict(obj * error);

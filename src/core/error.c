@@ -56,6 +56,14 @@ obj * init_fn_error(obj * name, obj * n, obj * expected, obj * arg) {
     ));
 }
 
+obj * init_destructure_error(obj * binding, obj * value) {
+    prepare_stack();
+    return return_from_stack(error_format(
+        lkeyword("Destructure-Error"),
+        lstring("Cannot destructure `{}` into `{}`!"),
+        cons(value, cons(binding, nil))
+    ));
+}
 
 obj * error_format(obj * type, obj * fmt, obj * args) {
     prepare_stack();

@@ -40,12 +40,11 @@ cll>(time-it (fib 31))
 15
 ```
 
-
 ## Broken
 
 
 ## TODO
-- Testing (cll asser and test file)
+- Testing
 - Documentation
 - Docs site
 - Performance (benchmarking)

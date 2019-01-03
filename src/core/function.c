@@ -31,16 +31,8 @@ obj * call(obj * fn, obj * args) {
     obj * fn_env  = FAST_CAR(fn);
     obj * fn_args = FAST_CAR(FAST_CDR(fn));
     obj * fn_body = FAST_CAR(FAST_CDR(FAST_CDR(fn)));
-    while (fn_args != nil) {
-        // Handle varargs
-        if (FAST_SYMBOL_EQ(FAST_CAR(fn_args), "&")) {
-            fn_env = naive_assoc(car(FAST_CDR(fn_args)), args, fn_env);
-            break;
-        }
-        fn_env  = naive_assoc(FAST_CAR(fn_args), car(args), fn_env);
-        fn_args = FAST_CDR(fn_args);
-        args    = cdr(args);
-    }
+    fn_env = destructure(fn_args, args, fn_env);
+    RETURN_ON_ERROR(fn_env);
     return return_from_stack(eval(fn_body, fn_env));
 }
 
