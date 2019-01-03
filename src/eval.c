@@ -201,7 +201,34 @@ static obj * eval_list(obj * list, obj * env) {
             obj * k = FAST_CAR(dict);
             obj * v = eval(FAST_CAR(FAST_CDR(dict)), let_env);
             RETURN_ON_ERROR(v);
-            let_env = naive_assoc(k, v, let_env);
+            if (k == nil) {
+                    return return_from_stack(THROW_FN_ARG("let", 1, "a symbol or destructure", k));
+            }
+            switch(k->type) {
+                case type_symbol:
+                    let_env = naive_assoc(k, v, let_env);
+                    break;
+                case type_list:
+                    CHECK_FN_ARG("let", 1, type_list, v);
+                    if (FAST_SYMBOL_EQ(FAST_CAR(k), "list")) {
+                        k = FAST_CDR(k);
+                    }
+                    while(k != nil) {
+                        CHECK_FN_ARG("let", 1, type_symbol, FAST_CAR(k));
+                        if (FAST_SYMBOL_EQ(FAST_CAR(k), "&")) {
+                            CHECK_FN_ARG("let", 1, type_symbol, car(FAST_CDR(k)));
+                            let_env = naive_assoc(FAST_CAR(FAST_CDR(k)), v, let_env);
+                            break;
+                        }
+                        let_env = naive_assoc(FAST_CAR(k), car(v), let_env);
+                        k = FAST_CDR(k);
+                        v = cdr(v);
+                    }
+                    break;
+                default:
+                    return return_from_stack(THROW_FN_ARG("let", 1, "a symbol or destructure", k));
+
+            }
             dict = FAST_CDR(FAST_CDR(dict));
         }
         obj * o = nil;

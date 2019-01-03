@@ -61,6 +61,12 @@
 
 ;; Lists
 
+(def fst car)
+(def rst cdr)
+
+(defn snd [iter]
+  (car (cdr iter)))
+
 (defn each [f iter]
   (let { ref-iter (ref iter) 
          ref-idx  (ref 0) }
@@ -69,24 +75,24 @@
       (set! ref-iter (cdr @ref-iter))
       (set! ref-idx (++ @ref-idx)))))
 
+(defn map [f iter]
+  (let { r (ref nil) }
+    (each (fn [x]
+      (set! r (cons (f x) @r))) iter)
+    (reverse @r)))
+
+(defn filter [f iter]
+  (let { r (ref nil) }
+    (each (fn [x]
+      (if (f x) 
+        (set! r (cons x @r)))) iter)
+    (reverse @r)))
+
 (defn reduce [f first iter]
   (let { r (ref first) }
     (each (fn [x] 
       (set! r (f @r x))) iter)
     @r))
-
-(defn map [f iter]
-  (let { r (ref nil) }
-    (each (fn [x idx]
-      (set! r (cons (f x idx) @r))) iter)
-    (reverse @r)))
-
-(defn filter [f iter]
-  (let { r (ref nil) }
-    (each (fn [x idx]
-      (if (f x idx) 
-        (set! r (cons x @r)))) iter)
-    (reverse @r)))
 
 (defn range [start end]
   (if (> start end)
@@ -176,4 +182,12 @@
 (defn != [x y] 
   (not (= x y)))
 
-(defn my-quote)
+;; Strings
+
+(defn str-join [sep s]
+  (let { c (count s) }
+    (cond
+      (= c 0) ""
+      (= c 1) (fst s)
+      (= c 2) (str (fst s) sep (snd s))
+      :else   (str (fst s) sep (str-join sep (rst s))))))

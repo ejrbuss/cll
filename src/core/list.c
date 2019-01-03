@@ -154,6 +154,9 @@ static obj * native_in(obj * args) {
  * @returns obj *      the number of items in the list
  */
 obj * count(obj * list) {
+    if (list == nil) {
+        return number(0);
+    }
     switch(list->type) {
         case type_list:
         case type_dict:
