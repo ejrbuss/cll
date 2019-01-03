@@ -41,8 +41,13 @@
     (= mode :not-equal) 
       ~'(if (= ~~args)
         (throw :Assertion-Error (str-fmt "Expected `{}` to not be equal!" [~~args])))
+    (= mode :throws) 
+      ~'(let { threw (ref nil) }
+        (catch (do ~~args) (fn [] (set! threw :true)))
+        (if @threw nil
+          (throw :Assertion-Error (str-fmt "Expected `{}` to throw!" '(do ~~args)))))
     :else (throw :Parameter-Error 
-      (str-fmt "`assert` expected a mode (:true, :false, :equal) but received `{}`", mode))))
+      (str-fmt "`assert` expected a mode (:true, :false, :equal, :not-equal, :throws) but received `{}`", mode))))
 
 ;; Docs
 

@@ -29,7 +29,7 @@ void test_quasi_quote() {
 }
 
 void test_macro() {
-    assert(ceval("(= 'x ((macro [y] 'y) x))"));
+    assert(ceval("(= 'x ((macro [y] ~''~y) x))"));
     assert(equal(type_of(ceval("(macro [])")), ceval(":error")));
 }
 

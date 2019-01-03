@@ -51,12 +51,30 @@
 (assert :equal [10 7 4 1] (range 10 0 -3))
 
 ; Test curry
+(defn id-args [& args] args)
+
+(assert :equal 
+  [1 2 3 4]
+  (id-args 1 2 3 4)
+  ((curry id-args 1) 2 3 4)
+  ((curry id-args 1 2) 3 4)
+  ((curry id-args 1 2 3) 4)
+  ((curry id-args 1 2 3 4))
+  ((curry (curry (curry id-args 1) 2) 3) 4))
 
 ; Test apply!
+(let { r (ref 2) }
+  (apply! inc r)
+  (assert :equal 3 @r)
+  (apply! (fn [n] (* n n)) r)
+  (assert :equal 9 @r))
 
 ; Test !=
+(assert :true (!= 1 2))
 
 ; Test str-join
+(assert :equal "1, 2, 3, 4" (str-join ", " (range 1 5)))
+(assert :equal "a-b-c", (str-join "-" '(a b c)))
 
 ;; Test Example Files code
 ;; -----------------------

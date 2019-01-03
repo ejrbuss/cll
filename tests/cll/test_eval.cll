@@ -1,0 +1,64 @@
+; Test nil
+(assert :equal nil () [] {})
+
+; Test symbols
+(def x 4)
+(assert :equal 4 x)
+(let { x 5 }
+  (assert :equal 5 x))
+(assert :equal :function (type-of list))
+
+; Test others
+(assert :equal 4 (eval 4))
+(assert :equal :keyword (eval :keyword))
+(assert :equal "string" (eval "string"))
+(assert :equal {:x 1 :y 2} (eval {:x 1 :y 2}))
+
+; Test quote
+(assert :equal 'x (quote x) (symbol "x"))
+(assert :equal '~x (quote (unquote x)))
+(assert :throws (quote 1 2))
+(assert :throws (quote))
+
+; Test quasi-quote, unquote, unquote-splice
+(assert :equal ~'x (quasi-quote x) (symbol "x"))
+(assert :equal ~'(if ~(+ 2 3) x y) '(if 5 x y))
+(assert :equal ~'(if ~~[1 2 3]) '(if 1 2 3))
+(assert :throws (quasi-quote 1 2))
+(assert :throws (quasi-quote))
+
+; Test macro
+(assert :equal 'x ((macro [y] ~''~y) x))
+(assert :throws (macro))
+(assert :throws (macro 2))
+(assert :throws macro [])
+(assert :throws (macro [] 1 2))
+
+; Test if
+(assert :equal 1 (if :true 1))
+(assert :equal nil (if nil 1))
+(assert :equal 2 (if nil 1 2))
+(assert :throws (if))
+(assert :throws (if :true))
+(assert :throws (if :true 1 2 3))
+
+; Test do
+(assert :equal nil (do))
+(assert :equal 1 (do 1))
+(assert :equal 2 (do 1 2))
+(assert :equal 4 (do 1 2 (+ 2 2)))
+
+; Test while
+
+; Test def
+
+; Test fn
+
+; Test let
+
+; Test catch
+
+; Test function evaluation
+
+; Closing nil
+nil

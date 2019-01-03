@@ -27,7 +27,7 @@ void init_env() {
 obj * destructure(obj * binding, obj * value, obj * env) {
     b();
     if (binding == nil) {
-        return nil;
+        return env;
     }
     switch(binding->type) {
         case type_symbol:
@@ -117,7 +117,7 @@ static obj * eval_list(obj * list, obj * env) {
     // Should return its first arg unevaluated
     if (FAST_SYMBOL_EQ(op, "quote")) {
         CHECK_FN_ARITY("quote", 1, 1, args);
-        return return_from_stack(car(args));
+        return return_from_stack(FAST_CAR(args));
     }
 
     // Special form: quasi-quote
