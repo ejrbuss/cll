@@ -92,8 +92,8 @@ obj * equal(obj * first, obj * second) {
                 equal(FAST_CAR(first), FAST_CAR(second)),
                 equal(FAST_CDR(first), FAST_CDR(second))
             );
-        case type_map:
-            // Map equality needs to consider out of order keys
+        case type_dict:
+            // Dictionary equality needs to consider out of order keys
             prepare_stack();
             obj * fst_keys = keys(first);
             while(fst_keys != nil) {

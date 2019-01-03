@@ -176,9 +176,9 @@ static obj * parse_list(char ** stream) {
     return return_from_stack(reverse(list));
 }
 
-static obj * parse_map(char ** stream) {
+static obj * parse_dict(char ** stream) {
     prepare_stack();
-    obj * map = nil;
+    obj * dict = nil;
     char * start = *stream - 1;
     while(next(stream, 1) != '}') {
         if (**stream == '\0') {
@@ -186,10 +186,10 @@ static obj * parse_map(char ** stream) {
         }
         obj * key = parse(stream);
         obj * val = parse(stream);
-        map = cons(val, cons(key, map));
+        dict = cons(val, cons(key, dict));
     }
     chomp(stream, 1);
-    return return_from_stack(cons(lsymbol("map"), reverse(map)));
+    return return_from_stack(cons(lsymbol("dict"), reverse(dict)));
 }
 
 static obj * parse_list_macro(char ** stream) {
@@ -334,7 +334,7 @@ obj * parse(char ** stream) {
             return parse_list(stream);
         case '{':
             chomp(stream, 1);
-            return parse_map(stream);
+            return parse_dict(stream);
         case '[':
             chomp(stream, 1);
             return parse_list_macro(stream);

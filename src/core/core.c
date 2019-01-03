@@ -32,7 +32,7 @@ static obj * native_keyword(obj * args) {
 static obj * native_eval(obj * args) {
     CHECK_FN_ARITY("eval", 1, 2, args);
     if (car(FAST_CDR(args)) != nil) {
-        CHECK_FN_ARG("eval", 2, type_map, car(FAST_CDR(args)));
+        CHECK_FN_ARG("eval", 2, type_dict, car(FAST_CDR(args)));
     }
     return eval(FAST_CAR(args), car(FAST_CDR(args)));
 }
@@ -66,7 +66,7 @@ static obj * native_str_eval(obj * args) {
     CHECK_FN_ARITY("str-eval", 1, 2, args);
     CHECK_FN_ARG("str-eval", 1, type_string, FAST_CAR(args));
     if (car(FAST_CDR(args)) != nil) {
-        CHECK_FN_ARG("str-eval", 2, type_map, car(FAST_CDR(args)));
+        CHECK_FN_ARG("str-eval", 2, type_dict, car(FAST_CDR(args)));
     }
     obj * source = FAST_CAR(args);
     obj * forms = read_all(source);
@@ -93,7 +93,7 @@ void load_core(hash_map * env) {
     load_io(env);
     load_types(env);
     load_list(env);
-    load_map(env);
+    load_dict(env);
     load_logic(env);
     load_math(env);
     load_references(env);

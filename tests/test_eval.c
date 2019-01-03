@@ -68,7 +68,29 @@ void test_def() {
 }
 
 void test_fn() {
-    
+    assert(ceval("(= 'x ((fn [y] y) x'))"));
+    assert(ceval("(= '4 ((fn [y] y) 4))"));
+    assert(equal(type_of(ceval("((fn [] nil) z)")), ceval(":error")));
+    assert(equal(type_of(ceval("(fn [])")), ceval(":error")));
+}
+
+void test_let() {
+    assert(ceval("(= 4 (let {x 4} x))"));
+    assert(ceval("(= 6 (let {x 4} x 5 6))"));
+    assert(ceval("(= 6 (let {x 4 y 5} x (+ y 1)))"));
+    assert(ceval("(= 9 (let {x 4 y 5 z (+ x y)} x (+ y 1) z))"));
+    assert(ceval("(= 4 (let (dict x 4) x))"));
+    assert(equal(type_of(ceval("(let)")), ceval(":error")));
+    assert(equal(type_of(ceval("(let [x 4] x)")), ceval(":error")));
+    assert(equal(type_of(ceval("(let {x})")), ceval(":error")));
+}
+
+void test_catch() {
+    assert(ceval("(= 1 (catch (throw) (fn [] 1)))"));
+    assert(ceval("(= 2 (catch (throw) (fn [] 2)))"));
+    assert(ceval("(= 3 (catch (throw :A) { :A (fn [] 3) }))"));
+    assert(equal(type_of(ceval("(catch (throw) 1)")), ceval(":error")));
+    assert(equal(type_of(ceval("(catch (throw :B) { :A (fn [] 1)})")), ceval(":error")));
 }
 
 int main() {
@@ -85,6 +107,8 @@ int main() {
         { "test_while", test_while },
         { "test_def", test_def },
         { "test_fn", test_fn },
+        { "test_let", test_let },
+        { "test_catch", test_catch },
         { 0 },
     };
     run_tests("test_eval.c", tests);

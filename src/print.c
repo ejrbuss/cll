@@ -22,7 +22,7 @@ static obj * list_to_string(obj * list, obj * left, obj * right) {
 
 static obj * error_to_string(obj * error) {
     prepare_stack();
-    obj * error_map = error_to_map(error);
+    obj * error_map = error_to_dict(error);
     obj * type = naive_get(lkeyword("type"), error_map);
     obj * message = naive_get(lkeyword("message"), error_map);
     obj * stack = naive_get(lkeyword("stack"), error_map);
@@ -31,12 +31,10 @@ static obj * error_to_string(obj * error) {
         cons(type, cons(message, nil))
     );
     obj * stack_string = lstring("");
+    obj * join = lstring("\n at ");
     while(stack != nil) {
-        stack_string = format(
-            lstring("{}\n  at {}"),
-            cons(stack_string, cons(print(car(stack)), nil))
-        );
-        stack = cdr(stack);
+        stack_string = cat(cat(stack_string, join), print(FAST_CAR(stack)));
+        stack = FAST_CDR(stack);
     }
     obj * error_string = cat(header, stack_string);
     return return_from_stack(error_string);
@@ -68,7 +66,7 @@ obj * print(obj * o) {
             return return_from_stack(number_to_string(o));
         case type_list:
             return return_from_stack(list_to_string(o, lstring("("), lstring(")")));
-        case type_map:
+        case type_dict:
             return return_from_stack(list_to_string(o, lstring("{"), lstring("}")));
         case type_macro:
             return return_from_stack(lstring("<macro>"));

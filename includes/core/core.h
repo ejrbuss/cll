@@ -10,7 +10,7 @@
 #include "io.h"
 #include "list.h"
 #include "logic.h"
-#include "map.h"
+#include "dict.h"
 #include "nmath.h"
 #include "references.h"
 #include "str.h"

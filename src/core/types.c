@@ -13,7 +13,7 @@ obj * type_of(obj * o) {
         case type_number:    return lkeyword("number");
         case type_list:      return lkeyword("list");
         case type_macro:     return lkeyword("macro");
-        case type_map:       return lkeyword("map");
+        case type_dict:      return lkeyword("dictionary");
         case type_function:
         case type_native_function:
             return lkeyword("function");

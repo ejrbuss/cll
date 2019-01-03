@@ -18,7 +18,7 @@ obj * car(obj * list) {
     switch(list->type) {
         case type_error:
         case type_list:
-        case type_map:
+        case type_dict:
         case type_macro:
         case type_function:
             return list->car;
@@ -48,7 +48,7 @@ obj * cdr(obj * list) {
     switch(list->type) {
         case type_error:
         case type_list:
-        case type_map:
+        case type_dict:
         case type_macro:
         case type_function:
             return list->cdr;
@@ -90,7 +90,7 @@ obj * reverse(obj * list) {
     }
     switch(list->type) {
         case type_list:
-        case type_map:
+        case type_dict:
             break;
         default:
             return THROW_FN_ARG("reverse", 1, "an iterable", list);
@@ -124,7 +124,7 @@ obj * in(obj * item, obj * list) {
     prepare_stack();
     switch(list->type) {
         case type_list:
-        case type_map:
+        case type_dict:
             while (list != nil) {
                 if (equal(item, FAST_CAR(list))) {
                     return return_from_stack(lkeyword("true"));
@@ -156,7 +156,7 @@ static obj * native_in(obj * args) {
 obj * count(obj * list) {
     switch(list->type) {
         case type_list:
-        case type_map:
+        case type_dict:
             break;
         case type_string:
             return number(list->length);

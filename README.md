@@ -45,11 +45,8 @@ cll>(time-it (fib 31))
 
 
 ## TODO
-- Testing
-  - Eval test (define how errors should behave)
-- Meta system
+- Testing (cll asser and test file)
 - Documentation
-- Syntax highlighting extension
 - Docs site
 - Performance (benchmarking)
 - Self hosting?

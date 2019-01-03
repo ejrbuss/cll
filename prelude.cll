@@ -27,6 +27,35 @@
     (let { __time_it_1 (time) }
       (- __time_it_1 __time_it_0))))
 
+(defmacro assert [mode & args]
+  (cond
+    (= mode :true) (let { condition (car args) }
+      ~'(if (not ~condition)
+        (throw :Assertion-Error (str-fmt "Expected `{}`!" '~(car args)))))
+    (= mode :false) (let { condition (car args) }
+      ~'(if (not ~condition)
+        (throw :Assertion-Error (str-fmt "Expected not `{}`!" '~(car args)))))
+    (= mode :equal) (let { a (car args) b (car (cdr args)) }
+      ~'(if (not (= ~a ~b))
+        (throw :Assertion-Error (str-fmt "Expected `{}` to equal `{}`!" ~a ~b))))
+    (= mode :not-equal) (let { a (car args) b (car (cdr args)) }
+      ~'(if (= ~a ~b)
+        (throw :Assertion-Error (str-fmt "Expected `{}` to equal `{}`!" ~a ~b))))
+    :else (throw :Parameter-Error 
+      (str-fmt "`assert` expected a mode (:true, :false, :equal) but received `{}`", mode))))
+
+;; Docs
+
+(def docs-dict (ref {}))
+
+(defmacro defdoc [f docstr]
+  (set! docs-dict (assoc f docstr @docs-dict)))
+
+(defmacro doc [f]
+  (if (in f @docs-dict)
+    (println (@docs-dict f))
+    (throw :Lookup-Error (str-fmt "No docs have been defined for `{}`!" f))))
+
 ;; Functions
 ;; ---------
 
@@ -46,7 +75,7 @@
       (set! r (f @r x))) iter)
     @r))
 
-(defn fmap [f iter]
+(defn map [f iter]
   (let { r (ref nil) }
     (each (fn [x idx]
       (set! r (cons (f x idx) @r))) iter)
@@ -113,8 +142,8 @@
 (defn list? [o]
   (= (type-of o) :list))
 
-(defn map? [o]
-  (= (type-of o) :map))
+(defn dictionary? [o]
+  (= (type-of o) :dictionary))
 
 (defn macro? [o]
   (= (type-of o) :macro))
@@ -146,3 +175,5 @@
 
 (defn != [x y] 
   (not (= x y)))
+
+(defn my-quote)

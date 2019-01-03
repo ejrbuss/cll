@@ -2,9 +2,9 @@
 #include "eval.h"
 
 /**
- * Call fn with the provided arg. Key words will look themselvese up on their
- * first argument. Maps will look up their first arguments. Native functions 
- * will be called. Functions are evaluated. All other types produce an error.
+ * Call fn with the provided arg. Keywords look themselvese up on their
+ * first argument. Dictionaries look up their first arguments. Native functions 
+ * are called. Functions are evaluated. All other types produce an error.
  * 
  * @param   obj * fn the function to call
  * @param   obj * args args to provide the function
@@ -17,7 +17,7 @@ obj * call(obj * fn, obj * args) {
     switch (fn->type) {            
         case type_keyword:
             return get(fn, car(args), car(cdr(args)));
-        case type_map:
+        case type_dict:
             return get(car(args), fn, car(cdr(args)));
         case type_native_function:
             return fn->native(args);

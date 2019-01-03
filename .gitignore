@@ -1,6 +1,7 @@
 # Custom
 target/
 .vscode/
+.DS_Store
 
 # Prerequisites
 *.d

@@ -189,20 +189,20 @@ static obj * eval_list(obj * list, obj * env) {
     // front of the environment.  
     if (FAST_SYMBOL_EQ(op, "let")) {
         CHECK_FN_ARITY("let", 1, INFINITY, args);
-        obj * map = car(args);
+        obj * dict = car(args);
         args = cdr(args);
-        if (map != nil && map->type == type_list && FAST_SYMBOL_EQ(car(map), "map")) {
-            map = cdr(map);
-        } else if  (map != nil) {
-            CHECK_FN_ARG("let", 1, type_map, map);
+        if (dict != nil && dict->type == type_list && FAST_SYMBOL_EQ(car(dict), "dict")) {
+            dict = cdr(dict);
+        } else if  (dict != nil) {
+            CHECK_FN_ARG("let", 1, type_dict, dict);
         }
         obj * let_env = env;
-        while(map != nil) {
-            obj * k = FAST_CAR(map);
-            obj * v = eval(FAST_CAR(FAST_CDR(map)), let_env);
+        while(dict != nil) {
+            obj * k = FAST_CAR(dict);
+            obj * v = eval(FAST_CAR(FAST_CDR(dict)), let_env);
             RETURN_ON_ERROR(v);
             let_env = naive_assoc(k, v, let_env);
-            map = FAST_CDR(FAST_CDR(map));
+            dict = FAST_CDR(FAST_CDR(dict));
         }
         obj * o = nil;
         while(args) {
@@ -214,6 +214,10 @@ static obj * eval_list(obj * list, obj * env) {
     }
 
     // Special form: catch
+    // Allows a handler to "catch" an error returned by potentially dangerous 
+    // code. The handler can either be a function, in which case it is passed
+    // the error, or a dictionary that maps error types, to different handler 
+    // functions.
     if (FAST_SYMBOL_EQ(op, "catch")) {
         CHECK_FN_ARITY("catch", 2, 2, args);
         obj * dangerous = FAST_CAR(args);
@@ -222,12 +226,15 @@ static obj * eval_list(obj * list, obj * env) {
         if (o == nil || o->type != type_error) {
             return return_from_stack(o);
         }
-        obj * err_map = error_to_map(o);
+        obj * err_map = error_to_dict(o);
         obj * err_type = get(lkeyword("type"), err_map, nil);
         obj * handler = eval(car(args), env);
         RETURN_ON_ERROR(handler);
-        if (handler != nil && handler->type == type_map) {
+        if (handler != nil && handler->type == type_dict) {
             handler = get(err_type, handler, nil);
+            if (handler == nil) {
+                return return_from_stack(o);
+            }
         }
         if (handler != nil && (
             handler->type == type_function || 

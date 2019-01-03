@@ -79,5 +79,5 @@ extern obj * init_type_error(obj * name, obj * n, type t, obj * arg);
 extern obj * init_fn_error(obj * name, obj * n, obj * expected, obj * arg);
 
 extern obj * error_format(obj * type, obj * fmt, obj * args);
-extern obj * error_to_map(obj * error);
+extern obj * error_to_dict(obj * error);
 extern obj * error_of_type(obj * error, obj * type, obj * message);

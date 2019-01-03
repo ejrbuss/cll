@@ -33,8 +33,8 @@ obj * init_type_error(obj * name, obj * n, type t, obj * arg) {
         "string",
         "number",
         "list",
-        "map",
-        "map",
+        "dictionary",
+        "dictionary",
         "macro",
         "function",
         "function",
@@ -62,7 +62,7 @@ obj * error_format(obj * type, obj * fmt, obj * args) {
     return return_from_stack(error(type, print_format(fmt, args)));
 }
 
-obj * error_to_map(obj * error) {
+obj * error_to_dict(obj * error) {
     prepare_stack();
     obj * stack = nil;
     while(error != nil) {
@@ -82,7 +82,7 @@ obj * error_to_map(obj * error) {
 
 extern obj * error_of_type(obj * error, obj * type, obj * message) {
     prepare_stack();
-    obj * error_dict = error_to_map(error);
+    obj * error_dict = error_to_dict(error);
     obj * t = get(lkeyword("type"), error_dict, nil);
     obj * m = get(lkeyword("message"), error_dict, nil);
     if (type == nil || equal(type, t)) {

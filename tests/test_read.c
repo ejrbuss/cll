@@ -106,11 +106,11 @@ void test_map() {
     prepare_stack();
     assert(equal(
         print(read(lstring("{:key \"value\"}"))),
-        lstring("(map :key \"value\")")
+        lstring("(dict :key \"value\")")
     ) != nil);
     assert(equal(
         print(read(lstring("{1 2 :list (1 2 3 {})}"))),
-        lstring("(map 1 2 :list (1 2 3 (map)))")
+        lstring("(dict 1 2 :list (1 2 3 (dict)))")
     ) != nil);
     return_from_stack(nil);
 }

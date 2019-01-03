@@ -28,7 +28,7 @@ enum type {
     type_string          = 4,
     type_number          = 5,
     type_list            = 6,
-    type_map             = 7,
+    type_dict             = 7,
     type_hash_map        = 8,
     type_macro           = 9,
     type_function        = 10,
@@ -118,8 +118,8 @@ extern obj * string(char * s, int copy, int own);
 extern obj * number(double n);
 extern obj * cons(obj * x, obj * list);
 extern obj * rev_cons(obj * list, obj * x);
-extern obj * naive_assoc(obj * key, obj * val, obj * map);
+extern obj * naive_assoc(obj * key, obj * val, obj * dict);
 extern obj * macro(obj * eenv, obj * args, obj * body);
 extern obj * fn(obj * env, obj * args, obj * body);
 extern obj * native(obj * (*fn)(obj *));
-extern obj * hash_map_obj(hash_map *);
+extern obj * hash_map_obj(hash_map * h);

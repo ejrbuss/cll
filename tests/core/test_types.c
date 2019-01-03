@@ -13,7 +13,7 @@ void test_type_of() {
     assert(equal(type_of(ceval("\"hello\"")), ceval(":string")));
     assert(equal(type_of(ceval("4")), ceval(":number")));
     assert(equal(type_of(ceval("[1 2 3]")), ceval(":list")));
-    assert(equal(type_of(ceval("{:x 4}")), ceval(":map")));
+    assert(equal(type_of(ceval("{:x 4}")), ceval(":dictionary")));
     assert(equal(type_of(ceval("+")), ceval(":function")));
     assert(equal(type_of(ceval("(fn [x] x)")), ceval(":function")));
     return_from_stack(nil);

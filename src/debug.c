@@ -15,7 +15,7 @@ char * type_names[] = {
     "string         ",
     "number         ",
     "list           ",
-    "map            ",
+    "dictionary     ",
     "hash_map       ",
     "macro          ",
     "function       ",

@@ -50,7 +50,7 @@ static void gc_mark_recursive(obj * o) {
             break;
         case type_error:
         case type_list:
-        case type_map:
+        case type_dict:
         case type_macro:
         case type_function:
             gc_mark_recursive(o->car);
@@ -389,18 +389,19 @@ obj * rev_cons(obj * tail, obj * item) {
 }
 
 /**
- * Creates a new key value pair on a map (without checking for duplicate keys).
+ * Creates a new key value pair on a dictionary (without checking for duplicate 
+ * keys).
  * 
  * @param    obj * key the key
  * @param    obj * val the value
- * @retturns obj *     the map object
+ * @retturns obj *     the dictionary object
  */
-obj * naive_assoc(obj * key, obj * val, obj * map) {
+obj * naive_assoc(obj * key, obj * val, obj * dict) {
     prepare_stack();
-    obj * v = cons(val, map);
+    obj * v = cons(val, dict);
     obj * k = cons(key, v);
-    v->type = type_map;
-    k->type = type_map;
+    v->type = type_dict;
+    k->type = type_dict;
     return return_from_stack(k);
 }
 
