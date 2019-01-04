@@ -5,65 +5,65 @@
 
 void test_cat() {
     prepare_stack();
-    assert(equal(cat(ceval("\"abc\""), ceval("\"def\"")), ceval("\"abcdef\"")));
-    assert(equal(cat(ceval("\"a\""), ceval("\"bcdef\"")), ceval("\"abcdef\"")));
-    assert(equal(cat(ceval("\"abcde\""), ceval("\"f\"")), ceval("\"abcdef\"")));
+    assert(equal(cat(c_eval("\"abc\""), c_eval("\"def\"")), c_eval("\"abcdef\"")));
+    assert(equal(cat(c_eval("\"a\""), c_eval("\"bcdef\"")), c_eval("\"abcdef\"")));
+    assert(equal(cat(c_eval("\"abcde\""), c_eval("\"f\"")), c_eval("\"abcdef\"")));
     return_from_stack(nil);
 }
 
 void test_number_to_string() {
     prepare_stack();
-    assert(equal(number_to_string(ceval("4")), ceval("\"4\"")));
-    assert(equal(number_to_string(ceval("-3.14")), ceval("\"-3.14\"")));
-    assert(equal(number_to_string(ceval("0")), ceval("\"0\"")));
+    assert(equal(number_to_string(c_eval("4")), c_eval("\"4\"")));
+    assert(equal(number_to_string(c_eval("-3.14")), c_eval("\"-3.14\"")));
+    assert(equal(number_to_string(c_eval("0")), c_eval("\"0\"")));
     return_from_stack(nil);
 }
 
 void test_replace() {
     prepare_stack();
-    assert(equal(replace(ceval("\"abc\""), ceval("\"def\""), ceval("\"abcabcabc\"")), ceval("\"defabcabc\"")));
-    assert(equal(replace(ceval("\"ab\""), ceval("\"cd\""), ceval("\"ab\"")), ceval("\"cd\"")));
-    assert(equal(replace(ceval("\"\""), ceval("\"a\""), ceval("\"b\"")), ceval("\"ab\"")));
+    assert(equal(replace(c_eval("\"abc\""), c_eval("\"def\""), c_eval("\"abcabcabc\"")), c_eval("\"defabcabc\"")));
+    assert(equal(replace(c_eval("\"ab\""), c_eval("\"cd\""), c_eval("\"ab\"")), c_eval("\"cd\"")));
+    assert(equal(replace(c_eval("\"\""), c_eval("\"a\""), c_eval("\"b\"")), c_eval("\"ab\"")));
     return_from_stack(nil);
 }
 
 void test_replace_all() {
     prepare_stack();
-    assert(equal(replace_all(ceval("\"abc\""), ceval("\"def\""), ceval("\"abcabcabc\"")), ceval("\"defdefdef\"")));
-    assert(equal(replace_all(ceval("\"ab\""), ceval("\"cd\""), ceval("\"ab\"")), ceval("\"cd\"")));
-    assert(equal(replace_all(ceval("\"c\""), ceval("\"ab\""), ceval("\"cbc\"")), ceval("\"abbab\"")));
+    assert(equal(replace_all(c_eval("\"abc\""), c_eval("\"def\""), c_eval("\"abcabcabc\"")), c_eval("\"defdefdef\"")));
+    assert(equal(replace_all(c_eval("\"ab\""), c_eval("\"cd\""), c_eval("\"ab\"")), c_eval("\"cd\"")));
+    assert(equal(replace_all(c_eval("\"c\""), c_eval("\"ab\""), c_eval("\"cbc\"")), c_eval("\"abbab\"")));
     return_from_stack(nil);
 }
 
 void test_no_whitespace() {
     prepare_stack();
-    assert(equal(no_whitespace(ceval("\"a b\"")), ceval("\"ab\"")));
-    assert(equal(no_whitespace(ceval("\"a\tb\"")), ceval("\"ab\"")));
-    assert(equal(no_whitespace(ceval("\"a\nb\"")), ceval("\"ab\"")));
-    assert(equal(no_whitespace(ceval("\"a,b\"")), ceval("\"ab\"")));
-    assert(equal(no_whitespace(ceval("\"a \t\tb,, c\"")), ceval("\"abc\"")));
+    assert(equal(no_whitespace(c_eval("\"a b\"")), c_eval("\"ab\"")));
+    assert(equal(no_whitespace(c_eval("\"a\tb\"")), c_eval("\"ab\"")));
+    assert(equal(no_whitespace(c_eval("\"a\nb\"")), c_eval("\"ab\"")));
+    assert(equal(no_whitespace(c_eval("\"a,b\"")), c_eval("\"ab\"")));
+    assert(equal(no_whitespace(c_eval("\"a \t\tb,, c\"")), c_eval("\"abc\"")));
     return_from_stack(nil);
 }
 
 void test_split() {
     prepare_stack();
-    assert(equal(split(ceval("\",\""), ceval("\"a,bb,c\"")), ceval("[\"a\" \"bb\" \"c\"]")));
+    assert(equal(split(c_eval("\",\""), c_eval("\"a,bb,c\"")), c_eval("[\"a\" \"bb\" \"c\"]")));
     return_from_stack(nil);
 }
 
 void test_substr() {
     prepare_stack();
-    assert(equal(substr(ceval("0"), ceval("3"), ceval("\"abc\"")), ceval("\"abc\"")));
-    assert(equal(substr(ceval("1"), ceval("3"), ceval("\"abc\"")), ceval("\"bc\"")));
-    assert(equal(substr(ceval("2"), ceval("3"), ceval("\"abc\"")), ceval("\"c\"")));
-    assert(equal(substr(ceval("0"), ceval("1"), ceval("\"abc\"")), ceval("\"a\"")));
-    assert(equal(substr(ceval("0"), ceval("2"), ceval("\"abc\"")), ceval("\"ab\"")));
+    assert(equal(substr(c_eval("0"), c_eval("3"), c_eval("\"abc\"")), c_eval("\"abc\"")));
+    assert(equal(substr(c_eval("1"), c_eval("3"), c_eval("\"abc\"")), c_eval("\"bc\"")));
+    assert(equal(substr(c_eval("2"), c_eval("3"), c_eval("\"abc\"")), c_eval("\"c\"")));
+    assert(equal(substr(c_eval("0"), c_eval("1"), c_eval("\"abc\"")), c_eval("\"a\"")));
+    assert(equal(substr(c_eval("0"), c_eval("2"), c_eval("\"abc\"")), c_eval("\"ab\"")));
     return_from_stack(nil);
 }
 
 void test_fromat() {
     prepare_stack();
-    assert(equal(format(ceval("\"a {} b {} c {}\""), cons(ceval(":A"), cons(ceval(":B"), cons(ceval(":C"), nil)))), ceval("\"a :A b :B c :C\"")));
+    assert(equal(format(c_eval("\"a {} b {} c {}\""), cons(c_eval(":A"), cons(c_eval(":B"), cons(c_eval(":C"), nil)))), c_eval("\"a :A b :B c :C\"")));
     return_from_stack(nil);
 }
 

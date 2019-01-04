@@ -564,7 +564,7 @@
   (set_local $$2
    (get_local $$0)
   )
-  ;;@ ./src/read.c:319:0
+  ;;@ ./src/read.c:314:0
   (set_local $$3
    (get_local $$2)
   )
@@ -619,7 +619,7 @@
                               )
                              )
                              (block
-                              ;;@ ./src/read.c:321:0
+                              ;;@ ./src/read.c:316:0
                               (set_local $$6
                                (get_local $$2)
                               )
@@ -650,7 +650,7 @@
                            )
                           )
                           (block
-                           ;;@ ./src/read.c:325:0
+                           ;;@ ./src/read.c:320:0
                            (set_local $$10
                             (get_local $$2)
                            )
@@ -679,7 +679,7 @@
                           )
                          )
                          (block
-                          ;;@ ./src/read.c:327:0
+                          ;;@ ./src/read.c:322:0
                           (set_local $$14
                            (get_local $$2)
                           )
@@ -687,7 +687,7 @@
                            (get_local $$14)
                            (i32.const 1)
                           )
-                          ;;@ ./src/read.c:328:0
+                          ;;@ ./src/read.c:323:0
                           (set_local $$15
                            (get_local $$2)
                           )
@@ -703,7 +703,7 @@
                          )
                         )
                         (block
-                         ;;@ ./src/read.c:330:0
+                         ;;@ ./src/read.c:325:0
                          (set_local $$17
                           (get_local $$2)
                          )
@@ -711,7 +711,7 @@
                           (get_local $$17)
                           (i32.const 1)
                          )
-                         ;;@ ./src/read.c:331:0
+                         ;;@ ./src/read.c:326:0
                          (set_local $$18
                           (get_local $$2)
                          )
@@ -727,7 +727,7 @@
                         )
                        )
                        (block
-                        ;;@ ./src/read.c:333:0
+                        ;;@ ./src/read.c:328:0
                         (set_local $$20
                          (get_local $$2)
                         )
@@ -735,7 +735,7 @@
                          (get_local $$20)
                          (i32.const 1)
                         )
-                        ;;@ ./src/read.c:334:0
+                        ;;@ ./src/read.c:329:0
                         (set_local $$21
                          (get_local $$2)
                         )
@@ -751,7 +751,7 @@
                        )
                       )
                       (block
-                       ;;@ ./src/read.c:336:0
+                       ;;@ ./src/read.c:331:0
                        (set_local $$23
                         (get_local $$2)
                        )
@@ -759,7 +759,7 @@
                         (get_local $$23)
                         (i32.const 1)
                        )
-                       ;;@ ./src/read.c:337:0
+                       ;;@ ./src/read.c:332:0
                        (set_local $$24
                         (get_local $$2)
                        )
@@ -775,7 +775,7 @@
                       )
                      )
                      (block
-                      ;;@ ./src/read.c:339:0
+                      ;;@ ./src/read.c:334:0
                       (set_local $$26
                        (get_local $$2)
                       )
@@ -783,7 +783,7 @@
                        (get_local $$26)
                        (i32.const 1)
                       )
-                      ;;@ ./src/read.c:340:0
+                      ;;@ ./src/read.c:335:0
                       (set_local $$27
                        (get_local $$2)
                       )
@@ -799,7 +799,7 @@
                      )
                     )
                     (block
-                     ;;@ ./src/read.c:342:0
+                     ;;@ ./src/read.c:337:0
                      (set_local $$29
                       (get_local $$2)
                      )
@@ -807,7 +807,7 @@
                       (get_local $$29)
                       (i32.const 1)
                      )
-                     ;;@ ./src/read.c:343:0
+                     ;;@ ./src/read.c:338:0
                      (set_local $$30
                       (get_local $$2)
                      )
@@ -823,7 +823,7 @@
                     )
                    )
                    (block
-                    ;;@ ./src/read.c:345:0
+                    ;;@ ./src/read.c:340:0
                     (set_local $$32
                      (get_local $$2)
                     )
@@ -864,7 +864,7 @@
                         )
                        )
                        (block
-                        ;;@ ./src/read.c:347:0
+                        ;;@ ./src/read.c:342:0
                         (set_local $$37
                          (get_local $$2)
                         )
@@ -872,7 +872,7 @@
                          (get_local $$37)
                          (i32.const 1)
                         )
-                        ;;@ ./src/read.c:348:0
+                        ;;@ ./src/read.c:343:0
                         (set_local $$38
                          (get_local $$2)
                         )
@@ -880,7 +880,7 @@
                          (get_local $$38)
                          (i32.const 1)
                         )
-                        ;;@ ./src/read.c:349:0
+                        ;;@ ./src/read.c:344:0
                         (set_local $$39
                          (get_local $$2)
                         )
@@ -896,7 +896,7 @@
                        )
                       )
                       (block
-                       ;;@ ./src/read.c:351:0
+                       ;;@ ./src/read.c:346:0
                        (set_local $$41
                         (get_local $$2)
                        )
@@ -904,7 +904,7 @@
                         (get_local $$41)
                         (i32.const 1)
                        )
-                       ;;@ ./src/read.c:352:0
+                       ;;@ ./src/read.c:347:0
                        (set_local $$42
                         (get_local $$2)
                        )
@@ -912,7 +912,7 @@
                         (get_local $$42)
                         (i32.const 1)
                        )
-                       ;;@ ./src/read.c:353:0
+                       ;;@ ./src/read.c:348:0
                        (set_local $$43
                         (get_local $$2)
                        )
@@ -928,7 +928,7 @@
                       )
                      )
                      (block
-                      ;;@ ./src/read.c:355:0
+                      ;;@ ./src/read.c:350:0
                       (set_local $$45
                        (get_local $$2)
                       )
@@ -936,7 +936,7 @@
                        (get_local $$45)
                        (i32.const 1)
                       )
-                      ;;@ ./src/read.c:356:0
+                      ;;@ ./src/read.c:351:0
                       (set_local $$46
                        (get_local $$2)
                       )
@@ -954,7 +954,7 @@
                    )
                   )
                   (block
-                   ;;@ ./src/read.c:359:0
+                   ;;@ ./src/read.c:354:0
                    (set_local $$48
                     (get_local $$2)
                    )
@@ -962,7 +962,7 @@
                     (get_local $$48)
                     (i32.const 1)
                    )
-                   ;;@ ./src/read.c:360:0
+                   ;;@ ./src/read.c:355:0
                    (set_local $$49
                     (get_local $$2)
                    )
@@ -979,7 +979,7 @@
                  )
                 )
                 (block
-                 ;;@ ./src/read.c:363:0
+                 ;;@ ./src/read.c:358:0
                  (set_local $$51
                   (get_local $$2)
                  )
@@ -1026,7 +1026,7 @@
                  (if
                   (get_local $$switch)
                   (block
-                   ;;@ ./src/read.c:374:0
+                   ;;@ ./src/read.c:369:0
                    (set_local $$57
                     (call $_parse_number
                      (get_local $$56)
@@ -1038,7 +1038,7 @@
                    (br $label$break$L1)
                   )
                   (block
-                   ;;@ ./src/read.c:376:0
+                   ;;@ ./src/read.c:371:0
                    (set_local $$58
                     (call $_parse_symbol
                      (get_local $$56)
@@ -1062,7 +1062,7 @@
        )
       )
       (block
-       ;;@ ./src/read.c:388:0
+       ;;@ ./src/read.c:383:0
        (set_local $$59
         (get_local $$2)
        )
@@ -1078,14 +1078,14 @@
       )
      )
      (block
-      ;;@ ./src/read.c:390:0
+      ;;@ ./src/read.c:385:0
       (set_local $$61
        (get_local $$2)
       )
       (call $_parse_comment
        (get_local $$61)
       )
-      ;;@ ./src/read.c:391:0
+      ;;@ ./src/read.c:386:0
       (set_local $$1
        (i32.const 0)
       )
@@ -1093,7 +1093,7 @@
      )
     )
     (block
-     ;;@ ./src/read.c:393:0
+     ;;@ ./src/read.c:388:0
      (set_local $$62
       (get_local $$2)
      )
@@ -1108,7 +1108,7 @@
     )
    )
   )
-  ;;@ ./src/read.c:396:0
+  ;;@ ./src/read.c:391:0
   (set_local $$64
    (get_local $$1)
   )
@@ -2264,9 +2264,9 @@
   (set_local $$2
    (get_local $$0)
   )
-  ;;@ ./src/read.c:134:0
+  ;;@ ./src/read.c:129:0
   (call $_prepare_stack)
-  ;;@ ./src/read.c:135:0
+  ;;@ ./src/read.c:130:0
   (set_local $$8
    (get_local $$2)
   )
@@ -2278,13 +2278,13 @@
   (set_local $$3
    (get_local $$9)
   )
-  ;;@ ./src/read.c:136:0
+  ;;@ ./src/read.c:131:0
   (set_local $$4
    (i32.const 0)
   )
   (loop $while-in
    (block $while-out
-    ;;@ ./src/read.c:137:0
+    ;;@ ./src/read.c:132:0
     (set_local $$10
      (get_local $$4)
     )
@@ -2343,7 +2343,7 @@
       (br $while-out)
      )
     )
-    ;;@ ./src/read.c:138:0
+    ;;@ ./src/read.c:133:0
     (set_local $$17
      (call $_next
       (get_local $$16)
@@ -2374,7 +2374,7 @@
       (br $while-out)
      )
     )
-    ;;@ ./src/read.c:141:0
+    ;;@ ./src/read.c:136:0
     (set_local $$25
      (get_local $$2)
     )
@@ -2402,7 +2402,7 @@
     (if
      (get_local $$28)
      (block
-      ;;@ ./src/read.c:142:0
+      ;;@ ./src/read.c:137:0
       (set_local $$29
        (get_local $$4)
       )
@@ -2428,12 +2428,12 @@
        (get_local $$32)
       )
      )
-     ;;@ ./src/read.c:144:0
+     ;;@ ./src/read.c:139:0
      (set_local $$4
       (i32.const 0)
      )
     )
-    ;;@ ./src/read.c:146:0
+    ;;@ ./src/read.c:141:0
     (set_local $$33
      (get_local $$2)
     )
@@ -2450,7 +2450,7 @@
     (i32.const 6)
    )
    (block
-    ;;@ ./src/read.c:139:0
+    ;;@ ./src/read.c:134:0
     (set_local $$20
      (get_local $$3)
     )
@@ -2481,7 +2481,7 @@
     (set_local $$1
      (get_local $$24)
     )
-    ;;@ ./src/read.c:163:0
+    ;;@ ./src/read.c:158:0
     (set_local $$81
      (get_local $$1)
     )
@@ -2498,7 +2498,7 @@
      (i32.const 11)
     )
     (block
-     ;;@ ./src/read.c:148:0
+     ;;@ ./src/read.c:143:0
      (set_local $$34
       (i32.load
        (get_local $$16)
@@ -2522,7 +2522,7 @@
      (set_local $$5
       (get_local $$38)
      )
-     ;;@ ./src/read.c:149:0
+     ;;@ ./src/read.c:144:0
      (set_local $$39
       (get_local $$5)
      )
@@ -2540,7 +2540,7 @@
      (set_local $$6
       (get_local $$41)
      )
-     ;;@ ./src/read.c:150:0
+     ;;@ ./src/read.c:145:0
      (set_local $$42
       (get_local $$6)
      )
@@ -2560,7 +2560,7 @@
        (get_local $$44)
       )
      )
-     ;;@ ./src/read.c:151:0
+     ;;@ ./src/read.c:146:0
      (set_local $$45
       (get_local $$6)
      )
@@ -2577,7 +2577,7 @@
        (get_local $$47)
       )
      )
-     ;;@ ./src/read.c:152:0
+     ;;@ ./src/read.c:147:0
      (set_local $$48
       (get_local $$6)
      )
@@ -2591,7 +2591,7 @@
      (set_local $$7
       (get_local $$49)
      )
-     ;;@ ./src/read.c:153:0
+     ;;@ ./src/read.c:148:0
      (set_local $$50
       (get_local $$2)
      )
@@ -2599,7 +2599,7 @@
       (get_local $$50)
       (i32.const 0)
      )
-     ;;@ ./src/read.c:155:0
+     ;;@ ./src/read.c:150:0
      (set_local $$51
       (call $_string
        (i32.const 5207)
@@ -2627,7 +2627,7 @@
      (set_local $$7
       (get_local $$54)
      )
-     ;;@ ./src/read.c:156:0
+     ;;@ ./src/read.c:151:0
      (set_local $$55
       (call $_string
        (i32.const 5212)
@@ -2655,7 +2655,7 @@
      (set_local $$7
       (get_local $$58)
      )
-     ;;@ ./src/read.c:157:0
+     ;;@ ./src/read.c:152:0
      (set_local $$59
       (call $_string
        (i32.const 5217)
@@ -2683,7 +2683,7 @@
      (set_local $$7
       (get_local $$62)
      )
-     ;;@ ./src/read.c:158:0
+     ;;@ ./src/read.c:153:0
      (set_local $$63
       (call $_string
        (i32.const 5220)
@@ -2711,7 +2711,7 @@
      (set_local $$7
       (get_local $$66)
      )
-     ;;@ ./src/read.c:159:0
+     ;;@ ./src/read.c:154:0
      (set_local $$67
       (call $_string
        (i32.const 5225)
@@ -2739,7 +2739,7 @@
      (set_local $$7
       (get_local $$70)
      )
-     ;;@ ./src/read.c:160:0
+     ;;@ ./src/read.c:155:0
      (set_local $$71
       (call $_string
        (i32.const 5228)
@@ -2767,7 +2767,7 @@
      (set_local $$7
       (get_local $$74)
      )
-     ;;@ ./src/read.c:161:0
+     ;;@ ./src/read.c:156:0
      (set_local $$75
       (call $_string
        (i32.const 5231)
@@ -2795,7 +2795,7 @@
      (set_local $$7
       (get_local $$78)
      )
-     ;;@ ./src/read.c:162:0
+     ;;@ ./src/read.c:157:0
      (set_local $$79
       (get_local $$7)
      )
@@ -2807,7 +2807,7 @@
      (set_local $$1
       (get_local $$80)
      )
-     ;;@ ./src/read.c:163:0
+     ;;@ ./src/read.c:158:0
      (set_local $$81
       (get_local $$1)
      )
@@ -2855,7 +2855,7 @@
   (set_local $$1
    (get_local $$0)
   )
-  ;;@ ./src/read.c:273:0
+  ;;@ ./src/read.c:268:0
   (set_local $$3
    (get_local $$1)
   )
@@ -2867,7 +2867,7 @@
   (set_local $$2
    (get_local $$4)
   )
-  ;;@ ./src/read.c:274:0
+  ;;@ ./src/read.c:269:0
   (set_local $$5
    (get_local $$2)
   )
@@ -2881,7 +2881,7 @@
    (get_local $$6)
    (i32.const 3)
   )
-  ;;@ ./src/read.c:275:0
+  ;;@ ./src/read.c:270:0
   (set_local $$7
    (get_local $$2)
   )
@@ -2944,13 +2944,13 @@
   (set_local $$2
    (get_local $$0)
   )
-  ;;@ ./src/read.c:166:0
+  ;;@ ./src/read.c:161:0
   (call $_prepare_stack)
-  ;;@ ./src/read.c:167:0
+  ;;@ ./src/read.c:162:0
   (set_local $$3
    (i32.const 0)
   )
-  ;;@ ./src/read.c:168:0
+  ;;@ ./src/read.c:163:0
   (set_local $$5
    (get_local $$2)
   )
@@ -2970,7 +2970,7 @@
   )
   (loop $while-in
    (block $while-out
-    ;;@ ./src/read.c:169:0
+    ;;@ ./src/read.c:164:0
     (set_local $$8
      (get_local $$2)
     )
@@ -3009,7 +3009,7 @@
       (br $while-out)
      )
     )
-    ;;@ ./src/read.c:170:0
+    ;;@ ./src/read.c:165:0
     (set_local $$13
      (i32.load
       (get_local $$12)
@@ -3044,7 +3044,7 @@
       (br $while-out)
      )
     )
-    ;;@ ./src/read.c:173:0
+    ;;@ ./src/read.c:168:0
     (set_local $$21
      (get_local $$2)
     )
@@ -3074,7 +3074,7 @@
     (i32.const 4)
    )
    (block
-    ;;@ ./src/read.c:171:0
+    ;;@ ./src/read.c:166:0
     (set_local $$17
      (get_local $$4)
     )
@@ -3099,7 +3099,7 @@
     (set_local $$1
      (get_local $$20)
     )
-    ;;@ ./src/read.c:177:0
+    ;;@ ./src/read.c:172:0
     (set_local $$28
      (get_local $$1)
     )
@@ -3116,12 +3116,12 @@
      (i32.const 6)
     )
     (block
-     ;;@ ./src/read.c:175:0
+     ;;@ ./src/read.c:170:0
      (call $_chomp
       (get_local $$12)
       (i32.const 1)
      )
-     ;;@ ./src/read.c:176:0
+     ;;@ ./src/read.c:171:0
      (set_local $$25
       (get_local $$3)
      )
@@ -3138,7 +3138,7 @@
      (set_local $$1
       (get_local $$27)
      )
-     ;;@ ./src/read.c:177:0
+     ;;@ ./src/read.c:172:0
      (set_local $$28
       (get_local $$1)
      )
@@ -3216,13 +3216,13 @@
   (set_local $$2
    (get_local $$0)
   )
-  ;;@ ./src/read.c:180:0
+  ;;@ ./src/read.c:175:0
   (call $_prepare_stack)
-  ;;@ ./src/read.c:181:0
+  ;;@ ./src/read.c:176:0
   (set_local $$3
    (i32.const 0)
   )
-  ;;@ ./src/read.c:182:0
+  ;;@ ./src/read.c:177:0
   (set_local $$7
    (get_local $$2)
   )
@@ -3242,7 +3242,7 @@
   )
   (loop $while-in
    (block $while-out
-    ;;@ ./src/read.c:183:0
+    ;;@ ./src/read.c:178:0
     (set_local $$10
      (get_local $$2)
     )
@@ -3281,7 +3281,7 @@
       (br $while-out)
      )
     )
-    ;;@ ./src/read.c:184:0
+    ;;@ ./src/read.c:179:0
     (set_local $$15
      (i32.load
       (get_local $$14)
@@ -3316,7 +3316,7 @@
       (br $while-out)
      )
     )
-    ;;@ ./src/read.c:187:0
+    ;;@ ./src/read.c:182:0
     (set_local $$23
      (get_local $$2)
     )
@@ -3328,7 +3328,7 @@
     (set_local $$5
      (get_local $$24)
     )
-    ;;@ ./src/read.c:188:0
+    ;;@ ./src/read.c:183:0
     (set_local $$25
      (get_local $$2)
     )
@@ -3340,7 +3340,7 @@
     (set_local $$6
      (get_local $$26)
     )
-    ;;@ ./src/read.c:189:0
+    ;;@ ./src/read.c:184:0
     (set_local $$27
      (get_local $$6)
     )
@@ -3374,7 +3374,7 @@
     (i32.const 4)
    )
    (block
-    ;;@ ./src/read.c:185:0
+    ;;@ ./src/read.c:180:0
     (set_local $$19
      (get_local $$4)
     )
@@ -3399,7 +3399,7 @@
     (set_local $$1
      (get_local $$22)
     )
-    ;;@ ./src/read.c:193:0
+    ;;@ ./src/read.c:188:0
     (set_local $$37
      (get_local $$1)
     )
@@ -3416,12 +3416,12 @@
      (i32.const 6)
     )
     (block
-     ;;@ ./src/read.c:191:0
+     ;;@ ./src/read.c:186:0
      (call $_chomp
       (get_local $$14)
       (i32.const 1)
      )
-     ;;@ ./src/read.c:192:0
+     ;;@ ./src/read.c:187:0
      (set_local $$32
       (call $_symbol
        (i32.const 6493)
@@ -3451,7 +3451,7 @@
      (set_local $$1
       (get_local $$36)
      )
-     ;;@ ./src/read.c:193:0
+     ;;@ ./src/read.c:188:0
      (set_local $$37
       (get_local $$1)
      )
@@ -3522,13 +3522,13 @@
   (set_local $$2
    (get_local $$0)
   )
-  ;;@ ./src/read.c:196:0
+  ;;@ ./src/read.c:191:0
   (call $_prepare_stack)
-  ;;@ ./src/read.c:197:0
+  ;;@ ./src/read.c:192:0
   (set_local $$3
    (i32.const 0)
   )
-  ;;@ ./src/read.c:198:0
+  ;;@ ./src/read.c:193:0
   (set_local $$5
    (get_local $$2)
   )
@@ -3548,7 +3548,7 @@
   )
   (loop $while-in
    (block $while-out
-    ;;@ ./src/read.c:199:0
+    ;;@ ./src/read.c:194:0
     (set_local $$8
      (get_local $$2)
     )
@@ -3587,7 +3587,7 @@
       (br $while-out)
      )
     )
-    ;;@ ./src/read.c:200:0
+    ;;@ ./src/read.c:195:0
     (set_local $$13
      (i32.load
       (get_local $$12)
@@ -3622,7 +3622,7 @@
       (br $while-out)
      )
     )
-    ;;@ ./src/read.c:203:0
+    ;;@ ./src/read.c:198:0
     (set_local $$21
      (get_local $$2)
     )
@@ -3652,7 +3652,7 @@
     (i32.const 4)
    )
    (block
-    ;;@ ./src/read.c:201:0
+    ;;@ ./src/read.c:196:0
     (set_local $$17
      (get_local $$4)
     )
@@ -3677,7 +3677,7 @@
     (set_local $$1
      (get_local $$20)
     )
-    ;;@ ./src/read.c:207:0
+    ;;@ ./src/read.c:202:0
     (set_local $$30
      (get_local $$1)
     )
@@ -3694,12 +3694,12 @@
      (i32.const 6)
     )
     (block
-     ;;@ ./src/read.c:205:0
+     ;;@ ./src/read.c:200:0
      (call $_chomp
       (get_local $$12)
       (i32.const 1)
      )
-     ;;@ ./src/read.c:206:0
+     ;;@ ./src/read.c:201:0
      (set_local $$25
       (call $_symbol
        (i32.const 7402)
@@ -3729,7 +3729,7 @@
      (set_local $$1
       (get_local $$29)
      )
-     ;;@ ./src/read.c:207:0
+     ;;@ ./src/read.c:202:0
      (set_local $$30
       (get_local $$1)
      )
@@ -3777,9 +3777,9 @@
   (set_local $$1
    (get_local $$0)
   )
-  ;;@ ./src/read.c:288:0
+  ;;@ ./src/read.c:283:0
   (call $_prepare_stack)
-  ;;@ ./src/read.c:289:0
+  ;;@ ./src/read.c:284:0
   (set_local $$2
    (call $_symbol
     (i32.const 5612)
@@ -3850,9 +3850,9 @@
   (set_local $$1
    (get_local $$0)
   )
-  ;;@ ./src/read.c:293:0
+  ;;@ ./src/read.c:288:0
   (call $_prepare_stack)
-  ;;@ ./src/read.c:294:0
+  ;;@ ./src/read.c:289:0
   (set_local $$2
    (call $_symbol
     (i32.const 5618)
@@ -3923,9 +3923,9 @@
   (set_local $$1
    (get_local $$0)
   )
-  ;;@ ./src/read.c:303:0
+  ;;@ ./src/read.c:298:0
   (call $_prepare_stack)
-  ;;@ ./src/read.c:304:0
+  ;;@ ./src/read.c:299:0
   (set_local $$2
    (call $_symbol
     (i32.const 5739)
@@ -3996,9 +3996,9 @@
   (set_local $$1
    (get_local $$0)
   )
-  ;;@ ./src/read.c:298:0
+  ;;@ ./src/read.c:293:0
   (call $_prepare_stack)
-  ;;@ ./src/read.c:299:0
+  ;;@ ./src/read.c:294:0
   (set_local $$2
    (call $_symbol
     (i32.const 5731)
@@ -4069,9 +4069,9 @@
   (set_local $$1
    (get_local $$0)
   )
-  ;;@ ./src/read.c:308:0
+  ;;@ ./src/read.c:303:0
   (call $_prepare_stack)
-  ;;@ ./src/read.c:309:0
+  ;;@ ./src/read.c:304:0
   (set_local $$2
    (call $_symbol
     (i32.const 7195)
@@ -4175,7 +4175,7 @@
   (set_local $$2
    (get_local $$0)
   )
-  ;;@ ./src/read.c:211:0
+  ;;@ ./src/read.c:206:0
   (set_local $$5
    (get_local $$2)
   )
@@ -4198,7 +4198,7 @@
   (set_local $$4
    (get_local $$7)
   )
-  ;;@ ./src/read.c:212:0
+  ;;@ ./src/read.c:207:0
   (set_local $$8
    (get_local $$4)
   )
@@ -4211,7 +4211,7 @@
   (if
    (get_local $$9)
    (block
-    ;;@ ./src/read.c:213:0
+    ;;@ ./src/read.c:208:0
     (set_local $$10
      (get_local $$2)
     )
@@ -4236,7 +4236,7 @@
     (set_local $$1
      (get_local $$13)
     )
-    ;;@ ./src/read.c:235:0
+    ;;@ ./src/read.c:230:0
     (set_local $$30
      (get_local $$1)
     )
@@ -4250,7 +4250,7 @@
   )
   (loop $label$continue$L5
    (block $label$break$L5
-    ;;@ ./src/read.c:217:0
+    ;;@ ./src/read.c:212:0
     (set_local $$14
      (get_local $$2)
     )
@@ -4299,7 +4299,7 @@
       (br $label$break$L5)
      )
     )
-    ;;@ ./src/read.c:228:0
+    ;;@ ./src/read.c:223:0
     (set_local $$19
      (get_local $$2)
     )
@@ -4362,7 +4362,7 @@
       (br $label$break$L5)
      )
     )
-    ;;@ ./src/read.c:231:0
+    ;;@ ./src/read.c:226:0
     (set_local $$29
      (get_local $$2)
     )
@@ -4379,7 +4379,7 @@
     (i32.const 5)
    )
    (block
-    ;;@ ./src/read.c:226:0
+    ;;@ ./src/read.c:221:0
     (set_local $$17
      (f64.load
       (get_local $$3)
@@ -4393,7 +4393,7 @@
     (set_local $$1
      (get_local $$18)
     )
-    ;;@ ./src/read.c:235:0
+    ;;@ ./src/read.c:230:0
     (set_local $$30
      (get_local $$1)
     )
@@ -4410,7 +4410,7 @@
      (i32.const 8)
     )
     (block
-     ;;@ ./src/read.c:229:0
+     ;;@ ./src/read.c:224:0
      (set_local $$27
       (f64.load
        (get_local $$3)
@@ -4424,7 +4424,7 @@
      (set_local $$1
       (get_local $$28)
      )
-     ;;@ ./src/read.c:235:0
+     ;;@ ./src/read.c:230:0
      (set_local $$30
       (get_local $$1)
      )
@@ -4510,7 +4510,7 @@
   (set_local $$1
    (get_local $$0)
   )
-  ;;@ ./src/read.c:238:0
+  ;;@ ./src/read.c:233:0
   (set_local $$7
    (get_local $$1)
   )
@@ -4524,7 +4524,7 @@
   )
   (loop $while-in
    (block $while-out
-    ;;@ ./src/read.c:240:0
+    ;;@ ./src/read.c:235:0
     (set_local $$9
      (get_local $$1)
     )
@@ -4549,7 +4549,7 @@
      (get_local $$12)
      (br $while-out)
     )
-    ;;@ ./src/read.c:241:0
+    ;;@ ./src/read.c:236:0
     (set_local $$13
      (get_local $$1)
     )
@@ -4580,7 +4580,7 @@
      )
      (br $while-out)
     )
-    ;;@ ./src/read.c:242:0
+    ;;@ ./src/read.c:237:0
     (set_local $$17
      (get_local $$1)
     )
@@ -4611,11 +4611,11 @@
      )
      (br $while-out)
     )
-    ;;@ ./src/read.c:244:0
+    ;;@ ./src/read.c:239:0
     (set_local $$3
      (i32.const 0)
     )
-    ;;@ ./src/read.c:245:0
+    ;;@ ./src/read.c:240:0
     (set_local $$21
      (get_local $$1)
     )
@@ -4659,7 +4659,7 @@
        )
       )
       (block
-       ;;@ ./src/read.c:254:0
+       ;;@ ./src/read.c:249:0
        (set_local $$3
         (i32.const 1)
        )
@@ -4667,7 +4667,7 @@
       )
      )
     )
-    ;;@ ./src/read.c:258:0
+    ;;@ ./src/read.c:253:0
     (set_local $$24
      (get_local $$3)
     )
@@ -4681,7 +4681,7 @@
      (get_local $$25)
      (br $while-out)
     )
-    ;;@ ./src/read.c:261:0
+    ;;@ ./src/read.c:256:0
     (set_local $$26
      (get_local $$1)
     )
@@ -4692,7 +4692,7 @@
     (br $while-in)
    )
   )
-  ;;@ ./src/read.c:263:0
+  ;;@ ./src/read.c:258:0
   (set_local $$27
    (get_local $$1)
   )
@@ -4719,7 +4719,7 @@
   (set_local $$4
    (get_local $$32)
   )
-  ;;@ ./src/read.c:264:0
+  ;;@ ./src/read.c:259:0
   (set_local $$33
    (get_local $$4)
   )
@@ -4737,7 +4737,7 @@
   (set_local $$5
    (get_local $$35)
   )
-  ;;@ ./src/read.c:265:0
+  ;;@ ./src/read.c:260:0
   (set_local $$36
    (get_local $$5)
   )
@@ -4757,7 +4757,7 @@
     (get_local $$38)
    )
   )
-  ;;@ ./src/read.c:266:0
+  ;;@ ./src/read.c:261:0
   (set_local $$39
    (get_local $$5)
   )
@@ -4774,7 +4774,7 @@
     (get_local $$41)
    )
   )
-  ;;@ ./src/read.c:267:0
+  ;;@ ./src/read.c:262:0
   (set_local $$42
    (get_local $$5)
   )
@@ -4788,14 +4788,14 @@
   (set_local $$6
    (get_local $$43)
   )
-  ;;@ ./src/read.c:268:0
+  ;;@ ./src/read.c:263:0
   (set_local $$44
    (get_local $$5)
   )
   (call $_free
    (get_local $$44)
   )
-  ;;@ ./src/read.c:269:0
+  ;;@ ./src/read.c:264:0
   (set_local $$45
    (get_local $$6)
   )
@@ -4842,7 +4842,7 @@
   )
   (loop $while-in
    (block $while-out
-    ;;@ ./src/read.c:282:0
+    ;;@ ./src/read.c:277:0
     (set_local $$2
      (get_local $$1)
     )
@@ -4913,7 +4913,7 @@
       (br $while-out)
      )
     )
-    ;;@ ./src/read.c:283:0
+    ;;@ ./src/read.c:278:0
     (set_local $$10
      (get_local $$1)
     )
@@ -4933,7 +4933,7 @@
     (set_global $STACKTOP
      (get_local $sp)
     )
-    ;;@ ./src/read.c:285:0
+    ;;@ ./src/read.c:280:0
     (return)
    )
   )
@@ -18546,9 +18546,9 @@
   (set_local $$1
    (get_local $$0)
   )
-  ;;@ ./src/interfaces.c:23:0
+  ;;@ ./src/interfaces.c:18:0
   (call $_prepare_stack)
-  ;;@ ./src/interfaces.c:24:0
+  ;;@ ./src/interfaces.c:19:0
   (set_local $$3
    (get_local $$1)
   )
@@ -18570,7 +18570,7 @@
   (set_local $$2
    (get_local $$6)
   )
-  ;;@ ./src/interfaces.c:25:0
+  ;;@ ./src/interfaces.c:20:0
   (set_local $$7
    (get_local $$2)
   )
@@ -18592,20 +18592,22 @@
    (get_local $$9)
   )
  )
- (func $_js_init (; 68 ;)
+ (func $_js_init (; 68 ;) (result i32)
   (local $label i32)
   (local $sp i32)
   (set_local $sp
    (get_global $STACKTOP)
   )
-  ;;@ ./src/interfaces.c:29:0
+  ;;@ ./src/interfaces.c:24:0
   (call $_init_vm
    (i32.const 128000)
   )
-  ;;@ ./src/interfaces.c:30:0
+  ;;@ ./src/interfaces.c:25:0
   (call $_init_env)
-  ;;@ ./src/interfaces.c:31:0
-  (return)
+  ;;@ ./src/interfaces.c:26:0
+  (return
+   (i32.const 1)
+  )
  )
  (func $_must_malloc (; 69 ;) (param $$0 i32) (result i32)
   (local $$1 i32)

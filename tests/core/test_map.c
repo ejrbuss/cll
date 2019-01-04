@@ -5,47 +5,47 @@
 
 void test_naive_get() {
     prepare_stack();
-    assert(equal(naive_get(ceval(":x"), ceval("{:x 4}")), ceval("4")));
-    assert(equal(naive_get(ceval("3"), ceval("{3 :y}")), ceval(":y")));
-    assert(equal(type_of(naive_get(ceval(":y"), ceval("{:x 4}"))), ceval(":error")));
-    assert(equal(type_of(naive_get(ceval(":y"), ceval("\"hello\""))), ceval(":error")));
+    assert(equal(naive_get(c_eval(":x"), c_eval("{:x 4}")), c_eval("4")));
+    assert(equal(naive_get(c_eval("3"), c_eval("{3 :y}")), c_eval(":y")));
+    assert(equal(type_of(naive_get(c_eval(":y"), c_eval("{:x 4}"))), c_eval(":error")));
+    assert(equal(type_of(naive_get(c_eval(":y"), c_eval("\"hello\""))), c_eval(":error")));
     return_from_stack(nil);
 }
 
 void test_get() {
     prepare_stack();
-    assert(equal(get(ceval(":x"), ceval("{:x 4}"), nil), ceval("4")));
-    assert(equal(get(ceval("3"), ceval("{3 :y}"), nil), ceval(":y")));
-    assert(equal(get(ceval(":x"), ceval("{:y 1}"), nil), nil));
-    assert(equal(get(ceval(":x"), ceval("{:y 1}"), ceval(":z")), ceval(":z")));
-    assert(equal(type_of(get(ceval(":y"), ceval("\"hello\""), nil)), ceval(":error")));
+    assert(equal(get(c_eval(":x"), c_eval("{:x 4}"), nil), c_eval("4")));
+    assert(equal(get(c_eval("3"), c_eval("{3 :y}"), nil), c_eval(":y")));
+    assert(equal(get(c_eval(":x"), c_eval("{:y 1}"), nil), nil));
+    assert(equal(get(c_eval(":x"), c_eval("{:y 1}"), c_eval(":z")), c_eval(":z")));
+    assert(equal(type_of(get(c_eval(":y"), c_eval("\"hello\""), nil)), c_eval(":error")));
     return_from_stack(nil);
 }
 
 void test_keys() {
     prepare_stack();
-    assert(equal(keys(ceval("{}")), nil));
-    assert(equal(keys(ceval("{:x 1 :y 2}")), ceval("[:x :y]")));
-    assert(equal(keys(ceval("{:x 1 :y 2 :z 3 :x 2}")), ceval("[:z :y :x]")));
+    assert(equal(keys(c_eval("{}")), nil));
+    assert(equal(keys(c_eval("{:x 1 :y 2}")), c_eval("[:x :y]")));
+    assert(equal(keys(c_eval("{:x 1 :y 2 :z 3 :x 2}")), c_eval("[:z :y :x]")));
     return_from_stack(nil);
 }
 
 void test_dissoc() {
     prepare_stack();
-    assert(equal(dissoc(ceval(":x"), ceval("{:x 4}")), nil));
-    assert(equal(dissoc(ceval(":y"), ceval("{:x 4 :z 5}")), ceval("{:x 4 :z 5}")));
-    assert(equal(dissoc(ceval(":z"), ceval("{:x 2 :z 5}")), ceval("{:x 2}")));
-    assert(equal(dissoc(ceval(":x"), ceval("{:x 4 :x 6 :x 5}")), nil));
+    assert(equal(dissoc(c_eval(":x"), c_eval("{:x 4}")), nil));
+    assert(equal(dissoc(c_eval(":y"), c_eval("{:x 4 :z 5}")), c_eval("{:x 4 :z 5}")));
+    assert(equal(dissoc(c_eval(":z"), c_eval("{:x 2 :z 5}")), c_eval("{:x 2}")));
+    assert(equal(dissoc(c_eval(":x"), c_eval("{:x 4 :x 6 :x 5}")), nil));
     return_from_stack(nil);
 }
 
 void test_assoc() {
     prepare_stack();
-    assert(equal(assoc(ceval(":x"), ceval("4"), nil), ceval("{:x 4}")));
-    assert(equal(assoc(ceval(":y"), ceval("3"), ceval("{:x 4 :z 5}")), ceval("{:x 4 :y 3 :z 5}")));
-    assert(equal(assoc(ceval(":z"), ceval("7"), ceval("{:x 2 :z 5}")), ceval("{:x 2 :z 7}")));
-    assert(equal(type_of(assoc(ceval(":y"), ceval("1"), ceval("[:y 5 :x 4]"))), ceval(":error")));
-    assert(equal(type_of(assoc(nil, nil, ceval("\"hello\""))), ceval(":error")));
+    assert(equal(assoc(c_eval(":x"), c_eval("4"), nil), c_eval("{:x 4}")));
+    assert(equal(assoc(c_eval(":y"), c_eval("3"), c_eval("{:x 4 :z 5}")), c_eval("{:x 4 :y 3 :z 5}")));
+    assert(equal(assoc(c_eval(":z"), c_eval("7"), c_eval("{:x 2 :z 5}")), c_eval("{:x 2 :z 7}")));
+    assert(equal(type_of(assoc(c_eval(":y"), c_eval("1"), c_eval("[:y 5 :x 4]"))), c_eval(":error")));
+    assert(equal(type_of(assoc(nil, nil, c_eval("\"hello\""))), c_eval(":error")));
     return_from_stack(nil);
 }
 

@@ -7,10 +7,10 @@ void test_set() {
     prepare_stack();
     obj * ref = reference(nil);
     assert(equal(ref->ref, nil));
-    set(ref, ceval("4"));
-    assert(equal(ref->ref, ceval("4")));
-    set(ref, ceval("[1 2 3]"));
-    assert(equal(ref->ref, ceval("[1 2 3]")));
+    set(ref, c_eval("4"));
+    assert(equal(ref->ref, c_eval("4")));
+    set(ref, c_eval("[1 2 3]"));
+    assert(equal(ref->ref, c_eval("[1 2 3]")));
     return_from_stack(nil);
 }
 

@@ -98,11 +98,7 @@ void parse_args(int argc, char ** argv) {
     }
 }
 
-int main(int argc, char ** argv) {
-#ifdef JS_BUILD
-    INIT_JS();
-#endif
-    parse_args(argc, argv);
+void repl() {
     printf("cll v%s repl\n\n", VERSION);
     for (;;) {
         char * line = wrap_readline("cll>");
@@ -116,6 +112,13 @@ int main(int argc, char ** argv) {
         puts(print(eval(read_form(source), nil))->string);
         return_from_stack(nil);
     }
-    free_vm();
+}
+
+int main(int argc, char ** argv) {
+    #ifndef JS_BUILD
+        parse_args(argc, argv);
+        repl();
+        free_vm();
+    #endif
     return EXIT_SUCCESS;
 }

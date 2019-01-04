@@ -2,6 +2,7 @@
 
 #include "obj.h"
 #include "debug.h"
+#include "interfaces.h"
 #include "print.h"
 #include "error.h"
 #include "fast.h"

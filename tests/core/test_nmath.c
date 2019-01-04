@@ -5,47 +5,47 @@
 
 void test_nmin() {
     prepare_stack();
-    assert(equal(nmin(ceval("4"), ceval("3")), ceval("3")));
-    assert(equal(nmin(ceval("-100"), ceval("3")), ceval("-100")));
+    assert(equal(nmin(c_eval("4"), c_eval("3")), c_eval("3")));
+    assert(equal(nmin(c_eval("-100"), c_eval("3")), c_eval("-100")));
     return_from_stack(nil);
 }
 
 void test_nmax() {
     prepare_stack();
-    assert(equal(nmax(ceval("4"), ceval("3")), ceval("4")));
-    assert(equal(nmax(ceval("-100"), ceval("3")), ceval("3")));
+    assert(equal(nmax(c_eval("4"), c_eval("3")), c_eval("4")));
+    assert(equal(nmax(c_eval("-100"), c_eval("3")), c_eval("3")));
     return_from_stack(nil);
 }
 
 void test_lt() {
     prepare_stack();
-    assert(lt(ceval("9"), ceval("122")));
-    assert(not(lt(ceval("4"), ceval("3"))));
-    assert(not(lt(ceval("pi"), ceval("pi"))));
+    assert(lt(c_eval("9"), c_eval("122")));
+    assert(not(lt(c_eval("4"), c_eval("3"))));
+    assert(not(lt(c_eval("pi"), c_eval("pi"))));
     return_from_stack(nil);
 }
 
 void test_lte() {
     prepare_stack();
-    assert(lte(ceval("9"), ceval("122")));
-    assert(not(lte(ceval("4"), ceval("3"))));
-    assert(lte(ceval("pi"), ceval("pi")));
+    assert(lte(c_eval("9"), c_eval("122")));
+    assert(not(lte(c_eval("4"), c_eval("3"))));
+    assert(lte(c_eval("pi"), c_eval("pi")));
     return_from_stack(nil);
 }
 
 void test_gt() {
     prepare_stack();
-    assert(not(gt(ceval("9"), ceval("122"))));
-    assert(gt(ceval("4"), ceval("3")));
-    assert(not(gt(ceval("pi"), ceval("pi"))));
+    assert(not(gt(c_eval("9"), c_eval("122"))));
+    assert(gt(c_eval("4"), c_eval("3")));
+    assert(not(gt(c_eval("pi"), c_eval("pi"))));
     return_from_stack(nil);
 }
 
 void test_gte() {
     prepare_stack();
-    assert(not(gte(ceval("9"), ceval("122"))));
-    assert(gte(ceval("4"), ceval("3")));
-    assert(gte(ceval("pi"), ceval("pi")));
+    assert(not(gte(c_eval("9"), c_eval("122"))));
+    assert(gte(c_eval("4"), c_eval("3")));
+    assert(gte(c_eval("pi"), c_eval("pi")));
     return_from_stack(nil);
 }
 

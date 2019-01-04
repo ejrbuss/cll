@@ -6,47 +6,47 @@
 void test_not() {
     prepare_stack();
     assert(not(nil));
-    assert(not(ceval("[]")));
-    assert(not(not(ceval("0"))));
-    assert(not(not(ceval("\"hello\""))));
-    assert(not(not(ceval("[1 2 3]"))));
+    assert(not(c_eval("[]")));
+    assert(not(not(c_eval("0"))));
+    assert(not(not(c_eval("\"hello\""))));
+    assert(not(not(c_eval("[1 2 3]"))));
     return_from_stack(nil);
 }
 
 void test_and() {
     prepare_stack();
-    assert(and(ceval("[1 2 3]"), ceval("\"hello\"")));
-    assert(not(and(ceval("[1 2 3]"), nil)));
-    assert(not(and(nil, ceval(":x"))));
+    assert(and(c_eval("[1 2 3]"), c_eval("\"hello\"")));
+    assert(not(and(c_eval("[1 2 3]"), nil)));
+    assert(not(and(nil, c_eval(":x"))));
     assert(not(and(nil, nil)));
     return_from_stack(nil);
 }
 
 void test_or() {
     prepare_stack();
-    assert(or(ceval("[1 2 3]"), ceval("\"hello\"")));
-    assert(or(ceval("[1 2 3]"), nil));
-    assert(or(nil, ceval(":x")));
+    assert(or(c_eval("[1 2 3]"), c_eval("\"hello\"")));
+    assert(or(c_eval("[1 2 3]"), nil));
+    assert(or(nil, c_eval(":x")));
     assert(not(or(nil, nil)));
     return_from_stack(nil);
 }
 
 void test_equal() {
     prepare_stack();
-    assert(equal(ceval("4"), ceval("4")));
-    assert(not(equal(ceval("6.13"), ceval("6"))));
-    assert(equal(ceval(":x"), ceval(":x")));
-    assert(not(equal(ceval(":y"), ceval(":Y"))));
-    assert(equal(ceval("\"hello\""), ceval("\"hello\"")));
-    assert(not(equal(ceval("\"test\""), ceval("\"tests\""))));
-    assert(not(equal(ceval("(ref nil)"), ceval("(ref nil)"))));
-    assert(not(equal(ceval("(ref \"test\")"), ceval("(ref :test)"))));
-    assert(equal(ceval("+"), ceval("+")));
-    assert(not(equal(ceval("(fn [x] x)"), ceval("(fn [x] x)"))));
-    assert(equal(ceval("[1 2 [3]]"), ceval("[1 2 [3]]")));
-    assert(not(equal(ceval("[[1] [2] 3]"), ceval("[[1] [2] [3]]"))));
-    assert(equal(ceval("{:x [{:y 2}] :y 2}"), ceval("{:y 2 :x [{:y 2}]}")));
-    assert(not(equal(ceval("{:x [:y :z]}"), ceval("{:x [:y :z 1]}"))));
+    assert(equal(c_eval("4"), c_eval("4")));
+    assert(not(equal(c_eval("6.13"), c_eval("6"))));
+    assert(equal(c_eval(":x"), c_eval(":x")));
+    assert(not(equal(c_eval(":y"), c_eval(":Y"))));
+    assert(equal(c_eval("\"hello\""), c_eval("\"hello\"")));
+    assert(not(equal(c_eval("\"test\""), c_eval("\"tests\""))));
+    assert(not(equal(c_eval("(ref nil)"), c_eval("(ref nil)"))));
+    assert(not(equal(c_eval("(ref \"test\")"), c_eval("(ref :test)"))));
+    assert(equal(c_eval("+"), c_eval("+")));
+    assert(not(equal(c_eval("(fn [x] x)"), c_eval("(fn [x] x)"))));
+    assert(equal(c_eval("[1 2 [3]]"), c_eval("[1 2 [3]]")));
+    assert(not(equal(c_eval("[[1] [2] 3]"), c_eval("[[1] [2] [3]]"))));
+    assert(equal(c_eval("{:x [{:y 2}] :y 2}"), c_eval("{:y 2 :x [{:y 2}]}")));
+    assert(not(equal(c_eval("{:x [:y :z]}"), c_eval("{:x [:y :z 1]}"))));
     return_from_stack(nil);
 }
 

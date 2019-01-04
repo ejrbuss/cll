@@ -17,13 +17,13 @@ void init_env() {
     // Protect g_env
     return_from_stack(hash_map_obj(g_env));
     prepare_stack();
-#ifndef JS_BUILD
-    // Load prelude
-    prepare_stack();
-    obj * o = ceval("(load \"prelude.cll\")");
-    EXIT_ON_ERROR("Error during prelude!\n%s", o);
-    return_from_stack(nil);
-#endif
+    #ifndef JS_BUILD
+        // Load prelude
+        prepare_stack();
+        obj * o = c_eval("(load \"prelude.cll\")");
+        EXIT_ON_ERROR("Error during prelude!\n%s", o);
+        return_from_stack(nil);
+    #endif
 }
 
 obj * destructure(obj * binding, obj * value, obj * env) {
@@ -379,9 +379,4 @@ obj * eval(obj * expr, obj * env) {
         case type_symbol: return eval_symbol(expr, env);
         default:          return expr;
     }
-}
-
-obj * ceval(char * source) {
-    prepare_stack();
-    return return_from_stack(eval(cread(source), nil));
 }

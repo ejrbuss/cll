@@ -12,11 +12,6 @@ obj * c_eval(char * source) {
     return return_from_stack(eval(c_read(source), nil));
 }
 
-void c_init(size_t memory) {
-    init_vm(memory);
-    init_env();
-}
-
 // JS interfaces
 
 char * js_eval(char * source) {

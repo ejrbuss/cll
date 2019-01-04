@@ -5,17 +5,17 @@
 
 void test_type_of() {
     prepare_stack();
-    assert(equal(type_of(nil), ceval(":nil")));
-    assert(equal(type_of(ceval("(ref nil)")), ceval(":reference")));
-    assert(equal(type_of(ceval("(throw nil)")), ceval(":error")));
-    assert(equal(type_of(ceval("(quote x)")), ceval(":symbol")));
-    assert(equal(type_of(ceval(":x")), ceval(":keyword")));
-    assert(equal(type_of(ceval("\"hello\"")), ceval(":string")));
-    assert(equal(type_of(ceval("4")), ceval(":number")));
-    assert(equal(type_of(ceval("[1 2 3]")), ceval(":list")));
-    assert(equal(type_of(ceval("{:x 4}")), ceval(":dictionary")));
-    assert(equal(type_of(ceval("+")), ceval(":function")));
-    assert(equal(type_of(ceval("(fn [x] x)")), ceval(":function")));
+    assert(equal(type_of(nil), c_eval(":nil")));
+    assert(equal(type_of(c_eval("(ref nil)")), c_eval(":reference")));
+    assert(equal(type_of(c_eval("(throw nil)")), c_eval(":error")));
+    assert(equal(type_of(c_eval("(quote x)")), c_eval(":symbol")));
+    assert(equal(type_of(c_eval(":x")), c_eval(":keyword")));
+    assert(equal(type_of(c_eval("\"hello\"")), c_eval(":string")));
+    assert(equal(type_of(c_eval("4")), c_eval(":number")));
+    assert(equal(type_of(c_eval("[1 2 3]")), c_eval(":list")));
+    assert(equal(type_of(c_eval("{:x 4}")), c_eval(":dictionary")));
+    assert(equal(type_of(c_eval("+")), c_eval(":function")));
+    assert(equal(type_of(c_eval("(fn [x] x)")), c_eval(":function")));
     return_from_stack(nil);
 }
 

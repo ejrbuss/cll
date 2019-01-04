@@ -125,11 +125,6 @@ obj * need_more_input(obj * source) {
     return return_from_stack(nil);
 }
 
-obj * cread(char * source) {
-    prepare_stack();
-    return return_from_stack(read_form(cstring(source)));
-}
-
 static obj * parse_string(char ** stream) {
     prepare_stack();
     char * start = *stream;

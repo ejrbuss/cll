@@ -5,7 +5,7 @@
 
 void test_file(char * load) {
     prepare_stack();
-    obj * o = ceval(load);
+    obj * o = c_eval(load);
     if (o != nil) {
         printf("\n%s\n", print(o)->string);
     }
