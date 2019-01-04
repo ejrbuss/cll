@@ -18,6 +18,18 @@ void * must_malloc(size_t bytes) {
     return ptr;
 }
 
+char * wrap_readline(char * prompt) {
+#ifdef JS_BUILD
+    panic("The JS build does not support IO!");
+#else
+    char * line = readline(prompt);
+    if (strlen(line) > 0) {
+        add_history(line);
+    }
+    return line;
+#endif
+}
+
 /**
  * Breakpoing catch b b
  */ 

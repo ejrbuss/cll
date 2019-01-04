@@ -1,6 +1,7 @@
 #include "ll.h"
 #include "core.h"
 #include "eval.h"
+#include "interfaces.h"
 
 #define check_option(o, f, v) (strcmp(o, f) == 0 || strcmp(o, v) == 0)
 
@@ -79,7 +80,7 @@ void parse_args(int argc, char ** argv) {
     }
     args = cons(lsymbol("list"), args);
     obj * args_def = format(lstring("(def io-args {})"), cons(args, nil));
-    obj * o = eval(read(args_def), nil);
+    obj * o = eval(read_form(args_def), nil);
     EXIT_ON_ERROR("Error during command line argument parsing!\n%s", o);
     return_from_stack(nil);
 
@@ -87,7 +88,7 @@ void parse_args(int argc, char ** argv) {
     if (program) {
         prepare_stack();
         obj * load_program = print_format(lstring("(load {})"), cons(cstring(program), nil));
-        o = eval(read(load_program), nil);
+        o = eval(read_form(load_program), nil);
         if (!interactive) {
             EXIT_ON_ERROR("%s", o);
             exit(EXIT_SUCCESS);
@@ -97,15 +98,10 @@ void parse_args(int argc, char ** argv) {
     }
 }
 
-char * wrap_readline(char * prompt) {
-    char * line = readline(prompt);
-    if (strlen(line) > 0) {
-        add_history(line);
-    }
-    return line;
-}
-
 int main(int argc, char ** argv) {
+#ifdef JS_BUILD
+    INIT_JS();
+#endif
     parse_args(argc, argv);
     printf("cll v%s repl\n\n", VERSION);
     for (;;) {
@@ -117,7 +113,7 @@ int main(int argc, char ** argv) {
             line = wrap_readline("..  ");
             source = cat(source, cat(lstring("\n"), pstring(line)));
         }
-        puts(print(eval(read(source), nil))->string);
+        puts(print(eval(read_form(source), nil))->string);
         return_from_stack(nil);
     }
     free_vm();

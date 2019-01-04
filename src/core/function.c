@@ -1,5 +1,4 @@
 #include "function.h"
-#include "eval.h"
 
 /**
  * Call fn with the provided arg. Keywords look themselvese up on their

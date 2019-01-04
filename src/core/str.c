@@ -266,7 +266,7 @@ static obj * native_format(obj * args) {
 }
 
 obj * str_to_num(obj * s) {
-    obj * n = read(s);
+    obj * n = read_form(s);
     RETURN_ON_ERROR(n);
     CHECK_FN_ARG_NS("str-to-num", 1, type_number, n);
     return n;

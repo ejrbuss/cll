@@ -6,6 +6,7 @@
 #include "error.h"
 #include "fast.h"
 #include "read.h"
+#include "eval.h"
 #include "function.h"
 #include "io.h"
 #include "list.h"

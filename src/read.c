@@ -66,7 +66,7 @@ static obj * parse(char ** stream);
  * @param   obj * source the source code string
  * @returns obj *        the read in object
  */
-obj * read(obj * source) {
+obj * read_form(obj * source) {
     prepare_stack();
     char * stream = source->string;
     obj * o = parse(&stream);
@@ -115,7 +115,7 @@ obj * need_more_input(obj * source) {
     prepare_stack();
     int save = DEBUG_PARSE;
     DEBUG_PARSE = 0;
-    obj * o = read(source);
+    obj * o = read_form(source);
     DEBUG_PARSE = save;
     if (o != nil && o->type == type_error) {
         if (error_of_type(o, lkeyword("Syntax-Error"), lstring("Unexpected end of input!"))) {
@@ -127,7 +127,7 @@ obj * need_more_input(obj * source) {
 
 obj * cread(char * source) {
     prepare_stack();
-    return return_from_stack(read(cstring(source)));
+    return return_from_stack(read_form(cstring(source)));
 }
 
 static obj * parse_string(char ** stream) {

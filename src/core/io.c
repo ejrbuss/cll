@@ -4,9 +4,9 @@ obj * io_input(obj * prompt) {
     prepare_stack();
     char * line;
     if (prompt != nil) {
-        line = readline(prompt->string);
+        line = wrap_readline(prompt->string);
     } else {
-        line = readline("");
+        line = wrap_readline("");
     }
     obj * o = pstring(line);
     return return_from_stack(o);

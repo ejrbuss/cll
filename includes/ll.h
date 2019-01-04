@@ -7,12 +7,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <stddef.h>
 #include <math.h>
 #include <time.h>
 
+#ifndef JS_BUILD
 #include <readline/readline.h>
 #include <readline/history.h>
+#endif
 
 // Macros
 // ------
@@ -71,4 +72,5 @@ extern int DEBUG_GC;
 #endif
 
 extern void * must_malloc(size_t bytes);
+extern char * wrap_readline(char * prompt);
 extern void b();

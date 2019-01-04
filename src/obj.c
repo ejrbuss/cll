@@ -240,6 +240,7 @@ obj * return_from_stack(obj * o) {
  *
  * returns obj * an allocated object
  */
+#include "debug.h"
 static obj * init_obj() {
     assert(g_vm != nil);
     obj * o = pool_alloc(g_vm->obj_pool);

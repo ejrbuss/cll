@@ -1,5 +1,4 @@
 #include "vmstat.h"
-#include "eval.h"
 
 obj * vm_stat() {
     prepare_stack();

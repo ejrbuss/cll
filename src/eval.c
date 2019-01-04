@@ -17,15 +17,16 @@ void init_env() {
     // Protect g_env
     return_from_stack(hash_map_obj(g_env));
     prepare_stack();
+#ifndef JS_BUILD
     // Load prelude
     prepare_stack();
     obj * o = ceval("(load \"prelude.cll\")");
     EXIT_ON_ERROR("Error during prelude!\n%s", o);
     return_from_stack(nil);
+#endif
 }
 
 obj * destructure(obj * binding, obj * value, obj * env) {
-    b();
     if (binding == nil) {
         return env;
     }
@@ -65,6 +66,7 @@ obj * destructure(obj * binding, obj * value, obj * env) {
 static obj * macro_expand(obj * op, obj * args) {
     prepare_stack();
     obj * o = call(op, args);
+    RETURN_ON_ERROR(o);
     if (o != nil && o->type == type_list) {
         op = FAST_CAR(o);
         args = FAST_CDR(o);
@@ -144,7 +146,9 @@ static obj * eval_list(obj * list, obj * env) {
     // argument.
     if (FAST_SYMBOL_EQ(op, "if")) {
         CHECK_FN_ARITY("if", 2, 3, args);
-        if (eval(FAST_CAR(args), env)) {
+        obj * cond = eval(FAST_CAR(args), env);
+        RETURN_ON_ERROR(cond);
+        if (cond) {
             return return_from_stack(eval(FAST_CAR(FAST_CDR(args)), env));
         } else {
             return return_from_stack(eval(car(cdr(FAST_CDR(args))), env));
@@ -291,14 +295,19 @@ static obj * eval_list(obj * list, obj * env) {
     // Eval operator
     op = eval(op, env);
 
+    if (op == nil) {
+        return_from_stack(THROW_FN_ARG("eval", 1, "a callable", op));
+    }
+
     // Propogate error
-    if (op != nil && op->type == type_error) {
+    if (op->type == type_error) {
         return return_from_stack(op);
     }
 
     // Expand macros
-    if (op != nil && op->type == type_macro) {
+    if (op->type == type_macro) {
         obj * expanded = macro_expand(op, args);
+        RETURN_ON_ERROR(expanded);
         if (DEBUG_MACROEXP) {
             printf("DEBUG MACROEXP\n  %s\n->\n  %s\n", 
                 print(list)->string, 
@@ -314,9 +323,7 @@ static obj * eval_list(obj * list, obj * env) {
     while (args != nil) {
         obj * next = eval(FAST_CAR(args), env);
         // If an argument is an error we need to propogate it
-        if (next != nil && next->type == type_error) {
-            return return_from_stack(next);
-        }
+        RETURN_ON_ERROR(next);
         // Otherwise put it onto the evaluated argument list
         FAST_REV_CONS(args_head, args_tail, next);
         args = FAST_CDR(args);

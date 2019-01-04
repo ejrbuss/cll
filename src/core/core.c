@@ -41,7 +41,7 @@ static obj * native_read(obj * args) {
     prepare_stack();
     CHECK_FN_ARITY("read", 1, 1, args);
     CHECK_FN_ARG("read", 1, type_string, FAST_CAR(args));
-    return return_from_stack(read(FAST_CAR(args)));
+    return return_from_stack(read_form(FAST_CAR(args)));
 }
 
 static obj * native_load(obj * args) {
