@@ -27,6 +27,15 @@ static obj * native_type_of(obj * args) {
     return type_of(FAST_CAR(args));
 }
 
+static obj * native_native(obj * args) {
+    CHECK_FN_ARITY_NS("native?", 1, 1, args);
+    if (FAST_CAR(args) != nil && FAST_CAR(args)->type == type_native_function) {
+        return lkeyword("true");
+    }
+    return nil;
+}
+
 void load_types(hash_map * env) {
     hash_map_assoc(env, "type-of", native(&native_type_of));
+    hash_map_assoc(env, "native?", native(&native_native));
 }

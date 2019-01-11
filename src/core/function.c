@@ -43,6 +43,22 @@ static obj * native_call(obj * args) {
     return call(FAST_CAR(args), car(FAST_CDR(args)));
 }
 
+static obj * native_function(obj * args) {
+    CHECK_FN_ARITY_NS("function", 3, 3, args);
+    if (FAST_CAR(args) != nil) {
+        CHECK_FN_ARG_NS("function", 1, type_list, FAST_CAR(args));
+    }
+    if (FAST_CAR(FAST_CDR(args)) != nil) {
+        CHECK_FN_ARG_NS("function", 2, type_list, FAST_CAR(FAST_CDR(args)));
+    }
+    return fn(
+        FAST_CAR(args),
+        FAST_CAR(FAST_CDR(args)),
+        FAST_CAR(FAST_CDR(FAST_CDR(args)))
+    );
+}
+
 void load_function(hash_map * env) {
     hash_map_assoc(env, "call", native(&native_call));
+    hash_map_assoc(env, "function", native(&native_function));
 }

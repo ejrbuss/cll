@@ -54,6 +54,7 @@ obj * destructure(obj * binding, obj * value, obj * env) {
                     return return_from_stack(naive_assoc(sym, value, env));
                 }
                 env = destructure(sym, car(value), env);
+                RETURN_ON_ERROR(env);
                 binding = FAST_CDR(binding);
                 value = cdr(value);
             }

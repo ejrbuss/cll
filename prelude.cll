@@ -159,6 +159,9 @@
 (defn function? [o]
   (= (type-of o) :function))
 
+(defn nil? [o]
+  (=(type-of o) :nil))
+
 ;; Math
 
 (defn even? [n] 

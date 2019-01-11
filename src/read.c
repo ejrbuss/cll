@@ -311,81 +311,83 @@ static obj * parse_deref(char ** stream) {
  * @returns obj *        the parsed object
  */
 obj * parse(char ** stream) {
-    switch (next(stream, 1)) {
-        case '\0':
-            return syntax_error(*stream, lstring("Unexpected end of input!"));
-        case ')':
-        case '}':
-        case ']':
-            return syntax_error(*stream, lstring("Unexpected character!"));
-        case '"':
-            chomp(stream, 1);
-            return parse_string(stream);
-        case ':':
-            chomp(stream, 1);
-            return parse_keyword(stream);
-        case '(':
-            chomp(stream, 1);
-            return parse_list(stream);
-        case '{':
-            chomp(stream, 1);
-            return parse_dict(stream);
-        case '[':
-            chomp(stream, 1);
-            return parse_list_macro(stream);
-        case '\'':
-            chomp(stream, 1);
-            return parse_quote(stream);
-        case '~':
-            switch(*(*stream + 1)) {
-                case '\'':
-                    chomp(stream, 1);
-                    chomp(stream, 1);
-                    return parse_quasi_quote(stream);
-                case '~':
-                    chomp(stream, 1);
-                    chomp(stream, 1);
-                    return parse_unquote_splice(stream);
-                default:
-                    chomp(stream, 1);
-                    return parse_unquote(stream);
-            }
-        case '@':
-            chomp(stream, 1);
-            return parse_deref(stream);
-        case '+':
-        case '-':
-            switch(*(*stream + 1)) {
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    return parse_number(stream);
-                default:
-                    return parse_symbol(stream);
-            }
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-            return parse_number(stream);
-        case ';':
-            parse_comment(stream);
-            return nil;
-        default:
-            return parse_symbol(stream);
+    for (;;) {
+        switch (next(stream, 1)) {
+            case '\0':
+                return syntax_error(*stream, lstring("Unexpected end of input!"));
+            case ')':
+            case '}':
+            case ']':
+                return syntax_error(*stream, lstring("Unexpected character!"));
+            case '"':
+                chomp(stream, 1);
+                return parse_string(stream);
+            case ':':
+                chomp(stream, 1);
+                return parse_keyword(stream);
+            case '(':
+                chomp(stream, 1);
+                return parse_list(stream);
+            case '{':
+                chomp(stream, 1);
+                return parse_dict(stream);
+            case '[':
+                chomp(stream, 1);
+                return parse_list_macro(stream);
+            case '\'':
+                chomp(stream, 1);
+                return parse_quote(stream);
+            case '~':
+                switch(*(*stream + 1)) {
+                    case '\'':
+                        chomp(stream, 1);
+                        chomp(stream, 1);
+                        return parse_quasi_quote(stream);
+                    case '~':
+                        chomp(stream, 1);
+                        chomp(stream, 1);
+                        return parse_unquote_splice(stream);
+                    default:
+                        chomp(stream, 1);
+                        return parse_unquote(stream);
+                }
+            case '@':
+                chomp(stream, 1);
+                return parse_deref(stream);
+            case '+':
+            case '-':
+                switch(*(*stream + 1)) {
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        return parse_number(stream);
+                    default:
+                        return parse_symbol(stream);
+                }
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                return parse_number(stream);
+            case ';':
+                parse_comment(stream);
+                continue;
+            default:
+                return parse_symbol(stream);
+        }
     }
     panic("Unreachable code execution!");
 }

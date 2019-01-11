@@ -1,0 +1,211 @@
+(def cll-VERSION "0.0.1 (meta)")
+
+(def cll-env (ref nil))
+
+(defn cll-main [args]
+  (cll-parse-args args)
+  (cll-repl))
+
+(defn cll-parse-args [args] 
+  nil)
+
+(defn cll-repl []
+  (println (str-fmt "cll v{} repl\n" cll-VERSION))
+  (while :true
+    (catch 
+      (let { line   (input "cll>") 
+             form   (read line)
+             result (cll-eval form) }
+        (println result))
+      (fn [err] (println (:type err) " " (:message err))))))
+
+(defn cll-eval [expr env]
+  (cond
+    (list? expr)   (cll-eval-list expr env)
+    (symbol? expr) (cll-eval-symbol expr env)
+    :else          expr))
+
+
+
+(defn cll-eval-list [[op & args] env]
+    (cond
+      (= 'quote op)
+        (car args)
+      (= 'quasi-quote op)
+        "TODO-quasi-quote"
+      (= 'macro op)
+        "TOOO-macro"
+      (= 'if op)
+        (if (cll-eval (car args)) 
+          (cll-eval (car (cdr args)))
+          (cll-eval (car (cdr (cdr args)))))
+      (= 'do op)
+        "TODO-do"
+      (= 'while op)
+        "TODO-while"
+      (= 'def op)
+        (set! cll-env (assoc 
+          (car args) 
+          (car (cdr args))
+          @cll-env))
+      (= 'let op)
+        "TODO-let"
+      (= 'catch op)
+        "TODO-catch"
+      (= 'fn op)
+        (let { [args body] args }
+          (function env args body))
+      :else 
+        (let { op   (cll-eval op env) 
+               args (map cll-eval args) }
+          (cll-call op args))))
+
+(defn cll-destructure [binding value env]
+  (cond
+    (nil? binding)
+      env
+    (symbol? binding)
+      (assoc binding value env)
+    (list? binding)
+      (let { binding (cond
+        (= 'dict (car binding))
+          (throw :Destructure-Error
+            (str-fmt "Ccannot destructure `{}` into `{}`!" value binding))
+        (= 'list (car binding)) 
+          (cdr binding)
+        :else 
+          binding)
+             ref-binding (ref binding) 
+             ref-value   (ref value)
+             ref-env     (ref env) }
+        (while @ref-binding
+          (set! ref-env (cll-destructure 
+            (car @ref-binding)
+            (car @ref-value)
+            @ref-env))
+          (apply! cdr ref-binding)
+          (apply! cdr ref-value))
+        @ref-env)))
+        
+(defn cll-call [op args]
+  (cond
+    (keyword? op)
+      (op args)
+    (dictionary? op)
+      (op args)
+    (native? op)
+      (call op args)
+    :else 
+      (let { fn-env (car op) 
+             fn-args (car (cdr op))
+             fn-body (car (cdr (cdr op))) }
+        (cll-eval fn-body (cll-destructure fn-args args fn-env)))))
+
+(defn cll-eval-symbol [symbol env]
+  (cond 
+    (in symbol env)      (get symbol env)
+    (in symbol @cll-env) (get symbol @cll-env)
+    :else                (throw :Lookup-Error (str-fmt "`{}` is not defined!" symbol))))
+
+;; Load core
+(set! cll-env {
+
+  ;; Core
+  'throw throw
+  'symbol symbol
+  'keyword keyword
+  'eval cll-eval
+  'read read
+  ; TODO 'load cll-load
+  ; TODO 'str-eval cll-str-eval
+  'nil nil
+  
+  ;; IO
+  'input input
+  'print print
+  'println println
+  'io-read io-read
+  'io-write io-write
+  'time time
+  'exit exit
+  
+  ;; Types
+  'type-of type-of
+  'native? native?
+  
+  ;; List
+  'list list
+  'car car
+  'cdr cdr
+  'cons cons
+  'in in
+  'count count
+  'reverse reverse
+  'concat concat
+
+  ;; Dict
+  'dict dict
+  'get get
+  'keys keys
+  'dissoc dissoc
+  'assoc assoc
+
+  ;; Logic
+  'not not
+  'and and
+  'or or
+  '= =
+  
+  ;; Math
+  'pi pi
+  'e e
+  '+ +
+  '- -
+  '* *
+  '/ /
+  'mod mod
+  'max max
+  'min min
+  '< <
+  '<= <=
+  '> >
+  '>= >=
+  'abs abs
+  'pow pow
+  'sin sin
+  'cos cos
+  'tan tan
+  'asin asin
+  'acos acos
+  'atan atan
+  'ceil ceil
+  'floor floor
+  'round round
+
+  ;; Referencces
+  'ref ref
+  'set! set!
+  'deref deref
+
+  ;; Strings
+  'str str
+  'str-replace str-replace
+  'str-replace-all str-replace-all
+  'str-no-whitespacee str-no-whitespace
+  'str-split str-split
+  'str-sub str-sub
+  'str-fmt str-fmt
+  'str-to-num str-to-num
+  'num-to-ascii num-to-ascii
+  'ascii-to-num ascii-to-num
+  'call cll-call
+  'function function
+
+  ;; VM-stat
+  'vm-stat vm-stat
+  'vm-force-gc vm-force-gc
+  'vm-debug-stack vm-debug-stack
+  'vm-debug-pool vm-debug-pool
+})
+
+(cll-main io-args)
